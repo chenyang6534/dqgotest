@@ -1,0 +1,150 @@
+2018-03-30T09:31:37+08:00 [dq] [I] [app.go:127] dq starting up
+2018-03-30T09:31:37+08:00 [dq] [I] [app.go:129] ---models:3
+2018-03-30T09:31:37+08:00 [dq] [I] [app.go:135] new model :Login
+2018-03-30T09:31:37+08:00 [dq] [I] [app.go:135] new model :Hall
+2018-03-30T09:31:37+08:00 [dq] [I] [app.go:135] new model :Game5G
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:31:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:36:39+08:00 [dq] [I] [app.go:127] dq starting up
+2018-03-30T09:36:39+08:00 [dq] [I] [app.go:129] ---models:3
+2018-03-30T09:36:39+08:00 [dq] [I] [app.go:135] new model :Login
+2018-03-30T09:36:39+08:00 [dq] [I] [app.go:135] new model :Hall
+2018-03-30T09:36:39+08:00 [dq] [I] [app.go:135] new model :Game5G
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-03-30T09:36:39+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-03-30T09:36:57+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T09:36:57+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgQuickLogin
+2018-03-30T09:36:57+08:00 [dq] [I] [loginAgent.go:160] ---------user login:24
+2018-03-30T09:36:57+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T09:36:57+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T09:36:58+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T09:36:58+08:00 [dq] [I] [hallAgent.go:232] --MsgType:CS_QuickGame
+2018-03-30T09:37:02+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T09:37:02+08:00 [dq] [I] [hallAgent.go:232] --MsgType:CS_QuickGameExit
+2018-03-30T09:37:33+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T09:37:33+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T09:37:33+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:24--
+2018-03-30T09:37:33+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T09:37:33+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T09:37:33+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T09:37:33+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T16:57:25+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T16:57:25+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgQuickLogin
+2018-03-30T16:57:25+08:00 [dq] [I] [loginAgent.go:160] ---------user login:24
+2018-03-30T16:57:25+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T16:57:25+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T16:57:26+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T16:57:26+08:00 [dq] [I] [hallAgent.go:232] --MsgType:CS_QuickGame
+2018-03-30T16:57:30+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T16:57:30+08:00 [dq] [I] [hallAgent.go:232] --MsgType:CS_QuickGameExit
+2018-03-30T16:57:32+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T16:57:32+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T16:57:32+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:24--
+2018-03-30T16:57:32+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T16:57:32+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T16:57:32+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T16:57:32+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"bMduqwdgaBV\/vuXBflcz0g==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:77] bMduqwdgaBV/vuXBflcz0g==
+2018-03-30T16:59:38+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T16:59:38+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T16:59:38+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:00:44+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:00:44+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:00:44+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:00:44+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:00:44+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:00:44+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:00:44+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"wZoSmQ4Dy7IEjIu8QJBHjA==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:77] wZoSmQ4Dy7IEjIu8QJBHjA==
+2018-03-30T17:04:00+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T17:04:00+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:04:00+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:06:47+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:06:47+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:06:47+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:06:47+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:06:47+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:06:47+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:06:47+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"ejiEjlnsLiCcPo7DksIyeQ==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:77] ejiEjlnsLiCcPo7DksIyeQ==
+2018-03-30T17:07:14+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T17:07:14+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:07:14+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:08:42+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:08:42+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:08:42+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:08:42+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:08:42+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:08:42+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:08:42+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"otIY6fWMeTX0Y14NVoAgYA==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:77] otIY6fWMeTX0Y14NVoAgYA==
+2018-03-30T17:09:16+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T17:09:16+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:09:16+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:10:39+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:10:39+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:10:39+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:10:39+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:10:39+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:10:39+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:10:39+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"bOHd50cwtnTD0Wl4ah9zKw==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:77] bOHd50cwtnTD0Wl4ah9zKw==
+2018-03-30T17:21:21+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T17:21:21+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:21:21+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:21:54+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:21:54+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:21:54+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:21:54+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:21:54+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:21:54+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:21:54+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:238] --MsgType:CS_MsgWeiXingLogin
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:69] {"session_key":"bOHd50cwtnTD0Wl4ah9zKw==","openid":"ot1fD5BWopBim40clP8b7WO6Ep5s"}
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:76] ot1fD5BWopBim40clP8b7WO6Ep5s
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:77] bOHd50cwtnTD0Wl4ah9zKw==
+2018-03-30T17:21:56+08:00 [dq] [I] [loginAgent.go:100] ---------user login:23
+2018-03-30T17:21:56+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:21:56+08:00 [dq] [I] [hallAgent.go:232] --MsgType:GetInfo
+2018-03-30T17:22:18+08:00 [dq] [I] [loginAgent.go:231] ----------login----readmsg---------
+2018-03-30T17:22:18+08:00 [dq] [I] [loginAgent.go:238] --MsgType:Disconnect
+2018-03-30T17:22:18+08:00 [dq] [I] [hallAgent.go:225] ----------Hall----readmsg---------
+2018-03-30T17:22:18+08:00 [dq] [I] [hallAgent.go:232] --MsgType:Disconnect
+2018-03-30T17:22:18+08:00 [dq] [I] [hallAgent.go:92] ----DoDisConnectData uid:23--
+2018-03-30T17:22:18+08:00 [dq] [I] [game5gAgent.go:257] ----------game5g----readmsg---------
+2018-03-30T17:22:18+08:00 [dq] [I] [game5gAgent.go:264] --MsgType:Disconnect

@@ -1,0 +1,135 @@
+2018-03-29T17:51:46+08:00 [dq] [I] [app.go:127] dq starting up
+2018-03-29T17:51:46+08:00 [dq] [I] [app.go:129] ---models:1
+2018-03-29T17:51:46+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-03-29T17:51:46+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-03-29T17:51:46+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-03-29T17:51:46+08:00 [dq] [I] [ws_server.go:117] ------Listen::1117
+2018-03-29T17:52:23+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-29T17:52:23+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-29T17:52:52+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-29T17:52:52+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-29T17:52:53+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-29T17:52:53+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-29T17:53:20+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-29T17:53:20+08:00 [dq] [I] [agent.go:43] ------readmsg len125:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-03-29T17:53:20+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-29T17:53:20+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-29T17:53:41+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-03-30T09:30:57+08:00 [dq] [I] [app.go:127] dq starting up
+2018-03-30T09:30:57+08:00 [dq] [I] [app.go:129] ---models:1
+2018-03-30T09:30:57+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-03-30T09:30:57+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-03-30T09:30:57+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-03-30T09:30:57+08:00 [dq] [I] [ws_server.go:117] ------Listen::1117
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Game5G\"}"}
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Game5G
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Hall\"}"}
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Hall
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-30T09:31:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-30T09:31:57+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T09:31:57+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-30T09:31:57+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T09:31:57+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Hall
+2018-03-30T09:31:57+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T09:31:57+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Game5G
+2018-03-30T09:34:01+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-30T09:34:01+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-30T09:36:34+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T09:36:34+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-30T09:36:35+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-30T09:36:35+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-30T09:36:38+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T09:36:38+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Hall\"}"}
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Hall
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Game5G\"}"}
+2018-03-30T09:36:39+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Game5G
+2018-03-30T09:36:57+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T09:36:57+08:00 [dq] [I] [agent.go:43] ------readmsg len125:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-03-30T09:36:57+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10000,"JsonData":""}
+2018-03-30T09:36:57+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-03-30T09:36:57+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10000,"JsonData":"{\"result\":1}"}
+2018-03-30T09:36:57+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":100,"MsgType":"GetInfo","ConnectId":10000,"JsonData":"{\"result\":1}"}
+2018-03-30T09:36:57+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10000,"JsonData":"{\"PlayerInfo\":{\"Uid\":24,\"Name\":\"xiaoming\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T09:36:58+08:00 [dq] [I] [agent.go:43] ------readmsg len56:{"ModeType":"Hall","MsgId":100,"MsgType":"CS_QuickGame"}
+2018-03-30T09:36:58+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_SerchPlayer","ConnectId":10000,"JsonData":""}
+2018-03-30T09:37:02+08:00 [dq] [I] [agent.go:43] ------readmsg len60:{"ModeType":"Hall","MsgId":100,"MsgType":"CS_QuickGameExit"}
+2018-03-30T09:37:02+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_QuickGameExit","ConnectId":10000,"JsonData":""}
+2018-03-30T09:37:33+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-03-30T09:37:33+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-03-30T16:57:25+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T16:57:25+08:00 [dq] [I] [agent.go:43] ------readmsg len125:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-03-30T16:57:25+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10001,"JsonData":""}
+2018-03-30T16:57:25+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-03-30T16:57:25+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10001,"JsonData":"{\"result\":1}"}
+2018-03-30T16:57:25+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":100,"MsgType":"GetInfo","ConnectId":10001,"JsonData":"{\"result\":1}"}
+2018-03-30T16:57:25+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10001,"JsonData":"{\"PlayerInfo\":{\"Uid\":24,\"Name\":\"xiaoming\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T16:57:26+08:00 [dq] [I] [agent.go:43] ------readmsg len56:{"ModeType":"Hall","MsgId":100,"MsgType":"CS_QuickGame"}
+2018-03-30T16:57:26+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_SerchPlayer","ConnectId":10001,"JsonData":""}
+2018-03-30T16:57:30+08:00 [dq] [I] [agent.go:43] ------readmsg len60:{"ModeType":"Hall","MsgId":100,"MsgType":"CS_QuickGameExit"}
+2018-03-30T16:57:30+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":100,"MsgType":"SC_QuickGameExit","ConnectId":10001,"JsonData":""}
+2018-03-30T16:57:32+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-03-30T16:57:32+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-03-30T16:59:38+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T16:59:38+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"003UU8F41rV63L1T7EG41Ja1F41UU8FP\",\"Name\":\"陈阳\"}"}
+2018-03-30T16:59:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10002,"JsonData":""}
+2018-03-30T16:59:38+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T16:59:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10002,"JsonData":"{\"result\":1}"}
+2018-03-30T16:59:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10002,"JsonData":"{\"result\":1}"}
+2018-03-30T16:59:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10002,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:00:44+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:00:44+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T17:04:00+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T17:04:00+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"003H0sHZ1ObaFZ0RxZJZ1GZAHZ1H0sHM\",\"Name\":\"陈阳\"}"}
+2018-03-30T17:04:00+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10003,"JsonData":""}
+2018-03-30T17:04:00+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T17:04:00+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10003,"JsonData":"{\"result\":1}"}
+2018-03-30T17:04:00+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10003,"JsonData":"{\"result\":1}"}
+2018-03-30T17:04:00+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10003,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:06:47+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:06:47+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T17:07:14+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T17:07:14+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"013u0LU52NLGmK0jsmS52wuoU52u0LUH\",\"Name\":\"陈阳\"}"}
+2018-03-30T17:07:14+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10004,"JsonData":""}
+2018-03-30T17:07:14+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T17:07:14+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10004,"JsonData":"{\"result\":1}"}
+2018-03-30T17:07:14+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10004,"JsonData":"{\"result\":1}"}
+2018-03-30T17:07:14+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10004,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:08:42+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:08:42+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T17:09:16+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T17:09:16+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"003pvf5W1osZsW0AQl7W10YU4W1pvf56\",\"Name\":\"陈阳\"}"}
+2018-03-30T17:09:16+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10005,"JsonData":""}
+2018-03-30T17:09:16+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T17:09:16+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10005,"JsonData":"{\"result\":1}"}
+2018-03-30T17:09:16+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10005,"JsonData":"{\"result\":1}"}
+2018-03-30T17:09:16+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10005,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:10:39+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:10:39+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T17:21:21+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T17:21:21+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"013TPQHv1Wl2k90RQPHv1MeYHv1TPQHT\",\"Name\":\"陈阳\"}"}
+2018-03-30T17:21:21+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10006,"JsonData":""}
+2018-03-30T17:21:21+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T17:21:21+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10006,"JsonData":"{\"result\":1}"}
+2018-03-30T17:21:21+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10006,"JsonData":"{\"result\":1}"}
+2018-03-30T17:21:21+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10006,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:21:54+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:21:54+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T17:21:56+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-03-30T17:21:56+08:00 [dq] [I] [agent.go:43] ------readmsg len144:{"ModeType":"Login","MsgId":100,"MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"003KAJCa0fXWfx1pwfBa0oqvCa0KAJC6\",\"Name\":\"陈阳\"}"}
+2018-03-30T17:21:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10007,"JsonData":""}
+2018-03-30T17:21:56+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-03-30T17:21:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_LoginResponse","ConnectId":10007,"JsonData":"{\"result\":1}"}
+2018-03-30T17:21:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":100,"MsgType":"GetInfo","ConnectId":10007,"JsonData":"{\"result\":1}"}
+2018-03-30T17:21:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":100,"MsgType":"SC_MsgHallInfo","ConnectId":10007,"JsonData":"{\"PlayerInfo\":{\"Uid\":23,\"Name\":\"陈阳\",\"Gold\":0,\"WinCount\":0,\"LoseCount\":0}}"}
+2018-03-30T17:22:18+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-03-30T17:22:18+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-03-30T18:07:17+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T18:07:17+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-03-30T18:07:17+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T18:07:17+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Hall
+2018-03-30T18:07:17+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-03-30T18:07:17+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Game5G
