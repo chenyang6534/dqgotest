@@ -1,0 +1,17 @@
+2018-04-03T14:57:36+08:00 [dq] [I] [app.go:127] dq starting up
+2018-04-03T14:57:36+08:00 [dq] [I] [app.go:129] ---models:3
+2018-04-03T14:57:36+08:00 [dq] [I] [app.go:135] new model :Login
+2018-04-03T14:57:36+08:00 [dq] [I] [app.go:135] new model :Hall
+2018-04-03T14:57:36+08:00 [dq] [I] [app.go:135] new model :Game5G
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-03T14:57:36+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-03T15:06:35+08:00 [dq] [D] [loginAgent.go:221] read message: read tcp 127.0.0.1:49154->127.0.0.1:1234: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-03T15:06:35+08:00 [dq] [D] [game5gAgent.go:247] read message: read tcp 127.0.0.1:49153->127.0.0.1:1234: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-03T15:06:35+08:00 [dq] [D] [hallAgent.go:215] read message: read tcp 127.0.0.1:49155->127.0.0.1:1234: wsarecv: An existing connection was forcibly closed by the remote host.

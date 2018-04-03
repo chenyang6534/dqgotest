@@ -1,0 +1,12 @@
+2018-04-03T12:29:59+08:00 [dq] [I] [app.go:127] dq starting up
+2018-04-03T12:29:59+08:00 [dq] [I] [app.go:129] ---models:1
+2018-04-03T12:29:59+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-04-03T12:29:59+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-04-03T12:29:59+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-03T12:29:59+08:00 [dq] [I] [ws_server.go:117] ------Listen::1117
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Game5G\"}"}
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Game5G
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Hall\"}"}
+2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Hall
