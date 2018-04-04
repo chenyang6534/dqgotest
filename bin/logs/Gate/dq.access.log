@@ -10,3 +10,88 @@
 2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Game5G
 2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Hall\"}"}
 2018-04-03T14:57:36+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Hall
+2018-04-04T10:01:00+08:00 [dq] [I] [app.go:127] dq starting up
+2018-04-04T10:01:00+08:00 [dq] [I] [app.go:129] ---models:1
+2018-04-04T10:01:00+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-04-04T10:01:00+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-04-04T10:01:00+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-04T10:01:00+08:00 [dq] [I] [ws_server.go:117] ------Listen::1117
+2018-04-04T10:06:19+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:06:31+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T10:16:54+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:18:39+08:00 [dq] [D] [agent.go:38] read message: read tcp 127.0.0.1:1117->127.0.0.1:63598: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-04T10:18:44+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:18:52+08:00 [dq] [D] [agent.go:38] read message: read tcp 127.0.0.1:1117->127.0.0.1:63612: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-04T10:19:30+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:19:31+08:00 [dq] [D] [agent.go:38] read message: read tcp 127.0.0.1:1117->127.0.0.1:63621: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-04T10:20:22+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:20:25+08:00 [dq] [D] [agent.go:38] read message: read tcp 127.0.0.1:1117->127.0.0.1:63627: wsarecv: An existing connection was forcibly closed by the remote host.
+2018-04-04T10:21:38+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:21:38+08:00 [dq] [I] [agent.go:43] ------readmsg len112:{"ModeType":"Gate","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"IOS\",\"MachineId\":\"123456789\"}"}
+2018-04-04T10:21:38+08:00 [dq] [I] [agent.go:56] you donnot login!!
+2018-04-04T10:22:29+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:22:29+08:00 [dq] [I] [agent.go:43] ------readmsg len112:{"ModeType":"Gate","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"IOS\",\"MachineId\":\"123456789\"}"}
+2018-04-04T10:22:29+08:00 [dq] [I] [agent.go:56] you donnot login!!
+2018-04-04T10:24:09+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:24:09+08:00 [dq] [I] [agent.go:43] ------readmsg len113:{"ModeType":"Login","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"IOS\",\"MachineId\":\"123456789\"}"}
+2018-04-04T10:24:09+08:00 [dq] [I] [agent.go:72] not find ModeType:Login
+2018-04-04T10:24:17+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T10:43:30+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-04-04T10:43:30+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-04-04T10:43:38+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:43:38+08:00 [dq] [I] [agent.go:43] ------readmsg len113:{"ModeType":"Login","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-04-04T10:43:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10008,"JsonData":""}
+2018-04-04T10:43:38+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-04-04T10:43:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":0,"MsgType":"SC_LoginResponse","ConnectId":10008,"JsonData":"{\"result\":1}"}
+2018-04-04T10:43:38+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":0,"MsgType":"GetInfo","ConnectId":10008,"JsonData":"{\"result\":1}"}
+2018-04-04T10:43:38+08:00 [dq] [I] [serverAgent.go:137] not find ModeType:Hall
+2018-04-04T10:43:54+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T10:43:54+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-04-04T10:44:20+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T10:44:20+08:00 [dq] [I] [agent.go:43] ------readmsg len113:{"ModeType":"Login","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-04-04T10:44:20+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10009,"JsonData":""}
+2018-04-04T10:44:20+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-04-04T10:44:20+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":0,"MsgType":"SC_LoginResponse","ConnectId":10009,"JsonData":"{\"result\":1}"}
+2018-04-04T10:44:20+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":0,"MsgType":"GetInfo","ConnectId":10009,"JsonData":"{\"result\":1}"}
+2018-04-04T10:44:20+08:00 [dq] [I] [serverAgent.go:137] not find ModeType:Hall
+2018-04-04T10:44:44+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T10:44:44+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-04-04T11:02:00+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T11:02:00+08:00 [dq] [I] [agent.go:43] ------readmsg len132:{"ModeType":"Login","MsgType":"CS_MsgWeiXingLogin","JsonData":"{\"Code\":\"013rPmz80CYBUH12O1w80QjCz80rPmzS\",\"Name\":\"陈阳\"}"}
+2018-04-04T11:02:01+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":23,"MsgId":0,"MsgType":"UserLogin","ConnectId":10010,"JsonData":""}
+2018-04-04T11:02:01+08:00 [dq] [I] [serverAgent.go:91] --login--:23
+2018-04-04T11:02:01+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":23,"MsgId":0,"MsgType":"SC_LoginResponse","ConnectId":10010,"JsonData":"{\"result\":1}"}
+2018-04-04T11:02:01+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":23,"MsgId":0,"MsgType":"GetInfo","ConnectId":10010,"JsonData":"{\"result\":1}"}
+2018-04-04T11:02:01+08:00 [dq] [I] [serverAgent.go:137] not find ModeType:Hall
+2018-04-04T11:02:24+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1001 (going away)
+2018-04-04T11:02:24+08:00 [dq] [I] [agent.go:112] --un login--:23
+2018-04-04T11:03:35+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T11:03:35+08:00 [dq] [I] [agent.go:43] ------readmsg len113:{"ModeType":"Login","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-04-04T11:03:35+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10011,"JsonData":""}
+2018-04-04T11:03:35+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-04-04T11:03:35+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":0,"MsgType":"SC_LoginResponse","ConnectId":10011,"JsonData":"{\"result\":1}"}
+2018-04-04T11:03:35+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":0,"MsgType":"GetInfo","ConnectId":10011,"JsonData":"{\"result\":1}"}
+2018-04-04T11:03:35+08:00 [dq] [I] [serverAgent.go:137] not find ModeType:Hall
+2018-04-04T11:03:42+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T11:03:42+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-04-04T11:03:56+08:00 [dq] [I] [ws_server.go:48] SvrConnHandler
+2018-04-04T11:03:56+08:00 [dq] [I] [agent.go:43] ------readmsg len113:{"ModeType":"Login","MsgType":"CS_MsgQuickLogin","JsonData":"{\"Platform\":\"ios\",\"MachineId\":\"123456789\"}"}
+2018-04-04T11:03:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":24,"MsgId":0,"MsgType":"UserLogin","ConnectId":10012,"JsonData":""}
+2018-04-04T11:03:56+08:00 [dq] [I] [serverAgent.go:91] --login--:24
+2018-04-04T11:03:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Client","Uid":24,"MsgId":0,"MsgType":"SC_LoginResponse","ConnectId":10012,"JsonData":"{\"result\":1}"}
+2018-04-04T11:03:56+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Hall","Uid":24,"MsgId":0,"MsgType":"GetInfo","ConnectId":10012,"JsonData":"{\"result\":1}"}
+2018-04-04T11:03:56+08:00 [dq] [I] [serverAgent.go:137] not find ModeType:Hall
+2018-04-04T11:04:13+08:00 [dq] [D] [agent.go:38] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-04T11:04:13+08:00 [dq] [I] [agent.go:112] --un login--:24
+2018-04-04T14:52:24+08:00 [dq] [I] [app.go:127] dq starting up
+2018-04-04T14:52:24+08:00 [dq] [I] [app.go:129] ---models:1
+2018-04-04T14:52:24+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-04-04T14:52:24+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-04-04T14:52:24+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-04T14:52:24+08:00 [dq] [I] [ws_server.go:118] ------Listen::1117
+2018-04-04T14:54:43+08:00 [dq] [I] [app.go:127] dq starting up
+2018-04-04T14:54:43+08:00 [dq] [I] [app.go:129] ---models:1
+2018-04-04T14:54:43+08:00 [dq] [I] [app.go:135] new model :Gate
+2018-04-04T14:54:43+08:00 [dq] [I] [gate.go:76] WSAddr::1117
+2018-04-04T14:54:43+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-04T14:54:43+08:00 [dq] [I] [ws_server.go:126] ------Listen::1117
