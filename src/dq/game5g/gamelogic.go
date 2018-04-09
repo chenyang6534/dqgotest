@@ -78,6 +78,7 @@ type Game5GLogic struct {
 
 func (game *Game5GLogic) Init() {
 	game.State = Game5GState_Wait
+	game.GameSeatIndex = -1
 	game.Observer = utils.NewBeeMap()
 	game.Lock = new(sync.Mutex)
 	game.Player[0] = nil
@@ -90,31 +91,44 @@ func (game *Game5GLogic) Init() {
 
 		}
 	}
-	game.QiPan[1][0] = 0
-	game.QiPan[1][1] = 0
-	game.QiPan[1][2] = 0
-	game.QiPan[1][3] = 0
+	//	game.QiPan[1][0] = 0
+	//	game.QiPan[1][1] = 0
+	//	game.QiPan[1][2] = 0
+	//	game.QiPan[1][3] = 0
 
-	game.QiPan[5][0] = 1
-	game.QiPan[5][1] = 1
-	game.QiPan[5][2] = 1
-	game.QiPan[5][3] = 1
+	//	game.QiPan[5][0] = 1
+	//	game.QiPan[5][1] = 1
+	//	game.QiPan[5][2] = 1
+	//	game.QiPan[5][3] = 1
 
 }
 
 func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
+	//基本数据
+	//	Uid       int
+	//	Name      string
+	//	Gold      int64
+	//	WinCount  int
+	//	LoseCount int
 
+	//	//游戏中数据
+	//	SeatIndex  int //座位号
+	//	PlayerType int //玩家类型 //玩家类型 1表示玩家 2表示旁观者
+	//	Time       int //剩余总时间
+	//	EveryTime  int //剩余的每次操作时间
 	//
 
 	jd := &datamsg.SC_PlayerGoIn{}
-	jd.PlayerType = player.PlayerType
-	jd.PlayerSeatIndex = player.SeatIndex
-	jd.PlayerInfo = datamsg.MsgPlayerInfo{}
+	jd.PlayerInfo = datamsg.MsgGame5GPlayerInfo{}
 	jd.PlayerInfo.Uid = player.Uid
 	jd.PlayerInfo.Name = player.Name
 	jd.PlayerInfo.Gold = player.Gold
 	jd.PlayerInfo.WinCount = player.WinCount
 	jd.PlayerInfo.LoseCount = player.LoseCount
+	jd.PlayerInfo.SeatIndex = player.SeatIndex
+	jd.PlayerInfo.PlayerType = player.PlayerType
+	jd.PlayerInfo.Time = player.Time
+	jd.PlayerInfo.EveryTime = game.EveryTime
 
 	game.sendMsgToAll("SC_PlayerGoIn", jd)
 
