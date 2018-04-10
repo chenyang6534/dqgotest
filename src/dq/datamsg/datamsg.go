@@ -11,6 +11,10 @@ var ClientMode = "Client" //客户端模块
 var HallMode = "Hall"     //大厅模块
 var Game5GMode = "Game5G" //五指棋游戏模块
 
+//消息类型
+var SC_Heart = "SC_Heart"
+var CS_Heart = "CS_Heart"
+
 type MsgBase struct {
 	ModeType  string
 	Uid       int

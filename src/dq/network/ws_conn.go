@@ -1,10 +1,13 @@
 package network
 
 import (
-	"errors"
 	"dq/log"
+	"dq/utils"
+	"errors"
 	"net"
 	"sync"
+	"time"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -16,10 +19,13 @@ type WSConn struct {
 	writeChan chan []byte
 	closeFlag bool
 	msgParser *MsgParser
+
+	ReadDataTime time.Duration
 }
 
 func newWSConn(conn *websocket.Conn, pendingWriteNum int, msgParser *MsgParser) *WSConn {
 	tcpConn := new(WSConn)
+	tcpConn.ReadDataTime = time.Duration(utils.Milliseconde())
 	tcpConn.conn = conn
 	tcpConn.writeChan = make(chan []byte, pendingWriteNum)
 	tcpConn.msgParser = msgParser
@@ -97,7 +103,7 @@ func (tcpConn *WSConn) Write(b []byte) {
 
 func (tcpConn *WSConn) Read(b []byte) (int, error) {
 	//return tcpConn.conn.Read(b)
-	return 0,errors.New("Read error")
+	return 0, errors.New("Read error")
 }
 
 func (tcpConn *WSConn) LocalAddr() net.Addr {
@@ -110,15 +116,18 @@ func (tcpConn *WSConn) RemoteAddr() net.Addr {
 
 func (tcpConn *WSConn) ReadMsg() ([]byte, error) {
 	//return tcpConn.msgParser.Read(tcpConn)
-	
+
 	_, b, err := tcpConn.conn.ReadMessage()
-	
-	
-	return b,err
+
+	return b, err
 }
 
 func (tcpConn *WSConn) WriteMsg(args []byte) error {
 	//return tcpConn.msgParser.Write(tcpConn, args)
 	tcpConn.Write(args)
 	return nil
+}
+
+func (tcpConn *WSConn) ReadSucc() {
+	tcpConn.ReadDataTime = time.Duration(utils.Milliseconde())
 }

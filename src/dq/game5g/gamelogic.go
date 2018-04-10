@@ -285,6 +285,22 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 
 	}
 	//通知玩家数据变化
+	for _, v := range game.Player {
+		if v != nil {
+			data := &datamsg.MsgBase{}
+			playerinfo := &datamsg.MsgPlayerInfo{}
+			err := db.DbOne.GetPlayerInfo(v.Uid, playerinfo)
+			if err == nil {
+				data.ModeType = "Client"
+				data.Uid = v.Uid
+				data.ConnectId = v.ConnectId
+				data.MsgType = "SC_MsgHallInfo"
+				jd := datamsg.SC_MsgHallInfo{}
+				jd.PlayerInfo = *playerinfo
+				game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			}
+		}
+	}
 
 	//
 	jd := &datamsg.SC_GameOver{}
@@ -476,7 +492,6 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 	//玩家
 	if player.PlayerType == 1 {
 
-		game.Player[player.SeatIndex] = nil
 		//给所有人发送玩家离开
 		jd := &datamsg.SC_PlayerGoOut{}
 		jd.Uid = player.Uid
@@ -487,6 +502,8 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 			wi = 1
 		}
 		game.gameWin(wi)
+
+		//game.Player[player.SeatIndex] = nil
 		return true
 	}
 

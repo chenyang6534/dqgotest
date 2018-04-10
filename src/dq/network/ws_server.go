@@ -1,6 +1,8 @@
 package network
 
 import (
+	"fmt"
+	"time"
 	//"time"
 	"dq/log"
 	"net/http"
@@ -9,13 +11,36 @@ import (
 	//"time"
 	//"fmt"
 	"dq/utils"
+	//"reflect"
+	"dq/conf"
 
 	"github.com/gorilla/websocket"
 )
 
+//type ServerData struct {
+//	Addr            string
+//	MaxConnNum      int
+//	PendingWriteNum int
+//	NewAgent        func(Conn) Agent
+//	ln              net.Listener
+
+//	//Agents			map[int]interface{}
+//	Agents			*utils.BeeMap
+//	LoginedConnect	*utils.BeeMap
+//	mutexConns      sync.Mutex
+//	wgLn            sync.WaitGroup
+//	wgConns         sync.WaitGroup
+
+//	// msg parser
+//	msgParser    *MsgParser
+//}
+
 type WSServer struct {
 	ServerData
-	conns map[*websocket.Conn]struct{}
+	//conns        map[*websocket.Conn]struct{}
+	conns        *utils.BeeMap
+	HttpServer   *http.Server
+	isCheckHeart bool
 }
 
 func (server *WSServer) Start() {
@@ -47,20 +72,29 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Info("SvrConnHandler")
-	server.mutexConns.Lock()
-	if len(server.conns) >= server.MaxConnNum {
-		server.mutexConns.Unlock()
+
+	if server.conns.Size() >= server.MaxConnNum {
 		conn.Close()
 		log.Debug("too many connections")
 		return
 	}
-	server.conns[conn] = struct{}{}
 
-	server.mutexConns.Unlock()
+	//	server.mutexConns.Lock()
+	//	if len(server.conns) >= server.MaxConnNum {
+	//		server.mutexConns.Unlock()
+	//		conn.Close()
+	//		log.Debug("too many connections")
+	//		return
+	//	}
+	//	server.conns[conn] = struct{}{}
+	//	server.mutexConns.Unlock()
 
 	server.wgConns.Add(1)
 
 	tcpConn := newWSConn(conn, server.PendingWriteNum, server.msgParser)
+
+	server.conns.Set(tcpConn, struct{}{})
+
 	agent := server.NewAgent(tcpConn)
 
 	//server.mutexConns.Lock()
@@ -73,11 +107,10 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 
 	// cleanup
 	tcpConn.Close()
-	server.mutexConns.Lock()
-	delete(server.conns, conn)
-	//delete(server.Agents, agent.GetCreateId())
-	server.mutexConns.Unlock()
-	//server.Agents.Delete(agent.GetConnectId())
+	//	server.mutexConns.Lock()
+	//	delete(server.conns, conn)
+	//	server.mutexConns.Unlock()
+	server.conns.Delete(tcpConn)
 	agent.OnClose()
 
 	server.wgConns.Done()
@@ -99,6 +132,8 @@ func (server *WSServer) init() {
 	//		log.Error("%v", err)
 	//	}
 
+	server.isCheckHeart = true
+
 	if server.MaxConnNum <= 0 {
 		server.MaxConnNum = 100
 		log.Debug("invalid MaxConnNum, reset to %v", server.MaxConnNum)
@@ -112,7 +147,8 @@ func (server *WSServer) init() {
 	}
 
 	//server.ln = ln
-	server.conns = make(map[*websocket.Conn]struct{})
+	//server.conns = make(map[*websocket.Conn]struct{})
+	server.conns = utils.NewBeeMap()
 	//server.Agents = make(map[int]interface{})
 	server.Agents = utils.NewBeeMap()
 	server.LoginedConnect = utils.NewBeeMap()
@@ -128,28 +164,83 @@ func (server *WSServer) init() {
 func (server *WSServer) run() {
 	server.wgLn.Add(1)
 	defer server.wgLn.Done()
-	//err := http.ListenAndServeTLS(server.Addr, "bin/conf/214571202380020.pem", "bin/conf/214571202380020.key", nil)
-	err := http.ListenAndServe(server.Addr, nil)
+
+	server.wgLn.Add(1)
+	go server.checkHeart()
+
+	server.HttpServer = &http.Server{Addr: server.Addr, Handler: nil}
+	{
+		//err := http.ListenAndServeTLS(server.Addr, "bin/conf/214571202380020.pem", "bin/conf/214571202380020.key", nil)
+		//server.HttpServer := &http.Server{Addr: addr, Handler: handler}
+		//err := server.HttpServer.ListenAndServeTLS("bin/conf/214571202380020.pem", "bin/conf/214571202380020.key")
+	}
+
+	err := server.HttpServer.ListenAndServe()
+	//err := http.ListenAndServe(server.Addr, nil)
 	//checkErr(err, "ListenAndServe");
 	if err != nil {
 		log.Info(err.Error())
 	}
-	log.Info("Func finish.")
+	fmt.Println("WSServer Func finish.")
+}
+
+func (server *WSServer) checkHeart() {
+
+	for {
+		if server.isCheckHeart == false {
+			fmt.Println("heart over")
+
+			break
+		}
+		var items = server.conns.Items()
+		curtime := time.Duration(utils.Milliseconde())
+		for k, _ := range items {
+			if server.isCheckHeart == false {
+				fmt.Println("heart over")
+
+				break
+			}
+			//log.Info(reflect.TypeOf(*v).Name())
+			//if reflect.TypeOf(*v).Name() == "agent" {
+			conn := k.(*WSConn)
+			subtime := curtime - conn.ReadDataTime
+			//log.Info("subtime:%d", conf.Conf.GateInfo.TimeOut)
+			if subtime > time.Duration(conf.Conf.GateInfo.TimeOut*1000) {
+				conn.Close()
+				log.Info("time out")
+			}
+			//}
+
+		}
+
+		time.Sleep(time.Second * 3)
+
+	}
+	server.wgLn.Done()
 }
 
 func (server *WSServer) Close() {
 
-	//server.ln.Close()
+	//fmt.Println("Close11")
+	server.isCheckHeart = false
+
+	server.HttpServer.Close()
+
 	server.wgLn.Wait()
 
-	server.mutexConns.Lock()
-	for conn := range server.conns {
-		conn.Close()
+	var conns = server.conns.Items()
+	for conn := range conns {
+		conn.(*WSConn).Close()
 	}
-	server.conns = nil
-	server.mutexConns.Unlock()
-	//server.Agents = nil
+	server.conns.DeleteAll()
+
+	//	server.mutexConns.Lock()
+	//	for conn := range server.conns {
+	//		conn.Close()
+	//	}
+	//	server.conns = nil
+	//	server.mutexConns.Unlock()
 
 	server.wgConns.Wait()
-	log.Info("tcp Close :%s", server.Addr)
+	fmt.Println("tcp Close :%s", server.Addr)
 }

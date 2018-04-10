@@ -47,6 +47,9 @@ func (a *Game5GAgent) Init() {
 	//创建游戏
 	a.handles["NewGame"] = a.DoNewGameData
 
+	//检查是否在游戏中
+	a.handles["CheckGame"] = a.DoCheckGameData
+
 	//玩家进来
 	a.handles["CS_GoIn"] = a.DoGoInData
 	//玩家退出游戏
@@ -157,6 +160,36 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 
 }
 
+//检查是否在游戏中
+func (a *Game5GAgent) DoCheckGameData(data *datamsg.MsgBase) {
+
+	log.Info("----DoCheckGameData--")
+	player := a.Players.Get(data.Uid)
+	if player == nil {
+		return
+	}
+	if player.(*Game5GPlayer).Game == nil {
+		return
+	}
+	game := player.(*Game5GPlayer).Game
+	if game.State >= Game5GState_Result {
+		return
+	}
+
+	//发送信息
+	data1 := &datamsg.MsgBase{}
+	data1.ModeType = "Client"
+	data1.MsgType = "SC_NewGame"
+	data1.Uid = data.Uid
+	data1.ConnectId = data.ConnectId
+	jd := &datamsg.SC_NewGame{}
+	jd.GameId = player.(*Game5GPlayer).Game.GameId
+
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data1, jd))
+
+}
+
+//CheckGame
 func (a *Game5GAgent) DoNewGameData(data *datamsg.MsgBase) {
 
 	log.Info("----DoNewGameData--")
@@ -210,7 +243,7 @@ func (a *Game5GAgent) DoDisConnectData(data *datamsg.MsgBase) {
 
 	//玩家退出游戏
 	if ok := game.Disconnect(player.(*Game5GPlayer)); ok {
-		a.Players.Delete(data.Uid)
+		//a.Players.Delete(data.Uid)
 		return
 	}
 

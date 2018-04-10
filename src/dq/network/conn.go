@@ -5,6 +5,7 @@ import (
 )
 
 type Conn interface {
+	ReadSucc()
 	ReadMsg() ([]byte, error)
 	WriteMsg(args []byte) error
 	LocalAddr() net.Addr
@@ -12,5 +13,5 @@ type Conn interface {
 	Close()
 	Destroy()
 	//Write(b []byte)
-	//Read(b []byte) (int, error) 
+	//Read(b []byte) (int, error)
 }

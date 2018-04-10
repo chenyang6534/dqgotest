@@ -14,6 +14,7 @@
 package app
 
 import (
+	//"time"
 	//"encoding/json"
 	"flag"
 	"fmt"
@@ -21,94 +22,89 @@ import (
 	//"os/exec"
 	"os/signal"
 	//"path/filepath"
-	"strings"
 	"dq/conf"
-	"dq/model"
-	"dq/gate"
-	"dq/login"
-	"errors"
-	"dq/log"
-	"sync"
-	"dq/db"
 	"dq/datamsg"
-	"dq/hall"
+	"dq/db"
 	"dq/game5g"
+	"dq/gate"
+	"dq/hall"
+	"dq/log"
+	"dq/login"
+	"dq/model"
+	"errors"
+	"strings"
+	"sync"
 )
+
 type DefaultApp struct {
 	//module.App
-	
-	settings         conf.Config
-	
-	moduleNew        func(modelType string) model.BaseModel
-	
-	databaseOne		 sync.Once
-	
+
+	settings conf.Config
+
+	moduleNew func(modelType string) model.BaseModel
+
+	databaseOne sync.Once
 }
 
-func (app *DefaultApp) Init(){
+func (app *DefaultApp) Init() {
 	app.moduleNew = func(modelType string) model.BaseModel {
-			
-			
-			if modelType == datamsg.GateMode{
-				a := &gate.Gate{
-						MaxConnNum:      conf.Conf.GateInfo.MaxConnNum,
-						PendingWriteNum: conf.Conf.GateInfo.PendingWriteNum,
-						//TCPAddr:         conf.Conf.GateInfo.ClientListenPort,
-						WSAddr:         conf.Conf.GateInfo.ClientListenPort,
-						LocalTCPAddr:	 conf.Conf.GateInfo.ServerListenPort,
-						
-					}
-				return a
-			}else if modelType == datamsg.LoginMode{
-				a := &login.Login{
-						TCPAddr : conf.Conf.LoginInfo["GateIp"].(string),
-					}
-				app.databaseOne.Do(db.CreateDB)
-				return a
-			}else if modelType == datamsg.HallMode{
-				a := &hall.Hall{
-						TCPAddr : conf.Conf.HallInfo["GateIp"].(string),
-					}
-				app.databaseOne.Do(db.CreateDB)
-				return a
-			}else if modelType == datamsg.Game5GMode{
-				a := &game5g.Game5G{
-						TCPAddr : conf.Conf.Game5GInfo["GateIp"].(string),
-					}
-				app.databaseOne.Do(db.CreateDB)
-				return a
-			}
-			
-			return nil
-			
-			
-		}
-}
 
+		if modelType == datamsg.GateMode {
+			a := &gate.Gate{
+				MaxConnNum:      conf.Conf.GateInfo.MaxConnNum,
+				PendingWriteNum: conf.Conf.GateInfo.PendingWriteNum,
+				//TCPAddr:         conf.Conf.GateInfo.ClientListenPort,
+				WSAddr:       conf.Conf.GateInfo.ClientListenPort,
+				LocalTCPAddr: conf.Conf.GateInfo.ServerListenPort,
+			}
+			return a
+		} else if modelType == datamsg.LoginMode {
+			a := &login.Login{
+				TCPAddr: conf.Conf.LoginInfo["GateIp"].(string),
+			}
+			app.databaseOne.Do(db.CreateDB)
+			return a
+		} else if modelType == datamsg.HallMode {
+			a := &hall.Hall{
+				TCPAddr: conf.Conf.HallInfo["GateIp"].(string),
+			}
+			app.databaseOne.Do(db.CreateDB)
+			return a
+		} else if modelType == datamsg.Game5GMode {
+			a := &game5g.Game5G{
+				TCPAddr: conf.Conf.Game5GInfo["GateIp"].(string),
+			}
+			app.databaseOne.Do(db.CreateDB)
+			return a
+		}
+
+		return nil
+
+	}
+}
 
 func (app *DefaultApp) Run() error {
-	
+
 	app.Init()
-	
-	
+
 	mods := flag.String("models", "tt", "Log file directory?")
 	flag.Parse() //解析输入的参数
-	
+
 	allModsName := strings.Split(*mods, ",")
 	//app.processId = *ProcessID
-	
+
 	ApplicationDir, err := os.Getwd()
 	if err != nil {
 		return errors.New("cannot find dir")
 	}
 
 	confPath := fmt.Sprintf("%s/bin/conf/server.json", ApplicationDir)
-	
+
 	f, err := os.Open(confPath)
 	if err != nil {
 		panic(err)
 	}
-	Logdir := fmt.Sprintf("%s/bin/logs/%s", ApplicationDir,*mods)
+	Logdir := fmt.Sprintf("%s/bin/logs/%s", ApplicationDir, *mods)
 
 	_, err = os.Open(Logdir)
 	if err != nil {
@@ -119,34 +115,51 @@ func (app *DefaultApp) Run() error {
 		}
 	}
 
-	
 	conf.LoadConfig(f.Name()) //加载配置文件
-	
+
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 
 	log.Info("dq starting up")
-	
-	log.Info("---models:%d",len(allModsName))
+
+	log.Info("---models:%d", len(allModsName))
 	// close
-	closesig := make(chan bool,len(allModsName))
+	closesig := make(chan bool, len(allModsName))
 	// module
+
+	var pro sync.WaitGroup
+
 	for i := 0; i < len(allModsName); i++ {
 		mod := app.moduleNew(allModsName[i])
-		log.Info("new model :%s",allModsName[i])
-		go mod.Run(closesig)
+		log.Info("new model :%s", allModsName[i])
+
+		pro.Add(1)
+		go func() {
+			mod.Run(closesig)
+			pro.Done()
+		}()
 	}
-	
-	
+
+	//var pro sync.WaitGroup
+	//pro.Add(1)
+	//go func() {
 	// close
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	sig := <-c
-	log.Debug("dq closing down (signal: %v)", sig)
+	log.Debug("dq closing down (signal: %v) %d", sig, len(allModsName))
 	for i := 0; i < len(allModsName); i++ {
+		//fmt.Println("over1")
 		closesig <- true
+		//fmt.Println("over2")
 	}
-	
-	
-	
+	//fmt.Println("over")
+	//pro.Done()
+	//}()
+	pro.Wait()
+	fmt.Println("app over")
+
+	//fmt.Println("over5")
+	//time.Sleep(time.Second * 5)
+	//fmt.Println("over5")
 	return nil
 }

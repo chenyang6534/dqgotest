@@ -119,6 +119,10 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
 	}
 
+	//检查是否有游戏正在进行中
+
+	a.CheckGame(data.Uid, data.ConnectId)
+
 }
 
 func (a *HallAgent) Update() {
@@ -169,6 +173,18 @@ func (a *HallAgent) Update() {
 		utils.MySleep(t1, int64(oneUpdateTime))
 
 	}
+}
+
+func (a *HallAgent) CheckGame(uid int, connectid int) {
+
+	//通知游戏 开始一局新游戏
+	data := &datamsg.MsgBase{}
+	data.ModeType = "Game5G"
+	data.Uid = uid
+	data.ConnectId = connectid
+	data.MsgType = "CheckGame"
+
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, nil))
 }
 
 func (a *HallAgent) CreateGame(arg *serchInfo, arg1 *serchInfo) {

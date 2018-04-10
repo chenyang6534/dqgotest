@@ -1,6 +1,8 @@
 package login
-import(
+
+import (
 	"dq/network"
+	"fmt"
 	//"dq/gate"
 	//"dq/log"
 	//"fmt"
@@ -13,40 +15,37 @@ import(
 	//"time"
 )
 
-type Login struct{
-	
+type Login struct {
+
 	// tcp
-	TCPAddr      string
-	
-	
-	TcpClient  *network.TCPClient
+	TCPAddr string
+
+	TcpClient *network.TCPClient
 }
 
 func (login *Login) Run(closeSig chan bool) {
 
-
-	
-	
 	var tcpClient *network.TCPClient
 	if login.TCPAddr != "" {
 		tcpClient = new(network.TCPClient)
 		tcpClient.Addr = login.TCPAddr
-		
+
 		tcpClient.NewAgent = func(conn *network.TCPConn) network.Agent {
 			a := &LoginAgent{conn: conn}
 			a.RegisterToGate()
 			return a
 		}
 	}
-	
+
 	if tcpClient != nil {
 		login.TcpClient = tcpClient
 		tcpClient.Start()
 	}
 	<-closeSig
-	
+
 	if tcpClient != nil {
 		tcpClient.Close()
 		login.TcpClient = nil
 	}
+	fmt.Println("login over")
 }

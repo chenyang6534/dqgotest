@@ -25,7 +25,6 @@ import (
 )
 
 var (
-
 	Conf = Config{}
 )
 
@@ -34,24 +33,23 @@ func LoadConfig(Path string) {
 	if err := readFileInto(Path); err != nil {
 		panic(err)
 	}
-	
+
 }
 
 type Config struct {
-	
-	GateInfo   gateInfo
-	LoginInfo  map[string]interface{}
-	HallInfo  map[string]interface{}
-	Game5GInfo  map[string]interface{}
+	GateInfo     gateInfo
+	LoginInfo    map[string]interface{}
+	HallInfo     map[string]interface{}
+	Game5GInfo   map[string]interface{}
 	DataBaseInfo map[string]interface{}
 }
-type gateInfo struct{
+type gateInfo struct {
 	ClientListenPort string
 	ServerListenPort string
-	MaxConnNum		 int
+	MaxConnNum       int
 	PendingWriteNum  int
+	TimeOut          int
 }
-
 
 func readFileInto(path string) error {
 	var data []byte

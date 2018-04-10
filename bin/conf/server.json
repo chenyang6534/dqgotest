@@ -5,7 +5,8 @@
         //服务器监听地址
         "ServerListenPort":"127.0.0.1:1234",
         "MaxConnNum":10000,
-        "PendingWriteNum":10
+        "PendingWriteNum":10,
+        "TimeOut":18
     },
     "LoginInfo":{
         //gate服务器监听地址

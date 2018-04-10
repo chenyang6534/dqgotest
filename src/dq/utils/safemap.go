@@ -18,10 +18,6 @@ import (
 	"sync"
 )
 
-
-
-
-
 // BeeMap is a map with lock
 type BeeVar struct {
 	lock *sync.RWMutex
@@ -41,7 +37,7 @@ func (m *BeeVar) Get() interface{} {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.bm
-	
+
 }
 
 // Set Maps the given key and value. Returns false
@@ -53,28 +49,11 @@ func (m *BeeVar) Set(v interface{}) bool {
 	return true
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // BeeMap is a map with lock
 type BeeMap struct {
 	lock *sync.RWMutex
 	bm   map[interface{}]interface{}
+	size int
 }
 
 // NewBeeMap return new safemap
@@ -82,6 +61,7 @@ func NewBeeMap() *BeeMap {
 	return &BeeMap{
 		lock: new(sync.RWMutex),
 		bm:   make(map[interface{}]interface{}),
+		size: 0,
 	}
 }
 
@@ -102,6 +82,7 @@ func (m *BeeMap) Set(k interface{}, v interface{}) bool {
 	m.lock.Lock()
 	if val, ok := m.bm[k]; !ok {
 		m.bm[k] = v
+		m.size++
 		m.lock.Unlock()
 	} else if val != v {
 		m.bm[k] = v
@@ -128,6 +109,7 @@ func (m *BeeMap) Check(k interface{}) bool {
 func (m *BeeMap) Delete(k interface{}) {
 	m.lock.Lock()
 	delete(m.bm, k)
+	m.size--
 	m.lock.Unlock()
 }
 
@@ -136,8 +118,16 @@ func (m *BeeMap) DeleteAll() {
 	for k, _ := range m.bm {
 		delete(m.bm, k)
 	}
+	m.size = 0
 
 	m.lock.Unlock()
+}
+
+func (m *BeeMap) Size() int {
+	m.lock.RLock()
+	var s = m.size
+	m.lock.RUnlock()
+	return s
 }
 
 // Items returns all items in safemap.
