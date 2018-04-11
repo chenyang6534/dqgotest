@@ -152,8 +152,8 @@ func (game *Game5GLogic) sendMsgToAll(msgType string, jd interface{}) {
 	for _, v := range allObserve {
 		if v != nil {
 
-			data.Uid = v.(Game5GPlayer).Uid
-			data.ConnectId = v.(Game5GPlayer).ConnectId
+			data.Uid = v.(*Game5GPlayer).Uid
+			data.ConnectId = v.(*Game5GPlayer).ConnectId
 			game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
 		}
 	}
@@ -472,6 +472,7 @@ func (game *Game5GLogic) GoIn(player *Game5GPlayer) (*Game5GPlayer, error) {
 	//旁观者进入
 	player.PlayerType = 2
 	player.SeatIndex = -2
+	player.Game = game
 	game.notifyAllPlayerGoIn(player)
 	game.Observer.Set(player.Uid, player)
 	game.sendGameInfoToPlayer(player)
@@ -507,13 +508,13 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 		return true
 	}
 
-	//观察者
-	game.Observer.Delete(player.Uid)
-
 	//给所有人发送玩家离开
 	jd := &datamsg.SC_PlayerGoOut{}
 	jd.Uid = player.Uid
 	game.sendMsgToAll("SC_PlayerGoOut", jd)
+
+	//观察者
+	game.Observer.Delete(player.Uid)
 
 	return true
 }

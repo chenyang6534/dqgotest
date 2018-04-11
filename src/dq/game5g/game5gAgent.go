@@ -2,6 +2,7 @@ package game5g
 
 import (
 	"dq/network"
+	"strconv"
 
 	"dq/datamsg"
 	"dq/log"
@@ -58,7 +59,66 @@ func (a *Game5GAgent) Init() {
 	//玩家走棋
 	a.handles["CS_DoGame5G"] = a.DoDoGame5GData
 
+	//获取当前正在进行的游戏信息
+	a.handles["CS_GetGamingInfo"] = a.DoGetGamingInfoData
+
 }
+
+func (a *Game5GAgent) DoGetGamingInfoData(data *datamsg.MsgBase) {
+
+	h2 := &datamsg.CS_GetGamingInfo{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	//---------------
+	//if( a.Games > 0)
+	items := a.Games.Items()
+
+	jd := &datamsg.SC_GetGamingInfo{}
+	jd.GameInfo = make([]datamsg.MsgGame5GingInfo, 0)
+	count := 0
+	for k, v := range items {
+		if count >= h2.Count {
+			break
+		}
+		game := v.(*Game5GLogic)
+		if game.State == Game5GState_Gaming {
+			gameinfo := datamsg.MsgGame5GingInfo{}
+			gameinfo.PlayerOneName = game.Player[0].Name
+			gameinfo.PlayerTwoName = game.Player[1].Name
+			gameinfo.GameId = k.(int)
+			gameinfo.Score = 1000
+			gameinfo.GameName = "game_" + strconv.Itoa(gameinfo.GameId)
+			jd.GameInfo = append(jd.GameInfo, gameinfo)
+		}
+
+	}
+	data.ModeType = "Client"
+	data.MsgType = "SC_GetGamingInfo"
+
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+
+}
+
+////获取当前进行中的游戏信息
+//type CS_GetGamingInfo struct {
+//	Count int //数量
+//}
+
+////当前进行中的游戏信息
+//type MsgGame5GingInfo struct {
+//	GameId        int
+//	PlayerOneName string
+//	PlayerTwoName string
+//	Score         int
+//}
+
+////当前进行中的游戏信息
+//type SC_GetGamingInfo struct {
+//	GameInfo []MsgGame5GingInfo
+//}
 
 func (a *Game5GAgent) DoDoGame5GData(data *datamsg.MsgBase) {
 

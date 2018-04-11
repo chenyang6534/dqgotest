@@ -62,6 +62,25 @@ type CS_DoGame5G struct {
 	Y int
 }
 
+//获取当前进行中的游戏信息
+type CS_GetGamingInfo struct {
+	Count int //数量
+}
+
+//当前进行中的游戏信息
+type MsgGame5GingInfo struct {
+	GameId        int
+	GameName      string
+	PlayerOneName string
+	PlayerTwoName string
+	Score         int
+}
+
+//当前进行中的游戏信息
+type SC_GetGamingInfo struct {
+	GameInfo []MsgGame5GingInfo
+}
+
 //CS_GoIn
 
 //大厅信息
