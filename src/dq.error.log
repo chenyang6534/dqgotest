@@ -1,0 +1,5 @@
+2018-04-12T13:27:05+08:00 [dq] [E] [tcp_server.go:58] listen tcp 127.0.0.1:1234: bind: address already in use 
+dq/network/tcp_server.go:58
+dq/network/tcp_server.go:51
+dq/gate/gate.go:107
+dq/app/app.go:137

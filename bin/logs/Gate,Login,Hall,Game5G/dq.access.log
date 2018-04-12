@@ -1,0 +1,36 @@
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:122] dq starting up
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:124] ---models:4
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:133] new model :Gate
+2018-04-12T13:51:37+08:00 [dq] [I] [gate.go:75] WSAddr::1117
+2018-04-12T13:51:37+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-12T13:51:37+08:00 [dq] [I] [ws_server.go:161] ------Listen::1117
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:133] new model :Login
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:133] new model :Hall
+2018-04-12T13:51:37+08:00 [dq] [I] [app.go:133] new model :Game5G
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-12T13:51:37+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Game5G\"}"}
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Game5G
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Login\"}"}
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Login
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:175] ------readmsg:{"ModeType":"Gate","Uid":0,"MsgId":0,"MsgType":"Register","ConnectId":0,"JsonData":"{\"ModeType\":\"Hall\"}"}
+2018-04-12T13:51:37+08:00 [dq] [I] [serverAgent.go:59] --register modetype:Hall
+2018-04-12T14:06:42+08:00 [dq] [D] [app.go:149] dq closing down (signal: interrupt) 4
+2018-04-12T14:06:42+08:00 [dq] [D] [game5gAgent.go:320] read message: read tcp 127.0.0.1:52269->127.0.0.1:1234: use of closed network connection
+2018-04-12T14:06:42+08:00 [dq] [D] [hallAgent.go:216] read message: read tcp 127.0.0.1:52271->127.0.0.1:1234: use of closed network connection
+2018-04-12T14:06:42+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-04-12T14:06:42+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-04-12T14:06:42+08:00 [dq] [D] [loginAgent.go:204] read message: read tcp 127.0.0.1:52270->127.0.0.1:1234: use of closed network connection
+2018-04-12T14:06:42+08:00 [dq] [D] [serverAgent.go:172] read message: EOF
+2018-04-12T14:06:42+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Hall
+2018-04-12T14:06:42+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Login
+2018-04-12T14:06:42+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Game5G
+2018-04-12T14:06:42+08:00 [dq] [I] [tcp_server.go:164] tcp Close :127.0.0.1:1234
+2018-04-12T14:06:42+08:00 [dq] [I] [ws_server.go:182] http: Server closed
