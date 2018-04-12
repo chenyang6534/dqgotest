@@ -92,6 +92,7 @@ func (a *Game5GAgent) DoGetGamingInfoData(data *datamsg.MsgBase) {
 			gameinfo.Score = 1000
 			gameinfo.GameName = "game_" + strconv.Itoa(gameinfo.GameId)
 			jd.GameInfo = append(jd.GameInfo, gameinfo)
+			count++
 		}
 
 	}
@@ -223,7 +224,7 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 //检查是否在游戏中
 func (a *Game5GAgent) DoCheckGameData(data *datamsg.MsgBase) {
 
-	log.Info("----DoCheckGameData--")
+	//log.Info("----DoCheckGameData--")
 	player := a.Players.Get(data.Uid)
 	if player == nil {
 		return
@@ -326,14 +327,14 @@ func (a *Game5GAgent) Run() {
 }
 
 func (a *Game5GAgent) doMessage(data []byte) {
-	log.Info("----------game5g----readmsg---------")
+	//log.Info("----------game5g----readmsg---------")
 	h1 := &datamsg.MsgBase{}
 	err := json.Unmarshal(data, h1)
 	if err != nil {
 		log.Info("--error")
 	} else {
 
-		log.Info("--MsgType:" + h1.MsgType)
+		//log.Info("--MsgType:" + h1.MsgType)
 		if f, ok := a.handles[h1.MsgType]; ok {
 			f(h1)
 		}

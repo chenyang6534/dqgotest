@@ -138,13 +138,14 @@ func (a *HallAgent) Update() {
 		serchPlayer := a.serchPoolFor5G.Items()
 
 		//算法忽略
-
+	loop:
 		//
 		size := len(serchPlayer)
 		if size <= 1 {
 			utils.MySleep(t1, int64(oneUpdateTime))
 			continue
 		}
+
 		fight := [2]int{}
 		i := 0
 		for k, _ := range serchPlayer {
@@ -169,8 +170,14 @@ func (a *HallAgent) Update() {
 			//创建一个游戏
 			a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))
 		}
+		t2 := utils.Milliseconde()
+		if t2-t1 >= int64(oneUpdateTime) {
+			utils.MySleep(t1, int64(t2+1))
+		} else {
+			goto loop
+		}
 
-		utils.MySleep(t1, int64(oneUpdateTime))
+		//utils.MySleep(t1, int64(oneUpdateTime))
 
 	}
 }
@@ -223,14 +230,14 @@ func (a *HallAgent) Run() {
 }
 
 func (a *HallAgent) doMessage(data []byte) {
-	log.Info("----------Hall----readmsg---------")
+	//log.Info("----------Hall----readmsg---------")
 	h1 := &datamsg.MsgBase{}
 	err := json.Unmarshal(data, h1)
 	if err != nil {
 		log.Info("--error")
 	} else {
 
-		log.Info("--MsgType:" + h1.MsgType)
+		//log.Info("--MsgType:" + h1.MsgType)
 		if f, ok := a.handles[h1.MsgType]; ok {
 			f(h1)
 		}

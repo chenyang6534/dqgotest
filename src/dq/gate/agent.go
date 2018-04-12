@@ -48,7 +48,7 @@ func (a *agent) Run() {
 				a.conn.ReadSucc()
 				continue
 			}
-			log.Info("------readmsg len%d:"+string(data), len(data))
+			//log.Info("------readmsg len%d:"+string(data), len(data))
 			//设置连接id
 			h1.ConnectId = (a.connectId)
 

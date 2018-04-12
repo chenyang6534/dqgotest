@@ -143,18 +143,22 @@ func (game *Game5GLogic) sendMsgToAll(msgType string, jd interface{}) {
 
 	for _, v := range game.Player {
 		if v != nil {
-			data.Uid = v.Uid
-			data.ConnectId = v.ConnectId
-			game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			if v.ConnectId > 0 {
+				data.Uid = v.Uid
+				data.ConnectId = v.ConnectId
+				game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			}
+
 		}
 	}
 	allObserve := game.Observer.Items()
 	for _, v := range allObserve {
 		if v != nil {
-
-			data.Uid = v.(*Game5GPlayer).Uid
-			data.ConnectId = v.(*Game5GPlayer).ConnectId
-			game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			if v.(*Game5GPlayer).ConnectId > 0 {
+				data.Uid = v.(*Game5GPlayer).Uid
+				data.ConnectId = v.(*Game5GPlayer).ConnectId
+				game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			}
 		}
 	}
 
@@ -287,17 +291,19 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 	//通知玩家数据变化
 	for _, v := range game.Player {
 		if v != nil {
-			data := &datamsg.MsgBase{}
-			playerinfo := &datamsg.MsgPlayerInfo{}
-			err := db.DbOne.GetPlayerInfo(v.Uid, playerinfo)
-			if err == nil {
-				data.ModeType = "Client"
-				data.Uid = v.Uid
-				data.ConnectId = v.ConnectId
-				data.MsgType = "SC_MsgHallInfo"
-				jd := datamsg.SC_MsgHallInfo{}
-				jd.PlayerInfo = *playerinfo
-				game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+			if v.ConnectId > 0 {
+				data := &datamsg.MsgBase{}
+				playerinfo := &datamsg.MsgPlayerInfo{}
+				err := db.DbOne.GetPlayerInfo(v.Uid, playerinfo)
+				if err == nil {
+					data.ModeType = "Client"
+					data.Uid = v.Uid
+					data.ConnectId = v.ConnectId
+					data.MsgType = "SC_MsgHallInfo"
+					jd := datamsg.SC_MsgHallInfo{}
+					jd.PlayerInfo = *playerinfo
+					game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+				}
 			}
 		}
 	}
@@ -523,7 +529,7 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 func (game *Game5GLogic) Disconnect(player *Game5GPlayer) bool {
 	game.Lock.Lock()
 	defer game.Lock.Unlock()
-
+	player.ConnectId = -1
 	//游戏结束
 	if game.State >= Game5GState_Result {
 		return true

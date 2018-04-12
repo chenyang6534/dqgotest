@@ -4,6 +4,7 @@ import (
 	"dq/log"
 	"net"
 	"sync"
+	"time"
 )
 
 type ConnSet map[net.Conn]struct{}
@@ -72,10 +73,11 @@ func (tcpConn *TCPConn) Close() {
 }
 
 func (tcpConn *TCPConn) doWrite(b []byte) {
-	if len(tcpConn.writeChan) == cap(tcpConn.writeChan) {
-		log.Debug("close conn: channel full")
-		tcpConn.doDestroy()
-		return
+	for len(tcpConn.writeChan) >= cap(tcpConn.writeChan) {
+		log.Debug("conn: channel full %d  %d", len(tcpConn.writeChan), cap(tcpConn.writeChan))
+		time.Sleep(time.Millisecond * 2)
+		//tcpConn.doDestroy()
+		//return
 	}
 
 	tcpConn.writeChan <- b
