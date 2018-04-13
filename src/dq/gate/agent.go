@@ -7,7 +7,6 @@ import (
 	"dq/utils"
 	"encoding/json"
 	"net"
-	//"time"
 )
 
 //客户端连接上来的代理
@@ -44,10 +43,11 @@ func (a *agent) Run() {
 			break
 		} else {
 
-			if h1.MsgType == datamsg.CS_Heart {
-				a.conn.ReadSucc()
-				continue
-			}
+			a.conn.ReadSucc()
+			//			if h1.MsgType == datamsg.CS_Heart {
+			//				a.conn.ReadSucc()
+			//				continue
+			//			}
 			//log.Info("------readmsg len%d:"+string(data), len(data))
 			//设置连接id
 			h1.ConnectId = (a.connectId)

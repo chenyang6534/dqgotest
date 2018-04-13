@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"dq/conf"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -129,5 +131,6 @@ func (tcpConn *WSConn) WriteMsg(args []byte) error {
 }
 
 func (tcpConn *WSConn) ReadSucc() {
-	tcpConn.ReadDataTime = time.Duration(utils.Milliseconde())
+	//tcpConn.ReadDataTime = time.Duration(utils.Milliseconde())
+	tcpConn.conn.SetReadDeadline(time.Now().Add(time.Second * time.Duration(conf.Conf.GateInfo.TimeOut)))
 }

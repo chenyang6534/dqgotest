@@ -34,3 +34,95 @@
 2018-04-12T14:06:42+08:00 [dq] [I] [serverAgent.go:196] --delete modetype:Game5G
 2018-04-12T14:06:42+08:00 [dq] [I] [tcp_server.go:164] tcp Close :127.0.0.1:1234
 2018-04-12T14:06:42+08:00 [dq] [I] [ws_server.go:182] http: Server closed
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:122] dq starting up
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:124] ---models:4
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:133] new model :Gate
+2018-04-13T09:53:55+08:00 [dq] [I] [gate.go:75] WSAddr::1117
+2018-04-13T09:53:55+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-13T09:53:55+08:00 [dq] [I] [ws_server.go:163] ------Listen::1117
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:133] new model :Login
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:133] new model :Hall
+2018-04-13T09:53:55+08:00 [dq] [I] [app.go:133] new model :Game5G
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T09:53:55+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Game5G
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T09:53:55+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Login
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T09:53:55+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T09:53:55+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Hall
+2018-04-13T09:54:32+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T09:54:32+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T09:54:32+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T09:54:42+08:00 [dq] [D] [agent.go:35] read message: read tcp 127.0.0.1:1117->127.0.0.1:53649: i/o timeout
+2018-04-13T09:54:42+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T09:54:42+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T09:54:42+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T09:54:42+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T09:54:42+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T09:54:52+08:00 [dq] [D] [agent.go:35] read message: read tcp 127.0.0.1:1117->127.0.0.1:53652: i/o timeout
+2018-04-13T09:54:52+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T09:54:52+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T09:54:52+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T09:54:52+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T09:54:52+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T09:54:55+08:00 [dq] [D] [agent.go:35] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-13T09:54:55+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T09:54:55+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T09:57:58+08:00 [dq] [D] [app.go:149] dq closing down (signal: interrupt) 4
+2018-04-13T09:57:58+08:00 [dq] [D] [hallAgent.go:223] read message: read tcp 127.0.0.1:53631->127.0.0.1:1234: use of closed network connection
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:122] dq starting up
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:124] ---models:4
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:133] new model :Gate
+2018-04-13T10:03:52+08:00 [dq] [I] [gate.go:75] WSAddr::1117
+2018-04-13T10:03:52+08:00 [dq] [I] [tcp_server.go:85] ------Listen:127.0.0.1:1234
+2018-04-13T10:03:52+08:00 [dq] [I] [ws_server.go:163] ------Listen::1117
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:133] new model :Login
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:133] new model :Hall
+2018-04-13T10:03:52+08:00 [dq] [I] [app.go:133] new model :Game5G
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T10:03:52+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Game5G
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:42] invalid ConnNum, reset to 1
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:46] invalid ConnectInterval, reset to 3s
+2018-04-13T10:03:52+08:00 [dq] [D] [tcp_client.go:50] invalid PendingWriteNum, reset to 200
+2018-04-13T10:03:52+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Login
+2018-04-13T10:03:52+08:00 [dq] [I] [serverAgent.go:60] --register modetype:Hall
+2018-04-13T10:03:56+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T10:03:56+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T10:03:56+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T10:04:54+08:00 [dq] [D] [agent.go:34] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-13T10:04:54+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T10:04:54+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T10:05:00+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T10:05:00+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T10:05:00+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T10:05:18+08:00 [dq] [D] [agent.go:34] read message: read tcp 127.0.0.1:1117->127.0.0.1:58321: i/o timeout
+2018-04-13T10:05:18+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T10:05:18+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T10:05:18+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T10:05:18+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T10:05:18+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T10:05:36+08:00 [dq] [D] [agent.go:34] read message: read tcp 127.0.0.1:1117->127.0.0.1:58324: i/o timeout
+2018-04-13T10:05:36+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T10:05:36+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T10:05:36+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T10:05:36+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T10:05:36+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T10:05:38+08:00 [dq] [D] [agent.go:34] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-13T10:05:38+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T10:05:38+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--
+2018-04-13T10:48:55+08:00 [dq] [I] [ws_server.go:75] SvrConnHandler
+2018-04-13T10:48:55+08:00 [dq] [I] [loginAgent.go:151] ---------user login:37
+2018-04-13T10:48:55+08:00 [dq] [I] [serverAgent.go:92] --login--:37
+2018-04-13T10:49:49+08:00 [dq] [D] [agent.go:34] read message: websocket: close 1006 (abnormal closure): unexpected EOF
+2018-04-13T10:49:49+08:00 [dq] [I] [agent.go:112] --un login--:37
+2018-04-13T10:49:49+08:00 [dq] [I] [hallAgent.go:89] ----DoDisConnectData uid:37--

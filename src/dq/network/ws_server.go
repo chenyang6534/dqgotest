@@ -71,6 +71,7 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 		log.Info("Upgrade err", err)
 		return
 	}
+
 	log.Info("SvrConnHandler")
 
 	if server.conns.Size() >= server.MaxConnNum {
@@ -78,6 +79,7 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 		log.Debug("too many connections")
 		return
 	}
+	conn.SetReadDeadline(time.Now().Add(time.Second * time.Duration(conf.Conf.GateInfo.TimeOut)))
 
 	//	server.mutexConns.Lock()
 	//	if len(server.conns) >= server.MaxConnNum {
@@ -165,8 +167,8 @@ func (server *WSServer) run() {
 	server.wgLn.Add(1)
 	defer server.wgLn.Done()
 
-	server.wgLn.Add(1)
-	go server.checkHeart()
+	//server.wgLn.Add(1)
+	//go server.checkHeart()
 
 	server.HttpServer = &http.Server{Addr: server.Addr, Handler: nil}
 	{
