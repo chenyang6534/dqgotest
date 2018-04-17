@@ -44,11 +44,11 @@ func (a *agent) Run() {
 		} else {
 
 			a.conn.ReadSucc()
-			//			if h1.MsgType == datamsg.CS_Heart {
-			//				a.conn.ReadSucc()
-			//				continue
-			//			}
-			//log.Info("------readmsg len%d:"+string(data), len(data))
+			if h1.MsgType == datamsg.CS_Heart {
+
+				continue
+			}
+			log.Info("------readmsg len%d:"+string(data), len(data))
 			//设置连接id
 			h1.ConnectId = (a.connectId)
 

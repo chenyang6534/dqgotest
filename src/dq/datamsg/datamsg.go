@@ -26,11 +26,12 @@ type MsgBase struct {
 
 //玩家信息
 type MsgPlayerInfo struct {
-	Uid       int
-	Name      string
-	Gold      int64
-	WinCount  int
-	LoseCount int
+	Uid         int
+	Name        string
+	Gold        int64
+	WinCount    int
+	LoseCount   int
+	SeasonScore int
 }
 
 //微信登录
@@ -67,6 +68,18 @@ type CS_GetGamingInfo struct {
 	Count int //数量
 }
 
+//查看能否进入此房间
+type CS_CheckGoToGame struct {
+	GameId int
+}
+
+//大厅信息
+type SC_CheckGoToGame struct {
+	GameId int
+	Code   int    //1表示可以进入 0表示不能进入
+	Err    string //不能进入原因
+}
+
 //当前进行中的游戏信息
 type MsgGame5GingInfo struct {
 	GameId        int
@@ -101,11 +114,12 @@ type SC_NewGame struct {
 //玩家
 type MsgGame5GPlayerInfo struct {
 	//基本数据
-	Uid       int
-	Name      string
-	Gold      int64
-	WinCount  int
-	LoseCount int
+	Uid         int
+	Name        string
+	Gold        int64
+	WinCount    int
+	LoseCount   int
+	SeasonScore int
 
 	//游戏中数据
 	SeatIndex  int //座位号
@@ -126,6 +140,8 @@ type MsgGame5GInfo struct {
 	EveryTime int //每次操作时间
 	//该下棋的人的位置号
 	GameSeatIndex int
+	//游戏模式
+	GameMode int
 
 	//棋盘信息
 	QiPan [15][15]int

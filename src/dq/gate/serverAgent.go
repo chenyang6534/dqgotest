@@ -162,7 +162,7 @@ func (a *ServersAgent) Run() {
 			log.Debug("read message: %v", err)
 			break
 		}
-		//log.Info("------readmsg:"+string(data))
+		log.Info("------readmsg:" + string(data))
 
 		h1 := &datamsg.MsgBase{}
 		err = json.Unmarshal(data, h1)

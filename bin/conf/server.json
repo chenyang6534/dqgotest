@@ -18,7 +18,15 @@
     },
     "Game5GInfo":{
         //gate服务器监听地址
-        "GateIp":"127.0.0.1:1234"
+        "GateIp":"127.0.0.1:1234",
+        "SeasonMatching_Time":60,
+        "SeasonMatching_EveryTime":30,
+
+        "CreateRoom_Time":60,
+        "CreateRoom_EveryTime":30,
+
+        "WinScore":10,
+        "LoseScore":8
     },
     //数据库信息
     "DataBaseInfo":{

@@ -1,6 +1,7 @@
 package game5g
 
 import (
+	"dq/conf"
 	"dq/datamsg"
 	"dq/db"
 	"dq/log"
@@ -14,12 +15,13 @@ import (
 //玩家
 type Game5GPlayer struct {
 	//基本数据
-	Uid       int
-	ConnectId int
-	Name      string
-	Gold      int64
-	WinCount  int
-	LoseCount int
+	Uid         int
+	ConnectId   int
+	Name        string
+	Gold        int64
+	WinCount    int
+	LoseCount   int
+	SeasonScore int
 
 	//游戏
 	Game *Game5GLogic
@@ -39,6 +41,13 @@ const (
 	Game5GState_Gaming = 2 //游戏中
 	Game5GState_Result = 3 //结算中
 	Game5GState_Over   = 4 //解散
+)
+
+//游戏模式
+const (
+	Game5GMode_CreateRoom     = 1 //自己建房
+	Game5GMode_AutoMatching   = 2 //自动匹配
+	Game5GMode_SeasonMatching = 3 //赛季天梯匹配
 )
 
 type Game5GLogic struct {
@@ -74,6 +83,9 @@ type Game5GLogic struct {
 
 	//时间到 倒计时
 	gameTimer *timer.Timer
+
+	//游戏模式
+	GameMode int
 }
 
 func (game *Game5GLogic) Init() {
@@ -129,6 +141,7 @@ func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
 	jd.PlayerInfo.PlayerType = player.PlayerType
 	jd.PlayerInfo.Time = player.Time
 	jd.PlayerInfo.EveryTime = game.EveryTime
+	jd.PlayerInfo.SeasonScore = player.SeasonScore
 
 	game.sendMsgToAll("SC_PlayerGoIn", jd)
 
@@ -180,6 +193,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 	jd.GameInfo.EveryTime = game.EveryTime
 	jd.GameInfo.GameSeatIndex = game.GameSeatIndex
 	jd.GameInfo.QiPan = game.QiPan
+	jd.GameInfo.GameMode = game.GameMode
 
 	jd.PlayerInfo = make([]datamsg.MsgGame5GPlayerInfo, 0)
 	jd.ObserveInfo = make([]datamsg.MsgGame5GPlayerInfo, 0)
@@ -192,6 +206,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.Name = v.Name
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
+			p1.SeasonScore = v.SeasonScore
 
 			p1.WinCount = v.WinCount
 
@@ -224,6 +239,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.Name = v.Name
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
+			p1.SeasonScore = v.SeasonScore
 
 			p1.WinCount = v.WinCount
 
@@ -281,13 +297,24 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 	}
 	loseplayer := game.Player[loseindex]
 
-	//
-	err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, loseplayer.Uid)
-	if err != nil {
-		log.Info(err.Error())
-		return
-
+	//更新数据库ng.GameMode = Game5GMode_SeasonMatching
+	if game.GameMode == Game5GMode_SeasonMatching {
+		winscore := int(conf.Conf.Game5GInfo["WinScore"].(float64))
+		losescore := int(conf.Conf.Game5GInfo["LoseScore"].(float64))
+		log.Info("----------win:%d-----lose:%d", winscore, losescore)
+		err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, winscore, loseplayer.Uid, losescore)
+		if err != nil {
+			log.Info(err.Error())
+			return
+		}
+	} else {
+		err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, 0, loseplayer.Uid, 0)
+		if err != nil {
+			log.Info(err.Error())
+			return
+		}
 	}
+
 	//通知玩家数据变化
 	for _, v := range game.Player {
 		if v != nil {
@@ -313,10 +340,18 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 	jd.WinPlayerSeatIndex = seatIndex
 	game.sendMsgToAll("SC_GameOver", jd)
 
+	game.dismissGame()
+
+}
+
+//解散房间
+func (game *Game5GLogic) dismissGame() {
+	game.State = Game5GState_Over
 	//解散房间
 	for _, v := range game.Player {
 		if v != nil {
 			game.GameAgent.Players.Delete(v.Uid)
+			game.GameAgent.Creators.Delete(v.Uid)
 		}
 	}
 	allObserve := game.Observer.Items()
@@ -326,7 +361,6 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 		}
 	}
 	game.GameAgent.Games.Delete(game.GameId)
-
 }
 
 //时间到
@@ -451,7 +485,9 @@ func (game *Game5GLogic) GoIn(player *Game5GPlayer) (*Game5GPlayer, error) {
 
 	//玩家进入
 	for k, v := range game.WillPlayGamePlayerUid {
-		if v == player.Uid {
+		if v == player.Uid || v == -1 {
+			game.WillPlayGamePlayerUid[k] = player.Uid
+
 			player.SeatIndex = k
 			player.PlayerType = 1
 
@@ -499,19 +535,27 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 	//玩家
 	if player.PlayerType == 1 {
 
-		//给所有人发送玩家离开
-		jd := &datamsg.SC_PlayerGoOut{}
-		jd.Uid = player.Uid
-		game.sendMsgToAll("SC_PlayerGoOut", jd)
+		if game.State == Game5GState_Wait {
 
-		wi := 0
-		if player.SeatIndex == 0 {
-			wi = 1
+			game.dismissGame()
+			return true
+
+		} else {
+			//给所有人发送玩家离开
+			jd := &datamsg.SC_PlayerGoOut{}
+			jd.Uid = player.Uid
+			game.sendMsgToAll("SC_PlayerGoOut", jd)
+
+			wi := 0
+			if player.SeatIndex == 0 {
+				wi = 1
+			}
+			game.gameWin(wi)
+
+			//game.Player[player.SeatIndex] = nil
+			return true
 		}
-		game.gameWin(wi)
 
-		//game.Player[player.SeatIndex] = nil
-		return true
 	}
 
 	//给所有人发送玩家离开
@@ -597,8 +641,23 @@ func GetNewGameId() int {
 	return g_GameId
 }
 
-//创建游戏
-func NewGame5GLogic(ga *Game5GAgent, p1Id int, p2Id int, time int, everytime int) *Game5GLogic {
+//创建自建房游戏
+func NewGame5GLogic_CreateRoom(ga *Game5GAgent, p1Id int, time int, everytime int) *Game5GLogic {
+	ng := &Game5GLogic{}
+	ng.GameId = GetNewGameId()
+	ng.WillPlayGamePlayerUid[0] = p1Id
+	ng.WillPlayGamePlayerUid[1] = -1
+	ng.GameAgent = ga
+	ng.Time = time
+	ng.EveryTime = everytime
+	ng.GameMode = Game5GMode_CreateRoom
+
+	ng.Init()
+	return ng
+}
+
+//创建赛季匹配游戏
+func NewGame5GLogic_SeasonMatching(ga *Game5GAgent, p1Id int, p2Id int, time int, everytime int) *Game5GLogic {
 	ng := &Game5GLogic{}
 	ng.GameId = GetNewGameId()
 	ng.WillPlayGamePlayerUid[0] = p1Id
@@ -606,6 +665,7 @@ func NewGame5GLogic(ga *Game5GAgent, p1Id int, p2Id int, time int, everytime int
 	ng.GameAgent = ga
 	ng.Time = time
 	ng.EveryTime = everytime
+	ng.GameMode = Game5GMode_SeasonMatching
 
 	ng.Init()
 	return ng
