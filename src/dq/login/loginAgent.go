@@ -103,6 +103,9 @@ func (a *LoginAgent) DoWeiXingLoginData(data *datamsg.MsgBase) {
 		}
 		log.Info("---------new user:%d", uid)
 	}
+	//更新头像信息h2.AvatarUrl
+	db.DbOne.UpdatePlayerAvatar(h2.AvatarUrl, uid)
+
 	//--------------------
 	a.NotifyGateLogined(int(data.ConnectId), uid)
 

@@ -22,6 +22,11 @@ type Game5GPlayer struct {
 	WinCount    int
 	LoseCount   int
 	SeasonScore int
+	AvatarUrl   string
+	qiziId      int
+
+	firstqiziId  int
+	secondqiziId int
 
 	//游戏
 	Game *Game5GLogic
@@ -142,6 +147,8 @@ func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
 	jd.PlayerInfo.Time = player.Time
 	jd.PlayerInfo.EveryTime = game.EveryTime
 	jd.PlayerInfo.SeasonScore = player.SeasonScore
+	jd.PlayerInfo.AvatarUrl = player.AvatarUrl
+	jd.PlayerInfo.QiZiId = player.qiziId
 
 	game.sendMsgToAll("SC_PlayerGoIn", jd)
 
@@ -207,6 +214,8 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
 			p1.SeasonScore = v.SeasonScore
+			p1.AvatarUrl = v.AvatarUrl
+			p1.QiZiId = v.qiziId
 
 			p1.WinCount = v.WinCount
 
@@ -240,6 +249,8 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
 			p1.SeasonScore = v.SeasonScore
+			p1.AvatarUrl = v.AvatarUrl
+			p1.QiZiId = v.qiziId
 
 			p1.WinCount = v.WinCount
 
@@ -262,6 +273,21 @@ func (game *Game5GLogic) gameStart() {
 	game.Player[1].Time = game.Time
 
 	game.State = Game5GState_Gaming
+	//	firstqiziId  int
+	//	secondqiziId int
+	if game.Player[0].firstqiziId == game.Player[1].firstqiziId {
+
+		if game.Player[0].SeasonScore >= game.Player[1].SeasonScore {
+			game.Player[0].qiziId = game.Player[0].firstqiziId
+			game.Player[1].qiziId = game.Player[1].secondqiziId
+		} else {
+			game.Player[0].qiziId = game.Player[0].secondqiziId
+			game.Player[1].qiziId = game.Player[1].firstqiziId
+		}
+	} else {
+		game.Player[0].qiziId = game.Player[0].firstqiziId
+		game.Player[1].qiziId = game.Player[1].firstqiziId
+	}
 
 	timer.AddCallback(time.Millisecond*3000, game.ChangeGameTurn)
 }
@@ -406,8 +432,12 @@ func (game *Game5GLogic) checkStart() {
 		game.gameStart()
 
 		//给所有人发送游戏开始信息
+		//		SeatIndex0_qiziid int
+		//		SeatIndex1_qiziid int
 		jd := &datamsg.SC_GameStart{}
 		jd.GameSeatIndex = game.GameSeatIndex
+		jd.SeatIndex0_qiziid = game.Player[0].qiziId
+		jd.SeatIndex1_qiziid = game.Player[1].qiziId
 		game.sendMsgToAll("SC_GameStart", jd)
 	}
 

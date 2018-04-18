@@ -231,6 +231,10 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 	player.Name = playerinfo.Name
 	player.WinCount = playerinfo.WinCount
 	player.SeasonScore = playerinfo.SeasonScore
+	player.AvatarUrl = playerinfo.AvatarUrl
+	player.firstqiziId = playerinfo.FirstQiZi
+	player.secondqiziId = playerinfo.SecondQiZi
+	player.qiziId = -1
 
 	//玩家加入游戏
 	if player, err = game.(*Game5GLogic).GoIn(player); err != nil {

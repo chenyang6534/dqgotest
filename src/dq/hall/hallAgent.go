@@ -117,6 +117,8 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 		jd := datamsg.SC_MsgHallInfo{}
 		jd.PlayerInfo = *playerinfo
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	} else {
+		log.Info(err.Error())
 	}
 
 	//检查是否有游戏正在进行中

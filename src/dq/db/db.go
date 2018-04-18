@@ -66,13 +66,13 @@ func (a *DB) CreateQuickPlayer(machineid string, platfom string, name string) in
 //创建新玩家基础信息
 func (a *DB) newUserBaseInfo(id int, name string) error {
 
-	stmt, err := a.Mydb.Prepare(`INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore) values (?,?,?,?,?,?,?,?)`)
+	stmt, err := a.Mydb.Prepare(`INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)`)
 	defer stmt.Close()
 	if err != nil {
 		log.Info(err.Error())
 		return err
 	}
-	_, err1 := stmt.Exec(id, name, 0, 0, 0, 1, 0, 1000)
+	_, err1 := stmt.Exec(id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
 	return err1
 }
 
@@ -156,7 +156,7 @@ func (a *DB) CheckQuickLogin(machineid string, platfom string) int {
 //获取玩家基本信息
 func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	info.Uid = uid
-	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore FROM userbaseinfo where uid=?")
+	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore,avatarurl,firstqizi,secondqizi FROM userbaseinfo where uid=?")
 
 	if err != nil {
 		log.Info(err.Error())
@@ -171,7 +171,7 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	defer rows.Close()
 
 	if rows.Next() {
-		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore)
+		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi)
 	} else {
 		log.Info("no user:%d", uid)
 		return errors.New("no user")
@@ -190,12 +190,6 @@ func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, lose
 		log.Info("update err")
 		return tx.Rollback()
 	}
-	//	res, err1 = tx.Exec("UPDATE userbaseinfo SET seasonscore=seasonscore+? where uid=?", winseasonscore, loseid)
-	//	n, e = res.RowsAffected()
-	//	if err1 != nil || n == 0 || e != nil {
-	//		log.Info("update err")
-	//		return tx.Rollback()
-	//	}
 
 	res, err1 = tx.Exec("UPDATE userbaseinfo SET losecount=losecount+1,seasonscore=seasonscore-? where uid=?", loseseasonscore, loseid)
 	n, e = res.RowsAffected()
@@ -204,12 +198,23 @@ func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, lose
 		return tx.Rollback()
 	}
 
-	//	res, err1 = tx.Exec("UPDATE userbaseinfo SET seasonscore=seasonscore-? where uid=?", loseseasonscore, loseid)
-	//	n, e = res.RowsAffected()
-	//	if err1 != nil || n == 0 || e != nil {
-	//		log.Info("update err")
-	//		return tx.Rollback()
-	//	}
+	err1 = tx.Commit()
+	return err1
+
+}
+
+//更新玩家头像
+func (a *DB) UpdatePlayerAvatar(avatarurl string, uid int) error {
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec("UPDATE userbaseinfo SET avatarurl=? where uid=?", avatarurl, uid)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err")
+		return tx.Rollback()
+	}
+
 	err1 = tx.Commit()
 	return err1
 

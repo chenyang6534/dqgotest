@@ -32,12 +32,16 @@ type MsgPlayerInfo struct {
 	WinCount    int
 	LoseCount   int
 	SeasonScore int
+	AvatarUrl   string
+	FirstQiZi   int
+	SecondQiZi  int
 }
 
 //微信登录
 type CS_MsgWeiXingLogin struct {
-	Code string
-	Name string
+	Code      string
+	Name      string
+	AvatarUrl string //头像
 }
 
 //快速登录
@@ -120,6 +124,8 @@ type MsgGame5GPlayerInfo struct {
 	WinCount    int
 	LoseCount   int
 	SeasonScore int
+	AvatarUrl   string
+	QiZiId      int
 
 	//游戏中数据
 	SeatIndex  int //座位号
@@ -161,7 +167,9 @@ type SC_GameInfo struct {
 
 //游戏开始
 type SC_GameStart struct {
-	GameSeatIndex int
+	GameSeatIndex     int
+	SeatIndex0_qiziid int
+	SeatIndex1_qiziid int
 }
 
 //切换下棋的人
