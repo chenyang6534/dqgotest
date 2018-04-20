@@ -108,6 +108,8 @@ func (a *HallAgent) DoQuickGameExitData(data *datamsg.MsgBase) {
 
 func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 
+	GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
+
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}
 	err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)

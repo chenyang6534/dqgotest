@@ -5,8 +5,10 @@ import (
 	"dq/conf"
 	"dq/datamsg"
 	"dq/log"
+	"dq/utils"
 	"errors"
 	"strconv"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -44,9 +46,13 @@ func (a *DB) CreateQuickWSOpenidPlayer(openid string, name string) int {
 
 	id := a.newUser("", "", "", openid)
 	if id > 0 {
-		if err := a.newUserBaseInfo(id, name); err == nil {
-			return id
+		if err := a.newUserBaseInfo(id, name); err != nil {
+			return -1
 		}
+		if err := a.newUserTaskEverydayInfo(id); err != nil {
+			return -1
+		}
+		return id
 	}
 	return id
 }
@@ -56,9 +62,13 @@ func (a *DB) CreateQuickPlayer(machineid string, platfom string, name string) in
 
 	id := a.newUser(machineid, platfom, "", "")
 	if id > 0 {
-		if err := a.newUserBaseInfo(id, name+strconv.Itoa(id)); err == nil {
-			return id
+		if err := a.newUserBaseInfo(id, name+strconv.Itoa(id)); err != nil {
+			return -1
 		}
+		if err := a.newUserTaskEverydayInfo(id); err != nil {
+			return -1
+		}
+		return id
 	}
 	return id
 }
@@ -73,6 +83,21 @@ func (a *DB) newUserBaseInfo(id int, name string) error {
 		return err
 	}
 	_, err1 := stmt.Exec(id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
+	return err1
+}
+
+//创建新玩家每日任务信息
+func (a *DB) newUserTaskEverydayInfo(id int) error {
+
+	day := time.Now().Format("2006-01-02")
+
+	stmt, err := a.Mydb.Prepare(`INSERT taskeveryday (uid,day) values (?,?)`)
+	defer stmt.Close()
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	_, err1 := stmt.Exec(id, day)
 	return err1
 }
 
@@ -179,7 +204,81 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 
 }
 
-//更新玩家胜负
+//获取玩家每日任务信息
+func (a *DB) GetPlayerTaskEd(uid int, date *string, info *utils.BeeMap) error {
+
+	size := 1
+	if info != nil {
+		size += info.Size()
+	}
+	count := 0
+	keys := make([]string, size)
+	values := make([]interface{}, size)
+	data := make([]interface{}, size)
+	for i := 0; i < size; i++ {
+		values[i] = &data[i]
+	}
+	values[0] = date
+
+	sqlstr := "SELECT "
+	keys[count] = "day"
+	//values[count] = "2016"
+	count++
+	sqlstr += "day"
+
+	if info != nil {
+		items := info.Items()
+		for k, _ := range items {
+			keys[count] = k.(string)
+			//values[count] = v
+			count++
+			if count == 1000 {
+				sqlstr = sqlstr + k.(string)
+			} else {
+				sqlstr = sqlstr + "," + k.(string)
+			}
+
+		}
+	}
+	sqlstr = sqlstr + " FROM taskeveryday where uid=?"
+
+	//info.Uid = uid
+
+	stmt, err := a.Mydb.Prepare(sqlstr)
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(uid)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		log.Info("---len:%d", len(values))
+		//return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi)
+		err = rows.Scan(values...)
+		if err != nil {
+			log.Info(err.Error())
+			return err
+		}
+		for i := 1; i < len(keys); i++ {
+			info.Set(keys[i], data[i])
+		}
+		//*date = data[0]
+		return nil
+	} else {
+		log.Info("no user:%d", uid)
+		return errors.New("no user")
+	}
+
+}
+
+//更新玩家胜负 事务
 func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, loseseasonscore int) error {
 	tx, _ := a.Mydb.Begin()
 

@@ -1,0 +1,43 @@
+{
+    "Version":13,
+    "Task":
+    [
+        {
+            "Id":100,
+            "Type":1,
+            "DestValue":5,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_100",
+            "ProgressDBFieldName":"play_count",
+            "InitialValue":0
+        },
+        {
+            "Id":101,
+            "Type":1,
+            "DestValue":10,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_101",
+            "ProgressDBFieldName":"play_count",
+            "InitialValue":0
+        },
+        {
+            "Id":102,
+            "Type":2,
+            "DestValue":2,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_102",
+            "ProgressDBFieldName":"win_count",
+            "InitialValue":0
+        },
+        {
+            "Id":103,
+            "Type":2,
+            "DestValue":4,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_103",
+            "ProgressDBFieldName":"win_count",
+            "InitialValue":0
+        }
+    ]
+	
+}

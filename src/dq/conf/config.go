@@ -30,10 +30,14 @@ var (
 
 func LoadConfig(Path string) {
 	// Read config.
-	if err := readFileInto(Path); err != nil {
+	err, data := readFileInto(Path)
+	if err != nil {
 		panic(err)
 	}
-
+	err = json.Unmarshal(data, &Conf)
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Config struct {
@@ -51,12 +55,12 @@ type gateInfo struct {
 	TimeOut          int
 }
 
-func readFileInto(path string) error {
+func readFileInto(path string) (error, []byte) {
 	var data []byte
 	buf := new(bytes.Buffer)
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		return err, data
 	}
 	defer f.Close()
 	r := bufio.NewReader(f)
@@ -75,7 +79,7 @@ func readFileInto(path string) error {
 	}
 	data = buf.Bytes()
 	//log.Info(string(data))
-	return json.Unmarshal(data, &Conf)
+	return nil, data
 }
 
 // If read the file has an error,it will throws a panic.
