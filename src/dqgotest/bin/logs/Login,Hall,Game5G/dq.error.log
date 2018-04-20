@@ -1,5 +1,0 @@
-2018-03-30T09:31:37+08:00 [dq] [E] [db.go:33] Error 1045: Access denied for user 'root'@'localhost' (using password: YES) 
-dq/db/db.go:33
-dq/db/db.go:19
-sync/once.go:44
-dq/app/app.go:66

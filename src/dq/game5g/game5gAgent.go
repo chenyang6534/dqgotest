@@ -247,7 +247,7 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 
 }
 
-//检查是否在游戏中
+//客户端主动检查是否在游戏中(从其他渠道获取游戏信息,进入游戏)
 func (a *Game5GAgent) DoCheckGoToGameData(data *datamsg.MsgBase) {
 
 	h2 := &datamsg.CS_CheckGoToGame{}
@@ -257,8 +257,18 @@ func (a *Game5GAgent) DoCheckGoToGameData(data *datamsg.MsgBase) {
 		return
 	}
 
+	data.ModeType = "Client"
+	data.MsgType = "SC_CheckGoToGame"
 	jd := &datamsg.SC_CheckGoToGame{}
 	jd.GameId = h2.GameId
+
+	//	if utils.Milliseconde()-h2.CreateGameTime > 1000*60*30 {
+	//		jd.Code = 0
+	//		jd.Err = "time out"
+	//		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	//		return
+	//	}
+
 	game := a.Games.Get(h2.GameId)
 	if game == nil {
 
@@ -357,13 +367,13 @@ func (a *Game5GAgent) DoCreateRoomData(data *datamsg.MsgBase) {
 	}
 	a.Creators.Set(data.Uid, -1)
 
-	log.Info("--data.Uid----%d", data.Uid)
+	log.Info("-DoCreateRoomData-data.Uid----%d", data.Uid)
 
 	//time conf.Conf.Game5GInfo.Time
 	time := int(conf.Conf.Game5GInfo["CreateRoom_Time"].(float64))
 	everytime := int(conf.Conf.Game5GInfo["CreateRoom_EveryTime"].(float64))
 
-	game := NewGame5GLogic_CreateRoom(a, data.Uid, time, everytime)
+	game := NewGame5GLogic_CreateRoom(a, data.Uid, time, everytime, data.Uid)
 
 	a.Games.Set(game.GameId, game)
 	a.Creators.Set(data.Uid, game.GameId)
@@ -373,6 +383,8 @@ func (a *Game5GAgent) DoCreateRoomData(data *datamsg.MsgBase) {
 	data1 := &datamsg.MsgBase{}
 	data1.ModeType = "Client"
 	data1.MsgType = "SC_NewGame"
+	data1.Uid = data.Uid
+	data1.ConnectId = data.ConnectId
 	jd := &datamsg.SC_NewGame{}
 	jd.GameId = game.GameId
 	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data1, jd))

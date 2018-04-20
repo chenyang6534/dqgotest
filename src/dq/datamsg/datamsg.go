@@ -74,7 +74,8 @@ type CS_GetGamingInfo struct {
 
 //查看能否进入此房间
 type CS_CheckGoToGame struct {
-	GameId int
+	GameId         int
+	CreateGameTime int64
 }
 
 //大厅信息
@@ -151,6 +152,9 @@ type MsgGame5GInfo struct {
 
 	//棋盘信息
 	QiPan [15][15]int
+
+	//游戏创建时间戳
+	CreateGameTime int64
 }
 
 //其他玩家进入
@@ -190,6 +194,8 @@ type SC_DoGame5G struct {
 //游戏结束
 type SC_GameOver struct {
 	WinPlayerSeatIndex int
+	Reason             int //0表示玩家退出 1表示时间到 2表示棋子5连
+	WinQiZi            [5][2]int
 }
 
 //玩家离开

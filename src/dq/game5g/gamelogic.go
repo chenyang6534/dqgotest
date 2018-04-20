@@ -91,6 +91,16 @@ type Game5GLogic struct {
 
 	//游戏模式
 	GameMode int
+
+	//5连棋子
+	WinQizi [5][2]int
+
+	//创建者UID -1表示服务器自动创建
+	CreateId int
+	//游戏刚创建时候的 计时器  (如果15秒内没人进来就解散房间)
+	gameCreateTimer *timer.Timer
+	//游戏创建时间戳
+	CreateGameTime int64
 }
 
 func (game *Game5GLogic) Init() {
@@ -100,6 +110,10 @@ func (game *Game5GLogic) Init() {
 	game.Lock = new(sync.Mutex)
 	game.Player[0] = nil
 	game.Player[1] = nil
+	game.WinQizi[0][0] = -1
+	game.CreateId = -1
+	game.CreateGameTime = utils.Milliseconde()
+	game.gameCreateTimer = timer.AddCallback(time.Second*15, game.TimeUpDismissGame)
 
 	//初始化棋盘
 	for y, value := range game.QiPan {
@@ -201,6 +215,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 	jd.GameInfo.GameSeatIndex = game.GameSeatIndex
 	jd.GameInfo.QiPan = game.QiPan
 	jd.GameInfo.GameMode = game.GameMode
+	jd.GameInfo.CreateGameTime = game.CreateGameTime
 
 	jd.PlayerInfo = make([]datamsg.MsgGame5GPlayerInfo, 0)
 	jd.ObserveInfo = make([]datamsg.MsgGame5GPlayerInfo, 0)
@@ -306,11 +321,23 @@ func (game *Game5GLogic) TimeUp(seatIndex interface{}) {
 	if seatIndex == 0 {
 		si = 1
 	}
-	game.gameWin(si)
+	game.gameWin(si, 0)
 }
 
-//游戏胜利
-func (game *Game5GLogic) gameWin(seatIndex int) {
+//时间到
+func (game *Game5GLogic) TimeUpDismissGame() {
+	game.Lock.Lock()
+	defer game.Lock.Unlock()
+	for _, v := range game.Player {
+		if v != nil {
+			return
+		}
+	}
+	game.dismissGame()
+}
+
+//游戏胜利 0表示玩家退出 1表示时间到 2表示棋子5连
+func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 	if game.State != Game5GState_Gaming {
 		return
 	}
@@ -364,6 +391,8 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 	//
 	jd := &datamsg.SC_GameOver{}
 	jd.WinPlayerSeatIndex = seatIndex
+	jd.Reason = reason
+	jd.WinQiZi = game.WinQizi
 	game.sendMsgToAll("SC_GameOver", jd)
 
 	game.dismissGame()
@@ -372,6 +401,8 @@ func (game *Game5GLogic) gameWin(seatIndex int) {
 
 //解散房间
 func (game *Game5GLogic) dismissGame() {
+	log.Info("---dismissGame---%d", game.GameId)
+
 	game.State = Game5GState_Over
 	//解散房间
 	for _, v := range game.Player {
@@ -386,6 +417,8 @@ func (game *Game5GLogic) dismissGame() {
 			game.GameAgent.Players.Delete(v.(*Game5GPlayer).Uid)
 		}
 	}
+	game.GameAgent.Creators.Delete(game.CreateId)
+
 	game.GameAgent.Games.Delete(game.GameId)
 }
 
@@ -489,7 +522,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	//检查是否胜利
 	winFlag := game.judgment(data.Y, data.X)
 	if winFlag != -1 {
-		game.gameWin(winFlag)
+		game.gameWin(winFlag, 2)
 	} else {
 		game.Lock.Unlock()
 		game.ChangeGameTurn()
@@ -529,6 +562,10 @@ func (game *Game5GLogic) GoIn(player *Game5GPlayer) (*Game5GPlayer, error) {
 				player.Game = game
 				game.notifyAllPlayerGoIn(player)
 				game.Player[k] = player
+				if game.gameCreateTimer != nil {
+					game.gameCreateTimer.Cancel()
+					game.gameCreateTimer = nil
+				}
 			}
 
 			game.sendGameInfoToPlayer(game.Player[k])
@@ -566,6 +603,10 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 	if player.PlayerType == 1 {
 
 		if game.State == Game5GState_Wait {
+			//给所有人发送玩家离开
+			jd := &datamsg.SC_PlayerGoOut{}
+			jd.Uid = player.Uid
+			game.sendMsgToAll("SC_PlayerGoOut", jd)
 
 			game.dismissGame()
 			return true
@@ -580,7 +621,7 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 			if player.SeatIndex == 0 {
 				wi = 1
 			}
-			game.gameWin(wi)
+			game.gameWin(wi, 1)
 
 			//game.Player[player.SeatIndex] = nil
 			return true
@@ -611,7 +652,10 @@ func (game *Game5GLogic) Disconnect(player *Game5GPlayer) bool {
 
 	//玩家
 	if player.PlayerType == 1 {
-
+		//游戏未开始
+		if game.State == Game5GState_Wait {
+			game.dismissGame()
+		}
 		//玩家掉线中标志
 
 		return true
@@ -629,32 +673,106 @@ func (game *Game5GLogic) Disconnect(player *Game5GPlayer) bool {
 }
 
 func (game *Game5GLogic) judgment(x int, y int) int {
+	//var qizi [5][2]int
 	winFlag := -1
 	data := game.QiPan
 	for i := 0; i != 5; i++ {
-		if (y-i >= 0 && y-i+4 < 15 &&
+		if y-i >= 0 && y-i+4 < 15 &&
 			data[x][y-i] == data[x][y-i+1] && // 横
 			data[x][y-i] == data[x][y-i+2] &&
 			data[x][y-i] == data[x][y-i+3] &&
-			data[x][y-i] == data[x][y-i+4]) ||
-			(x-i >= 0 && x-i+4 < 15 && // 竖
-				data[x-i][y] == data[x-i+1][y] &&
-				data[x-i][y] == data[x-i+2][y] &&
-				data[x-i][y] == data[x-i+3][y] &&
-				data[x-i][y] == data[x-i+4][y]) ||
-			(x-i >= 0 && y-i >= 0 && x-i+4 < 15 && y-i+4 < 15 && // 左向右斜
-				data[x-i][y-i] == data[x-i+1][y-i+1] &&
-				data[x-i][y-i] == data[x-i+2][y-i+2] &&
-				data[x-i][y-i] == data[x-i+3][y-i+3] &&
-				data[x-i][y-i] == data[x-i+4][y-i+4]) ||
-			(x-i >= 0 && y+i < 15 && x-i+4 < 15 && y+i-4 >= 0 && // 右向左斜
-				data[x-i][y+i] == data[x-i+1][y+i-1] &&
-				data[x-i][y+i] == data[x-i+2][y+i-2] &&
-				data[x-i][y+i] == data[x-i+3][y+i-3] &&
-				data[x-i][y+i] == data[x-i+4][y+i-4]) {
+			data[x][y-i] == data[x][y-i+4] {
 			winFlag = data[x][y]
+			game.WinQizi[0][0] = x
+			game.WinQizi[0][1] = y - i
+			game.WinQizi[1][0] = x
+			game.WinQizi[1][1] = y - i + 1
+			game.WinQizi[2][0] = x
+			game.WinQizi[2][1] = y - i + 2
+			game.WinQizi[3][0] = x
+			game.WinQizi[3][1] = y - i + 3
+			game.WinQizi[4][0] = x
+			game.WinQizi[4][1] = y - i + 4
+			break
+		} else if x-i >= 0 && x-i+4 < 15 && // 竖
+			data[x-i][y] == data[x-i+1][y] &&
+			data[x-i][y] == data[x-i+2][y] &&
+			data[x-i][y] == data[x-i+3][y] &&
+			data[x-i][y] == data[x-i+4][y] {
+
+			winFlag = data[x][y]
+			game.WinQizi[0][0] = x - i
+			game.WinQizi[0][1] = y
+			game.WinQizi[1][0] = x - i + 1
+			game.WinQizi[1][1] = y
+			game.WinQizi[2][0] = x - i + 2
+			game.WinQizi[2][1] = y
+			game.WinQizi[3][0] = x - i + 3
+			game.WinQizi[3][1] = y
+			game.WinQizi[4][0] = x - i + 4
+			game.WinQizi[4][1] = y
+			break
+		} else if x-i >= 0 && y-i >= 0 && x-i+4 < 15 && y-i+4 < 15 && // 左向右斜
+			data[x-i][y-i] == data[x-i+1][y-i+1] &&
+			data[x-i][y-i] == data[x-i+2][y-i+2] &&
+			data[x-i][y-i] == data[x-i+3][y-i+3] &&
+			data[x-i][y-i] == data[x-i+4][y-i+4] {
+
+			winFlag = data[x][y]
+			game.WinQizi[0][0] = x - i
+			game.WinQizi[0][1] = y - i
+			game.WinQizi[1][0] = x - i + 1
+			game.WinQizi[1][1] = y - i + 1
+			game.WinQizi[2][0] = x - i + 2
+			game.WinQizi[2][1] = y - i + 2
+			game.WinQizi[3][0] = x - i + 3
+			game.WinQizi[3][1] = y - i + 3
+			game.WinQizi[4][0] = x - i + 4
+			game.WinQizi[4][1] = y - i + 4
+			break
+		} else if x-i >= 0 && y+i < 15 && x-i+4 < 15 && y+i-4 >= 0 && // 右向左斜
+			data[x-i][y+i] == data[x-i+1][y+i-1] &&
+			data[x-i][y+i] == data[x-i+2][y+i-2] &&
+			data[x-i][y+i] == data[x-i+3][y+i-3] &&
+			data[x-i][y+i] == data[x-i+4][y+i-4] {
+
+			winFlag = data[x][y]
+			game.WinQizi[0][0] = x - i
+			game.WinQizi[0][1] = y + i
+			game.WinQizi[1][0] = x - i + 1
+			game.WinQizi[1][1] = y + i - 1
+			game.WinQizi[2][0] = x - i + 2
+			game.WinQizi[2][1] = y + i - 2
+			game.WinQizi[3][0] = x - i + 3
+			game.WinQizi[3][1] = y + i - 3
+			game.WinQizi[4][0] = x - i + 4
+			game.WinQizi[4][1] = y + i - 4
 			break
 		}
+
+		//				if (y-i >= 0 && y-i+4 < 15 &&
+		//					data[x][y-i] == data[x][y-i+1] && // 横
+		//					data[x][y-i] == data[x][y-i+2] &&
+		//					data[x][y-i] == data[x][y-i+3] &&
+		//					data[x][y-i] == data[x][y-i+4]) ||
+		//					(x-i >= 0 && x-i+4 < 15 && // 竖
+		//						data[x-i][y] == data[x-i+1][y] &&
+		//						data[x-i][y] == data[x-i+2][y] &&
+		//						data[x-i][y] == data[x-i+3][y] &&
+		//						data[x-i][y] == data[x-i+4][y]) ||
+		//					(x-i >= 0 && y-i >= 0 && x-i+4 < 15 && y-i+4 < 15 && // 左向右斜
+		//						data[x-i][y-i] == data[x-i+1][y-i+1] &&
+		//						data[x-i][y-i] == data[x-i+2][y-i+2] &&
+		//						data[x-i][y-i] == data[x-i+3][y-i+3] &&
+		//						data[x-i][y-i] == data[x-i+4][y-i+4]) ||
+		//					(x-i >= 0 && y+i < 15 && x-i+4 < 15 && y+i-4 >= 0 && // 右向左斜
+		//						data[x-i][y+i] == data[x-i+1][y+i-1] &&
+		//						data[x-i][y+i] == data[x-i+2][y+i-2] &&
+		//						data[x-i][y+i] == data[x-i+3][y+i-3] &&
+		//						data[x-i][y+i] == data[x-i+4][y+i-4]) {
+		//					winFlag = data[x][y]
+		//					break
+		//				}
 	}
 	return winFlag
 }
@@ -672,32 +790,34 @@ func GetNewGameId() int {
 }
 
 //创建自建房游戏
-func NewGame5GLogic_CreateRoom(ga *Game5GAgent, p1Id int, time int, everytime int) *Game5GLogic {
+func NewGame5GLogic_CreateRoom(ga *Game5GAgent, p1Id int, time1 int, everytime int, createid int) *Game5GLogic {
 	ng := &Game5GLogic{}
 	ng.GameId = GetNewGameId()
 	ng.WillPlayGamePlayerUid[0] = p1Id
 	ng.WillPlayGamePlayerUid[1] = -1
 	ng.GameAgent = ga
-	ng.Time = time
+	ng.Time = time1
 	ng.EveryTime = everytime
 	ng.GameMode = Game5GMode_CreateRoom
-
+	ng.CreateId = createid
 	ng.Init()
+
 	return ng
 }
 
 //创建赛季匹配游戏
-func NewGame5GLogic_SeasonMatching(ga *Game5GAgent, p1Id int, p2Id int, time int, everytime int) *Game5GLogic {
+func NewGame5GLogic_SeasonMatching(ga *Game5GAgent, p1Id int, p2Id int, time1 int, everytime int) *Game5GLogic {
 	ng := &Game5GLogic{}
 	ng.GameId = GetNewGameId()
 	ng.WillPlayGamePlayerUid[0] = p1Id
 	ng.WillPlayGamePlayerUid[1] = p2Id
 	ng.GameAgent = ga
-	ng.Time = time
+	ng.Time = time1
 	ng.EveryTime = everytime
 	ng.GameMode = Game5GMode_SeasonMatching
-
+	ng.CreateId = -1
 	ng.Init()
+
 	return ng
 }
 
