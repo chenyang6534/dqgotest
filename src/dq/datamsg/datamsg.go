@@ -61,7 +61,7 @@ type CS_GoOut struct {
 	GameId int
 }
 
-//走棋
+//走棋11
 type CS_DoGame5G struct {
 	X int
 	Y int

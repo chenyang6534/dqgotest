@@ -262,12 +262,12 @@ func (a *Game5GAgent) DoCheckGoToGameData(data *datamsg.MsgBase) {
 	jd := &datamsg.SC_CheckGoToGame{}
 	jd.GameId = h2.GameId
 
-	//	if utils.Milliseconde()-h2.CreateGameTime > 1000*60*30 {
-	//		jd.Code = 0
-	//		jd.Err = "time out"
-	//		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
-	//		return
-	//	}
+	if utils.Milliseconde()-h2.CreateGameTime > 1000*60*30 {
+		jd.Code = 0
+		jd.Err = "time out"
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+		return
+	}
 
 	game := a.Games.Get(h2.GameId)
 	if game == nil {
