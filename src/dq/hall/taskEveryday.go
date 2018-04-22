@@ -6,6 +6,7 @@ import (
 	"dq/log"
 	"dq/utils"
 	"sync"
+	"time"
 )
 
 var (
@@ -28,6 +29,21 @@ type UserTaskEveryday struct {
 	DBValue *utils.BeeMap //数据库中的字段和值
 }
 
+func newUserTaskEveryday(uid int) *UserTaskEveryday {
+	player := &UserTaskEveryday{}
+	//taskE.PlayerTskEd.Set(uid, player)
+	player.DBValue = utils.NewBeeMap()
+	player.Uid = uid
+
+	//获取值
+	cfg := conf.GetTaskEveryDayCfg()
+	for _, v := range cfg.Task {
+		player.DBValue.Set(v.GetTagDBFieldName, 0)
+		player.DBValue.Set(v.ProgressDBFieldName, v.InitialValue)
+	}
+	return player
+}
+
 func (user *UserTaskEveryday) readValueFromDB() {
 	//从数据库获取值
 	if err := db.DbOne.GetPlayerTaskEd(user.Uid, &user.Date, user.DBValue); err != nil {
@@ -41,23 +57,44 @@ func (user *UserTaskEveryday) readValueFromDB() {
 
 }
 
+//写到数据库
+func (user *UserTaskEveryday) writeToDB() {
+
+	items := user.DBValue.Items()
+	for k, _ := range items {
+		user.DBValue.Set(k, 100)
+	}
+
+	db.DbOne.SetPlayerTaskEd(user.Uid, user.Date, user.DBValue)
+}
+
+func (user *UserTaskEveryday) doCheck() bool {
+	today := time.Now().Format("2006-01-02")
+	if today != user.Date {
+		//
+		return false
+
+	}
+	return true
+}
+
 func (taskE *TaskEveryday) getPlayer(uid int) *UserTaskEveryday {
 	if taskE.PlayerTskEd.Check(uid) == false {
-		player := &UserTaskEveryday{}
-		//taskE.PlayerTskEd.Set(uid, player)
-		player.DBValue = utils.NewBeeMap()
-		player.Uid = uid
 
-		//获取值
-		cfg := conf.GetTaskEveryDayCfg()
-		for _, v := range cfg.Task {
-			player.DBValue.Set(v.GetTagDBFieldName, 0)
-			player.DBValue.Set(v.ProgressDBFieldName, v.InitialValue)
+		player := newUserTaskEveryday(uid)
+		//再次检查
+		if taskE.PlayerTskEd.Check(uid) == false {
+			player.readValueFromDB()
+			taskE.PlayerTskEd.Set(uid, player)
+			return player
 		}
-		player.readValueFromDB()
 
-		taskE.PlayerTskEd.Set(uid, player)
+	}
 
+	//检查日期是否过期
+	if (taskE.PlayerTskEd.Get(uid)).(*UserTaskEveryday).doCheck() == false {
+		taskE.PlayerTskEd.Delete(uid)
+		return taskE.getPlayer(uid)
 	}
 
 	return (taskE.PlayerTskEd.Get(uid)).(*UserTaskEveryday)
@@ -71,7 +108,10 @@ func (taskE *TaskEveryday) getCompleteNumOfTskEd(uid int) {
 	//	Version int //版本
 	//	Task    []TaskConfig
 	//}
-	taskE.getPlayer(uid)
+	player := taskE.getPlayer(uid)
+	if player != nil {
+		player.writeToDB()
+	}
 	//cfg := conf.GetTaskEveryDayCfg()
 	//	for v := range cfg.Task {
 

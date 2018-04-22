@@ -8,6 +8,7 @@ import (
 	"dq/utils"
 	"errors"
 	"strconv"
+	//"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -44,80 +45,129 @@ func (a *DB) Init() {
 //创建微信openid玩家
 func (a *DB) CreateQuickWSOpenidPlayer(openid string, name string) int {
 
-	id := a.newUser("", "", "", openid)
-	if id > 0 {
-		if err := a.newUserBaseInfo(id, name); err != nil {
-			return -1
-		}
-		if err := a.newUserTaskEverydayInfo(id); err != nil {
-			return -1
-		}
-		return id
-	}
+	id, _ := a.newUser("", "", "", openid, name)
+	//	if id > 0 {
+	//		if err := a.newUserBaseInfo(id, name); err == nil {
+	//			return err
+	//		}
+
+	//	}
 	return id
 }
 
 //创建快速新玩家
 func (a *DB) CreateQuickPlayer(machineid string, platfom string, name string) int {
 
-	id := a.newUser(machineid, platfom, "", "")
-	if id > 0 {
-		if err := a.newUserBaseInfo(id, name+strconv.Itoa(id)); err != nil {
-			return -1
-		}
-		if err := a.newUserTaskEverydayInfo(id); err != nil {
-			return -1
-		}
-		return id
-	}
+	id, _ := a.newUser(machineid, platfom, "", "", name)
+	//	if id > 0 {
+	//		if err := a.newUserBaseInfo(id, name+strconv.Itoa(id)); err == nil {
+	//			return err
+	//		}
+
+	//	}
 	return id
 }
 
 //创建新玩家基础信息
 func (a *DB) newUserBaseInfo(id int, name string) error {
 
-	stmt, err := a.Mydb.Prepare(`INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)`)
-	defer stmt.Close()
-	if err != nil {
-		log.Info(err.Error())
-		return err
-	}
-	_, err1 := stmt.Exec(id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
-	return err1
-}
+	//	stmt, err := a.Mydb.Prepare(`INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)`)
+	//	defer stmt.Close()
+	//	if err != nil {
+	//		log.Info(err.Error())
+	//		return err
+	//	}
+	//	_, err1 := stmt.Exec(id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
+	//	return err1
 
-//创建新玩家每日任务信息
-func (a *DB) newUserTaskEverydayInfo(id int) error {
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
+		id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("INSERT userbaseinfo err")
+		return tx.Rollback()
+	}
 
 	day := time.Now().Format("2006-01-02")
-
-	stmt, err := a.Mydb.Prepare(`INSERT taskeveryday (uid,day) values (?,?)`)
-	defer stmt.Close()
-	if err != nil {
-		log.Info(err.Error())
-		return err
+	res, err1 = tx.Exec("INSERT taskeveryday (uid,day) values (?,?)", id, day)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("INSERT taskeveryday err")
+		return tx.Rollback()
 	}
-	_, err1 := stmt.Exec(id, day)
+
+	err1 = tx.Commit()
 	return err1
+
 }
 
-//创建新玩家信息
-func (a *DB) newUser(machineid string, platfom string, phonenumber string, openid string) int {
+////创建新玩家每日任务信息
+//func (a *DB) newUserTaskEverydayInfo(id int) error {
 
-	stmt, err := a.Mydb.Prepare(`INSERT user (phonenumber,platform,machineid,wechat_id) values (?,?,?,?)`)
-	defer stmt.Close()
-	if err != nil {
-		log.Info(err.Error())
-		return -1
+//	day := time.Now().Format("2006-01-02")
+
+//	stmt, err := a.Mydb.Prepare(`INSERT taskeveryday (uid,day) values (?,?)`)
+//	defer stmt.Close()
+//	if err != nil {
+//		log.Info(err.Error())
+//		return err
+//	}
+//	_, err1 := stmt.Exec(id, day)
+//	return err1
+//}
+
+//创建新玩家信息
+func (a *DB) newUser(machineid string, platfom string, phonenumber string, openid string, name string) (int, error) {
+
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec("INSERT user (phonenumber,platform,machineid,wechat_id) values (?,?,?,?)",
+		phonenumber, platfom, machineid, openid)
+	n, e := res.RowsAffected()
+	id, err2 := res.LastInsertId()
+	if err1 != nil || n == 0 || e != nil || err2 != nil {
+		log.Info("INSERT user err")
+		return -1, tx.Rollback()
 	}
-	res, err1 := stmt.Exec(phonenumber, platfom, machineid, openid)
+
+	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
+		id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("INSERT userbaseinfo err")
+		return -1, tx.Rollback()
+	}
+
+	day := time.Now().Format("2006-01-02")
+	res, err1 = tx.Exec("INSERT taskeveryday (uid,day) values (?,?)", id, day)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("INSERT taskeveryday err")
+		return -1, tx.Rollback()
+	}
+
+	err1 = tx.Commit()
 	if err1 == nil {
-		id, _ := res.LastInsertId()
-		return int(id)
+		return int(id), nil
 	}
-	log.Info(err1.Error())
-	stmt.Query()
-	return -1
+	return -1, err1
+
+	//	stmt, err := a.Mydb.Prepare(`INSERT user (phonenumber,platform,machineid,wechat_id) values (?,?,?,?)`)
+	//	defer stmt.Close()
+	//	if err != nil {
+	//		log.Info(err.Error())
+	//		return -1
+	//	}
+	//	res, err1 := stmt.Exec(phonenumber, platfom, machineid, openid)
+	//	if err1 == nil {
+	//		id, _ := res.LastInsertId()
+	//		return int(id)
+	//	}
+	//	log.Info(err1.Error())
+	//	stmt.Query()
+	//	return -1
 }
 
 //检查微信openid登录
@@ -202,6 +252,62 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 		return errors.New("no user")
 	}
 
+}
+
+//获取玩家每日任务信息
+func (a *DB) SetPlayerTaskEd(uid int, date string, info *utils.BeeMap) error {
+
+	//----------
+	size := 1
+	if info != nil {
+		size += info.Size()
+	}
+	keys := make([]string, size)
+	values := make([]interface{}, size)
+
+	sqlstr := "UPDATE taskeveryday SET "
+
+	count := 0
+	keys[count] = "day"
+	values[count] = "\"" + date + "\""
+	//sqlstr = sqlstr + keys[count] + "=" + (values[count].(string))
+	sqlstr = sqlstr + keys[count] + "=?"
+	count++
+
+	if info != nil {
+		items := info.Items()
+		for k, v := range items {
+			keys[count] = k.(string)
+			values[count] = v
+			count++
+		}
+	}
+
+	for i := 1; i < size; i++ {
+		sqlstr = sqlstr + "," + keys[i] + "=" + strconv.Itoa(values[i].(int))
+	}
+
+	sqlstr += " where uid=?"
+
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec(sqlstr, date, uid)
+
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		if err1 != nil {
+			log.Error(err1.Error())
+		}
+		if e != nil {
+			log.Error(e.Error())
+		}
+
+		log.Info("n:%d", n)
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
 }
 
 //获取玩家每日任务信息
