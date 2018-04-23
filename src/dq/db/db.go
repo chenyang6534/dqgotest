@@ -8,7 +8,6 @@ import (
 	"dq/utils"
 	"errors"
 	"strconv"
-	//"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -130,6 +129,9 @@ func (a *DB) newUser(machineid string, platfom string, phonenumber string, openi
 	if err1 != nil || n == 0 || e != nil || err2 != nil {
 		log.Info("INSERT user err")
 		return -1, tx.Rollback()
+	}
+	if name == "" {
+		name = "xiaoming_" + strconv.Itoa(int(id))
 	}
 
 	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
@@ -320,7 +322,7 @@ func (a *DB) GetPlayerTaskEd(uid int, date *string, info *utils.BeeMap) error {
 	count := 0
 	keys := make([]string, size)
 	values := make([]interface{}, size)
-	data := make([]interface{}, size)
+	data := make([]int, size)
 	for i := 0; i < size; i++ {
 		values[i] = &data[i]
 	}

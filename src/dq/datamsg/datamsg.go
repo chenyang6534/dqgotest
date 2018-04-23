@@ -106,6 +106,12 @@ type SC_MsgHallInfo struct {
 	PlayerInfo MsgPlayerInfo
 }
 
+//大厅UI信息
+type SC_HallUIInfo struct {
+	TaskED_ShowNum int
+	Task_ShowNum   int
+}
+
 //操作结果
 type SC_Result struct {
 	Result string
@@ -114,6 +120,15 @@ type SC_Result struct {
 //游戏创建好了 等到加入
 type SC_NewGame struct {
 	GameId int
+}
+
+//GameOverInfo
+//游戏结束信息
+type GameOverInfo struct {
+	GameMode   int
+	WinId      int
+	LoseId     int
+	ObserverId []int
 }
 
 //玩家
@@ -196,6 +211,20 @@ type SC_GameOver struct {
 	WinPlayerSeatIndex int
 	Reason             int //0表示玩家退出 1表示时间到 2表示棋子5连
 	WinQiZi            [5][2]int
+}
+
+type MsgTaskInfo struct {
+	Id            int
+	Type          int
+	DestValue     int //目标
+	ProgressValue int //进度
+	State         int //状态 0表示未完成 1表示已完成没领取 2表示已领取
+
+}
+
+//每日任务信息
+type SC_TskEdInfo struct {
+	Task []MsgTaskInfo
 }
 
 //玩家离开

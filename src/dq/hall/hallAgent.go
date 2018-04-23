@@ -52,12 +52,27 @@ func (a *HallAgent) Init() {
 
 	a.handles["GetInfo"] = a.DoGetInfoData
 
+	//一场游戏比赛结束
+	a.handles["GameOverInfo"] = a.DoGameOverInfoData
+
+	a.handles["CS_GetTskInfo"] = a.DoGetTskInfoData
 	a.handles["CS_QuickGame"] = a.DoQuickGameData
 	a.handles["CS_QuickGameExit"] = a.DoQuickGameExitData
 
 	//玩家断线
 	a.handles["Disconnect"] = a.DoDisConnectData
 
+}
+
+func (a *HallAgent) DoGetTskInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_TskEdInfo"
+
+	tsdinfo := GetTaskEveryday().getTskEdInfo(data.Uid)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
 }
 
 func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
@@ -106,9 +121,59 @@ func (a *HallAgent) DoQuickGameExitData(data *datamsg.MsgBase) {
 
 }
 
+//游戏结束信息
+func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
+
+	h2 := &datamsg.GameOverInfo{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	//设置每日任务数据
+	GetTaskEveryday().Play(h2.WinId)
+	GetTaskEveryday().Play(h2.LoseId)
+	GetTaskEveryday().Win(h2.WinId)
+	if h2.GameMode == 1 { //好友比赛
+		GetTaskEveryday().FriendMatchPlay(h2.WinId)
+		GetTaskEveryday().FriendMatchPlay(h2.LoseId)
+
+		GetTaskEveryday().FriendMatchWin(h2.WinId)
+	} else if h2.GameMode == 3 { //赛季天梯匹配
+		GetTaskEveryday().SeasonMatchPlay(h2.WinId)
+		GetTaskEveryday().SeasonMatchPlay(h2.LoseId)
+		GetTaskEveryday().SeasonMatchWin(h2.WinId)
+	}
+
+	//持久化
+	GetTaskEveryday().getPlayer(h2.WinId).writeToDB()
+	GetTaskEveryday().getPlayer(h2.LoseId).writeToDB()
+
+	//
+	//type GameOverInfo struct {
+	//	GameMode   int
+	//	WinId      int
+	//	LoseId     int
+	//	ObserverId []int
+	//}
+}
+
+func (a *HallAgent) SendHallUIInfo(data *datamsg.MsgBase) {
+	//大厅界面信息
+	numTed := GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
+	if numTed > 0 {
+		data.ModeType = "Client"
+		data.MsgType = "SC_HallUIInfo"
+		jd := datamsg.SC_HallUIInfo{}
+		jd.TaskED_ShowNum = numTed
+		jd.Task_ShowNum = 0
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	}
+}
+
 func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 
-	GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
+	a.SendHallUIInfo(data)
 
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}

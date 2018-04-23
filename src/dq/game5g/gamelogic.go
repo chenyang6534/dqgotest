@@ -387,6 +387,30 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 			}
 		}
 	}
+	//通知大厅游戏结束信息
+	if true {
+		//		GameMode   int
+		//	WinId      int
+		//	LoseId     int
+		//	ObserverId []int
+
+		data := &datamsg.MsgBase{}
+		data.ModeType = "Hall"
+		data.MsgType = "GameOverInfo"
+		jd := datamsg.GameOverInfo{}
+		jd.WinId = winplayer.Uid
+		jd.LoseId = loseplayer.Uid
+		jd.GameMode = game.GameMode
+		allObserve := game.Observer.Items()
+		count := 0
+		for _, v := range allObserve {
+			if v != nil {
+				jd.ObserverId[count] = (v.(*Game5GPlayer).Uid)
+				count++
+			}
+		}
+		game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	}
 
 	//
 	jd := &datamsg.SC_GameOver{}

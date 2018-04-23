@@ -153,7 +153,7 @@ func (a *LoginAgent) DoQuickLoginData(data *datamsg.MsgBase) {
 	if uid = db.DbOne.CheckQuickLogin(h2.MachineId, h2.Platform); uid > 0 {
 		log.Info("---------user login:%d", uid)
 	} else {
-		uid = db.DbOne.CreateQuickPlayer(h2.MachineId, h2.Platform, "xiaoming")
+		uid = db.DbOne.CreateQuickPlayer(h2.MachineId, h2.Platform, "")
 		if uid < 0 {
 			log.Info("---------new user lose", uid)
 			return

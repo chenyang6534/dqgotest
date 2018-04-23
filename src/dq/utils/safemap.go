@@ -94,6 +94,26 @@ func (m *BeeMap) Set(k interface{}, v interface{}) bool {
 	return true
 }
 
+func (m *BeeMap) AddInt(k interface{}, addcount int) bool {
+	m.lock.Lock()
+	if _, ok := m.bm[k]; !ok {
+
+		m.lock.Unlock()
+		return false
+	} else {
+		value, ok := m.bm[k].(int)
+		if ok {
+			m.bm[k] = value + addcount
+			m.lock.Unlock()
+			return true
+		}
+
+		m.lock.Unlock()
+		return false
+	}
+	return false
+}
+
 // Check Returns true if k is exist in the map.
 func (m *BeeMap) Check(k interface{}) bool {
 	m.lock.RLock()

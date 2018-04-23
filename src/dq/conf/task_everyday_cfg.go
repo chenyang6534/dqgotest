@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	taskEveryDayCfg = TaskEveryDayConfig{Version: -1}
+	taskEveryDayCfg = TaskEveryDayConfig{Version: "0"}
 	//锁
 	lock = new(sync.RWMutex)
 )
@@ -67,7 +67,7 @@ func LoadTaskEveryDayConfig() {
 		return
 	}
 	//数据被改变
-	if ted.Version > taskEveryDayCfg.Version {
+	if ted.Version != taskEveryDayCfg.Version {
 		log.Info("LoadTaskEveryDayConfig")
 		lock.Lock()
 		taskEveryDayCfg = ted
@@ -84,7 +84,7 @@ func GetTaskEveryDayCfg() *TaskEveryDayConfig {
 }
 
 type TaskEveryDayConfig struct {
-	Version int //版本
+	Version string //版本
 	Task    []TaskConfig
 }
 
