@@ -1,6 +1,7 @@
 package datamsg
 
 import (
+	"dq/conf"
 	"encoding/json"
 )
 
@@ -76,6 +77,17 @@ type CS_GetGamingInfo struct {
 type CS_CheckGoToGame struct {
 	GameId         int
 	CreateGameTime int64
+}
+
+//获取任务奖励
+type CS_GetTaskRewards struct {
+	Id int //任务id
+}
+
+//大厅信息
+type SC_GetTaskRewards struct {
+	Code int //1表示成功
+	Id   int //任务ID
 }
 
 //大厅信息
@@ -220,6 +232,7 @@ type MsgTaskInfo struct {
 	ProgressValue int //进度
 	State         int //状态 0表示未完成 1表示已完成没领取 2表示已领取
 
+	Rewards []conf.RewardsConfig
 }
 
 //每日任务信息

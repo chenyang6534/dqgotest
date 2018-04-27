@@ -45,6 +45,45 @@ func (user *UserTaskEveryday) readValueFromDB() {
 	log.Info("---day:" + user.Date)
 
 }
+func (user *UserTaskEveryday) doShare() {
+	user.lock.RLock()
+	defer user.lock.RUnlock()
+
+	//以后优化
+	user.DBValue.AddInt("share_count", 1)
+	user.writeToDB()
+}
+
+//获取任务奖励
+func (user *UserTaskEveryday) getTskEdRewards(taskid int) bool {
+	user.lock.RLock()
+	defer user.lock.RUnlock()
+
+	//以后优化
+	cfg := conf.GetTaskEveryDayCfg()
+	for _, v := range cfg.Task {
+		if v.Id == taskid {
+			value := user.DBValue.Get(v.ProgressDBFieldName)
+			get := user.DBValue.Get(v.GetTagDBFieldName)
+
+			log.Info("---------value:%d----get:%d", value.(int), get.(int))
+			if value != nil && get != nil {
+
+				if value.(int) >= v.DestValue && get.(int) != 1 {
+					user.DBValue.Set(v.GetTagDBFieldName, 1)
+					//奖励
+					db.DbOne.GetTaskRewards(user.Uid, v.Rewards, v.GetTagDBFieldName)
+
+					return true
+				}
+
+			}
+			return false
+		}
+	}
+
+	return false
+}
 
 //获取任务信息
 func (user *UserTaskEveryday) getTskEdInfo() *datamsg.SC_TskEdInfo {
@@ -63,6 +102,7 @@ func (user *UserTaskEveryday) getTskEdInfo() *datamsg.SC_TskEdInfo {
 		jd.Task[k].DestValue = v.DestValue
 		jd.Task[k].ProgressValue = 0
 		jd.Task[k].State = 0
+		jd.Task[k].Rewards = v.Rewards
 		value := user.DBValue.Get(v.ProgressDBFieldName)
 		get := user.DBValue.Get(v.GetTagDBFieldName)
 		if value != nil && get != nil {
@@ -141,6 +181,7 @@ func (user *UserTaskEveryday) doCheck() bool {
 		for k, _ := range items {
 			user.DBValue.Set(k, 0)
 		}
+		user.Date = today
 		user.writeToDB()
 		//
 		return false
@@ -245,6 +286,28 @@ func (taskE *TaskEveryday) getTskEdInfo(uid int) *datamsg.SC_TskEdInfo {
 		return player.getTskEdInfo()
 	}
 	return nil
+}
+
+func (taskE *TaskEveryday) getTskEdRewards(uid int, taskid int) bool {
+	log.Info("----getTskEdRewards----")
+	//t1 := time.Now().Format("2006-01-02")
+	//	type TaskEveryDayConfig struct {
+	//	Version int //版本
+	//	Task    []TaskConfig
+	//}
+	player := taskE.getPlayer(uid)
+	if player != nil {
+		return player.getTskEdRewards(taskid)
+	}
+	return false
+}
+
+func (taskE *TaskEveryday) doShare(uid int) {
+
+	player := taskE.getPlayer(uid)
+	if player != nil {
+		player.doShare()
+	}
 }
 
 //赛季比赛赢

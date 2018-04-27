@@ -256,6 +256,43 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 
 }
 
+//type RewardsConfig struct {
+//	Type  int
+//	Count int
+//	Time  int
+//}
+//获取奖励
+func (a *DB) GetTaskRewards(uid int, rewards []conf.RewardsConfig, getTagDBFieldName string) error {
+
+	tx, _ := a.Mydb.Begin()
+
+	for _, v := range rewards {
+
+		//金币
+		if v.Type == 1 {
+			res, err1 := tx.Exec("UPDATE userbaseinfo SET gold=gold+? where uid=?", v.Count, uid)
+			//res.LastInsertId()
+			n, e := res.RowsAffected()
+			if err1 != nil || n == 0 || e != nil {
+				log.Info("update err")
+				return tx.Rollback()
+			}
+		}
+
+	}
+	sqlstr := "UPDATE taskeveryday SET " + getTagDBFieldName + "=1 where uid=?"
+	res, err1 := tx.Exec(sqlstr, uid)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+
 //获取玩家每日任务信息
 func (a *DB) SetPlayerTaskEd(uid int, date string, info *utils.BeeMap) error {
 

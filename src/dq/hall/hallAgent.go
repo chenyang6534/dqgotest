@@ -56,11 +56,47 @@ func (a *HallAgent) Init() {
 	a.handles["GameOverInfo"] = a.DoGameOverInfoData
 
 	a.handles["CS_GetTskInfo"] = a.DoGetTskInfoData
+	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
+	a.handles["CS_Share"] = a.DoShareData
+
 	a.handles["CS_QuickGame"] = a.DoQuickGameData
 	a.handles["CS_QuickGameExit"] = a.DoQuickGameExitData
 
 	//玩家断线
 	a.handles["Disconnect"] = a.DoDisConnectData
+
+}
+func (a *HallAgent) DoShareData(data *datamsg.MsgBase) {
+	GetTaskEveryday().doShare(data.Uid)
+}
+
+func (a *HallAgent) DoGetTaskRewardsData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_GetTaskRewards{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	flag := GetTaskEveryday().getTskEdRewards(data.Uid, h2.Id)
+	if flag == true {
+		//更新大厅信息
+		playerinfo := &datamsg.MsgPlayerInfo{}
+		err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
+		if err == nil {
+			data.ModeType = "Client"
+			data.MsgType = "SC_MsgHallInfo"
+			jd := datamsg.SC_MsgHallInfo{}
+			jd.PlayerInfo = *playerinfo
+			a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+		}
+		//
+		data.MsgType = "SC_GetTaskRewards"
+		jd := datamsg.SC_GetTaskRewards{}
+		jd.Code = 1
+		jd.Id = h2.Id
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+
+	}
 
 }
 

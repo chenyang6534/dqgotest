@@ -88,6 +88,12 @@ type TaskEveryDayConfig struct {
 	Task    []TaskConfig
 }
 
+type RewardsConfig struct {
+	Type  int
+	Count int
+	Time  int
+}
+
 type TaskConfig struct {
 	Id        int
 	Type      int
@@ -97,4 +103,6 @@ type TaskConfig struct {
 	GetTagDBFieldName   string //是否已经领取
 	ProgressDBFieldName string //进度在数据库的字段名字
 	InitialValue        int    //初始值
+
+	Rewards []RewardsConfig
 }
