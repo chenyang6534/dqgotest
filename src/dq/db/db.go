@@ -6,6 +6,7 @@ import (
 	"dq/datamsg"
 	"dq/log"
 	"dq/utils"
+	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
@@ -254,6 +255,93 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 		return errors.New("no user")
 	}
 
+}
+
+func (a *DB) GetJSON(sqlString string) (string, error) {
+	stmt, err := a.Mydb.Prepare(sqlString)
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query()
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	columns, err := rows.Columns()
+	if err != nil {
+		return "", err
+	}
+	count := len(columns)
+	tableData := make([]map[string]interface{}, 0)
+	values := make([]interface{}, count)
+	valuePtrs := make([]interface{}, count)
+	for rows.Next() {
+		for i := 0; i < count; i++ {
+			valuePtrs[i] = &values[i]
+		}
+		rows.Scan(valuePtrs...)
+		entry := make(map[string]interface{})
+		for i, col := range columns {
+			var v interface{}
+			val := values[i]
+			b, ok := val.([]byte)
+			if ok {
+				v = string(b)
+			} else {
+				v = val
+			}
+			entry[col] = v
+		}
+		tableData = append(tableData, entry)
+	}
+	jsonData, err := json.Marshal(tableData)
+	if err != nil {
+		return "", err
+	}
+	log.Info(string(jsonData))
+	return string(jsonData), nil
+}
+
+//获取公共邮件数据库信息
+func (a *DB) GetPublicMailInfo(mails *utils.BeeMap, maxIndex *int) error {
+
+	//	type MailInfo struct {
+	//	Id        int
+	//	SendName  string
+	//	Title     string
+	//	Content   string
+	//	RecUid    int
+	//	Date      string
+	//	Reward    []conf.RewardsConfig
+	//	ReadState int
+	//	GetState  int
+	//}
+
+	//stmt, err := a.Mydb.Prepare("SELECT * FROM publicmail")
+	maxIndex = 0
+
+	str, err := a.GetJSON("SELECT * FROM publicmail")
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	h2 := []datamsg.MailInfo{}
+	err = json.Unmarshal([]byte(str), &h2)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	for _, v := range h2 {
+		mails.Set(v.Id, v)
+		if maxIndex < v.Id {
+			maxIndex = v.Id
+		}
+		log.Info("----id:%d-----v:%v", v.Id, v)
+	}
+
+	return nil
 }
 
 //type RewardsConfig struct {

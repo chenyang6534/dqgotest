@@ -48,6 +48,8 @@ func (a *HallAgent) Init() {
 	a.serchPoolFor5G = utils.NewBeeMap()
 	a.closeFlag = utils.NewBeeVar(false)
 
+	GetMail().Init()
+
 	a.handles = make(map[string]func(data *datamsg.MsgBase))
 
 	a.handles["GetInfo"] = a.DoGetInfoData

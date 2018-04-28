@@ -235,6 +235,18 @@ type MsgTaskInfo struct {
 	Rewards []conf.RewardsConfig
 }
 
+type MailInfo struct {
+	Id        int
+	SendName  string
+	Title     string
+	Content   string
+	RecUid    int
+	Date      string
+	Reward    []conf.RewardsConfig
+	ReadState int
+	GetState  int
+}
+
 //每日任务信息
 type SC_TskEdInfo struct {
 	Task []MsgTaskInfo
