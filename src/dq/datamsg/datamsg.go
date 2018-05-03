@@ -84,6 +84,11 @@ type CS_GetTaskRewards struct {
 	Id int //任务id
 }
 
+//上传推荐者
+type CS_Presenter struct {
+	PresenterUid int
+}
+
 //大厅信息
 type SC_GetTaskRewards struct {
 	Code int //1表示成功
@@ -122,6 +127,7 @@ type SC_MsgHallInfo struct {
 type SC_HallUIInfo struct {
 	TaskED_ShowNum int
 	Task_ShowNum   int
+	Mail_ShowNum   int
 }
 
 //操作结果
@@ -243,8 +249,14 @@ type MailInfo struct {
 	RecUid    int
 	Date      string
 	Reward    []conf.RewardsConfig
+	Rewardstr string
 	ReadState int
 	GetState  int
+}
+
+//邮件信息
+type SC_MailInfo struct {
+	Mails []MailInfo
 }
 
 //每日任务信息

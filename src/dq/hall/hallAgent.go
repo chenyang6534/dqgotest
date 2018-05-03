@@ -2,6 +2,7 @@ package hall
 
 import (
 	"dq/network"
+	"math"
 
 	"dq/datamsg"
 	"dq/log"
@@ -60,6 +61,7 @@ func (a *HallAgent) Init() {
 	a.handles["CS_GetTskInfo"] = a.DoGetTskInfoData
 	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
 	a.handles["CS_Share"] = a.DoShareData
+	a.handles["CS_Presenter"] = a.DoPresenterData
 
 	a.handles["CS_QuickGame"] = a.DoQuickGameData
 	a.handles["CS_QuickGameExit"] = a.DoQuickGameExitData
@@ -68,6 +70,74 @@ func (a *HallAgent) Init() {
 	a.handles["Disconnect"] = a.DoDisConnectData
 
 }
+
+func (a *HallAgent) DoPresenterData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_Presenter{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	if h2.PresenterUid <= 0 {
+		return
+	}
+
+	//查看是否已经有推荐者了
+	mypre := -1
+	db.DbOne.GetPlayerOneOtherInfo(data.Uid, "presenter", &mypre)
+	if mypre > 0 {
+		return
+	}
+	db.DbOne.SetPlayerOneOtherInfo(data.Uid, "presenter", h2.PresenterUid)
+
+	initGold := 200
+	count := 0
+	presenteruid := h2.PresenterUid
+	content := "恭喜你,你"
+
+	names := []string{}
+	nameone := ""
+	db.DbOne.GetPlayerOneOtherInfo(data.Uid, "name", &nameone)
+	names = append(names, nameone)
+	for {
+
+		nextpresenter := 0
+		err = db.DbOne.GetPlayerOneOtherInfo(presenteruid, "presenter", &nextpresenter)
+		if err != nil {
+			return
+		}
+		//推荐内容
+		contents := content
+		for i := len(names) - 1; i >= 0; i-- {
+			if i == 0 {
+				contents = contents + "推荐了" + names[i]
+			} else {
+				contents = contents + "推荐的" + names[i]
+			}
+
+		}
+		//--
+		contents = contents + ".请收下你的辛苦费!"
+		GetMail().DoPresenterMail(presenteruid, contents, initGold)
+		if nextpresenter <= 0 {
+
+			return
+		}
+		db.DbOne.GetPlayerOneOtherInfo(presenteruid, "name", &nameone)
+		names = append(names, nameone)
+
+		presenteruid = nextpresenter
+		initGold = int(math.Ceil(float64(float64(initGold) * 0.8)))
+
+		count++
+		if count >= 10 {
+			return
+		}
+
+	}
+
+}
+
 func (a *HallAgent) DoShareData(data *datamsg.MsgBase) {
 	GetTaskEveryday().doShare(data.Uid)
 }
@@ -142,6 +212,8 @@ func (a *HallAgent) DoDisConnectData(data *datamsg.MsgBase) {
 	log.Info("----DoDisConnectData uid:%d--", data.Uid)
 	a.serchPoolFor5G.Delete(data.Uid)
 
+	GetTaskEveryday().DeleteUserTaskEveryday(data.Uid)
+
 }
 
 func (a *HallAgent) DoQuickGameExitData(data *datamsg.MsgBase) {
@@ -199,17 +271,22 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 func (a *HallAgent) SendHallUIInfo(data *datamsg.MsgBase) {
 	//大厅界面信息
 	numTed := GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
-	if numTed > 0 {
+	numMail := GetMail().getNewMailNum(data.Uid)
+	if numTed > 0 || numMail > 0 {
 		data.ModeType = "Client"
 		data.MsgType = "SC_HallUIInfo"
 		jd := datamsg.SC_HallUIInfo{}
 		jd.TaskED_ShowNum = numTed
 		jd.Task_ShowNum = 0
+		jd.Mail_ShowNum = numMail
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
 	}
 }
 
 func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
+
+	GetMail().CheckUserPublicMail(data.Uid)
+	GetMail().CheckUserMail(data.Uid)
 
 	a.SendHallUIInfo(data)
 

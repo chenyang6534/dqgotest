@@ -257,6 +257,132 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 
 }
 
+//获取信息
+func (a *DB) GetPlayerOneInfo(uid int, tablename string, field string, value interface{}) error {
+
+	sqlstr := "SELECT " + field + " FROM " + tablename + " where uid=?"
+	if tablename == "mail" || tablename == "publicmail" {
+		sqlstr = "SELECT " + field + " FROM " + tablename + " where id=?"
+	}
+
+	stmt, err := a.Mydb.Prepare(sqlstr)
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(uid)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(value)
+	} else {
+		log.Info("no user:%d", uid)
+		return errors.New("no user")
+	}
+
+}
+
+//设置信息
+func (a *DB) SetPlayerOneInfo(uid int, tablename string, field string, value interface{}) error {
+
+	sqlstr := "UPDATE " + tablename + " SET " + field + "=? where uid=?"
+	if tablename == "mail" || tablename == "publicmail" {
+		sqlstr = "UPDATE " + tablename + " SET " + field + "=? where id=?"
+	}
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec(sqlstr, value, uid)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+
+}
+
+//获取玩家一项其他信息
+func (a *DB) GetPlayerOneOtherInfo(uid int, field string, value interface{}) error {
+
+	sqlstr := "SELECT " + field + " FROM userbaseinfo where uid=?"
+
+	stmt, err := a.Mydb.Prepare(sqlstr)
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(uid)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(value)
+	} else {
+		log.Info("no user:%d", uid)
+		return errors.New("no user")
+	}
+
+}
+
+//设置玩家一项其他信息
+func (a *DB) SetPlayerOneOtherInfo(uid int, field string, value interface{}) error {
+
+	sqlstr := "UPDATE userbaseinfo SET " + field + "=? where uid=?"
+
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec(sqlstr, value, uid)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+
+//获取玩家其他信息
+func (a *DB) GetPlayerOtherInfo(uid int, mails *string, publicIndex *int) error {
+
+	stmt, err := a.Mydb.Prepare("SELECT mails_id,publicmail_index FROM userbaseinfo where uid=?")
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(uid)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(mails, publicIndex)
+	} else {
+		log.Info("no user:%d", uid)
+		return errors.New("no user")
+	}
+
+}
+
 func (a *DB) GetJSON(sqlString string) (string, error) {
 	stmt, err := a.Mydb.Prepare(sqlString)
 	if err != nil {
@@ -303,23 +429,98 @@ func (a *DB) GetJSON(sqlString string) (string, error) {
 	return string(jsonData), nil
 }
 
+//	type MailInfo struct {
+//	Id        int
+//	SendName  string
+//	Title     string
+//	Content   string
+//	RecUid    int
+//	Date      string
+//	Reward    []conf.RewardsConfig
+//	ReadState int
+//	GetState  int
+//}
+//给用户写邮件
+func (a *DB) WritePrivateMailInfo(uid int, mailInfo *datamsg.MailInfo) error {
+	tx, _ := a.Mydb.Begin()
+
+	//	rewardlen := len(mailInfo.Reward)
+	//	reward := [3]string{"", "", ""}
+	//	for i := 0; i < rewardlen; i++ {
+	//		tt, _ := json.Marshal(mailInfo.Reward[i])
+	//		reward[i] = string(tt)
+	//		log.Info("------------i:%d----str:%s", i, reward[i])
+	//	}
+	rewards, _ := json.Marshal(mailInfo.Reward)
+
+	res, err1 := tx.Exec("INSERT mail (sendname,title,content,recUid,date,rewardstr,readstate,getstate) values (?,?,?,?,?,?,?,?)",
+		mailInfo.SendName, mailInfo.Title, mailInfo.Content, uid, mailInfo.Date, rewards, mailInfo.ReadState, mailInfo.GetState)
+	n, e := res.RowsAffected()
+	id, err2 := res.LastInsertId()
+	if err1 != nil || n == 0 || e != nil || err2 != nil {
+		log.Info("INSERT mail err")
+		return tx.Rollback()
+	}
+
+	addmail := strconv.Itoa(int(id))
+
+	res, err1 = tx.Exec("UPDATE userbaseinfo SET mails_id=concat_ws(',',mails_id,?) where uid=?", addmail, uid)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("UPDATE mail err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+func (a *DB) WritePrivateMailInfoFromPublic(uid int, mailInfo *datamsg.MailInfo, index int) error {
+	tx, _ := a.Mydb.Begin()
+
+	//	rewardlen := len(mailInfo.Reward)
+	//	reward := [3]string{"", "", ""}
+	//	for i := 0; i < rewardlen; i++ {
+	//		tt, _ := json.Marshal(mailInfo.Reward[i])
+	//		reward[i] = string(tt)
+	//		log.Info("------------i:%d----str:%s", i, reward[i])
+	//	}
+
+	rewards, _ := json.Marshal(mailInfo.Reward)
+
+	res, err1 := tx.Exec("INSERT mail (sendname,title,content,recUid,date,rewardstr,readstate,getstate) values (?,?,?,?,?,?,?,?)",
+		mailInfo.SendName, mailInfo.Title, mailInfo.Content, uid, mailInfo.Date, rewards, mailInfo.ReadState, mailInfo.GetState)
+	n, e := res.RowsAffected()
+	id, err2 := res.LastInsertId()
+	if err1 != nil || n == 0 || e != nil || err2 != nil {
+		log.Info("INSERT mail err")
+		return tx.Rollback()
+	}
+
+	addmail := strconv.Itoa(int(id))
+
+	res, err1 = tx.Exec("UPDATE userbaseinfo SET mails_id=concat_ws(',',mails_id,?) where uid=?", addmail, uid)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("UPDATE mail err")
+		return tx.Rollback()
+	}
+
+	res, err1 = tx.Exec("UPDATE userbaseinfo SET publicmail_index=? where uid=?", index, uid)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("UPDATE mail err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+
 //获取公共邮件数据库信息
 func (a *DB) GetPublicMailInfo(mails *utils.BeeMap, maxIndex *int) error {
 
-	//	type MailInfo struct {
-	//	Id        int
-	//	SendName  string
-	//	Title     string
-	//	Content   string
-	//	RecUid    int
-	//	Date      string
-	//	Reward    []conf.RewardsConfig
-	//	ReadState int
-	//	GetState  int
-	//}
-
 	//stmt, err := a.Mydb.Prepare("SELECT * FROM publicmail")
-	maxIndex = 0
+	*maxIndex = 0
 
 	str, err := a.GetJSON("SELECT * FROM publicmail")
 	if err != nil {
@@ -334,11 +535,20 @@ func (a *DB) GetPublicMailInfo(mails *utils.BeeMap, maxIndex *int) error {
 		return err
 	}
 	for _, v := range h2 {
-		mails.Set(v.Id, v)
-		if maxIndex < v.Id {
-			maxIndex = v.Id
+		d1 := v
+
+		if len(v.Rewardstr) > 0 {
+			err = json.Unmarshal([]byte(v.Rewardstr), &d1.Reward)
+			if err != nil {
+				log.Info(err.Error())
+			}
 		}
-		log.Info("----id:%d-----v:%v", v.Id, v)
+
+		mails.Set(v.Id, &d1)
+		if *maxIndex < v.Id {
+			*maxIndex = v.Id
+		}
+		log.Info("----id:%d-----v:%v", d1.Id, d1)
 	}
 
 	return nil
@@ -349,25 +559,87 @@ func (a *DB) GetPublicMailInfo(mails *utils.BeeMap, maxIndex *int) error {
 //	Count int
 //	Time  int
 //}
+
+//获取奖励
+func (a *DB) GetMailRewards(uid int, mailid int) error {
+
+	log.Info("GetMailRewards")
+	isget := 0
+	err := a.GetPlayerOneInfo(mailid, "mail", "getstate", &isget)
+	if err != nil || isget != 0 {
+		log.Info(err.Error())
+		return err
+	}
+	recuid := 0
+	err = a.GetPlayerOneInfo(mailid, "mail", "recUid", &recuid)
+	if err != nil || recuid != uid {
+		log.Info(err.Error())
+		return err
+	}
+
+	//rewards := make([]conf.RewardsConfig, 0)
+	//for i := 0; i < 3; i++ {
+	reward := ""
+	err = a.GetPlayerOneInfo(mailid, "mail", "rewardstr", &reward)
+	if err != nil || reward == "" {
+		return err
+	}
+	rewards := []conf.RewardsConfig{}
+	err = json.Unmarshal([]byte(reward), &rewards)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	//rewards = append(rewards, rw)
+
+	//}
+
+	tx, _ := a.Mydb.Begin()
+
+	for _, v := range rewards {
+		err = a.doRewards(tx, uid, v)
+		if err != nil {
+			return err
+		}
+	}
+
+	err1 := tx.Commit()
+	if err1 == nil {
+		err1 = a.SetPlayerOneInfo(mailid, "mail", "getstate", 1)
+	}
+
+	return err1
+}
+
+func (a *DB) doRewards(tx *sql.Tx, uid int, reward conf.RewardsConfig) error {
+	//金币
+	v := reward
+	if v.Type == 1 {
+		res, err1 := tx.Exec("UPDATE userbaseinfo SET gold=gold+? where uid=?", v.Count, uid)
+		//res.LastInsertId()
+		n, e := res.RowsAffected()
+		if err1 != nil || n == 0 || e != nil {
+			log.Info("update err")
+			return tx.Rollback()
+		}
+	}
+
+	return nil
+
+}
+
 //获取奖励
 func (a *DB) GetTaskRewards(uid int, rewards []conf.RewardsConfig, getTagDBFieldName string) error {
 
 	tx, _ := a.Mydb.Begin()
 
 	for _, v := range rewards {
-
-		//金币
-		if v.Type == 1 {
-			res, err1 := tx.Exec("UPDATE userbaseinfo SET gold=gold+? where uid=?", v.Count, uid)
-			//res.LastInsertId()
-			n, e := res.RowsAffected()
-			if err1 != nil || n == 0 || e != nil {
-				log.Info("update err")
-				return tx.Rollback()
-			}
+		err := a.doRewards(tx, uid, v)
+		if err != nil {
+			return err
 		}
-
 	}
+
 	sqlstr := "UPDATE taskeveryday SET " + getTagDBFieldName + "=1 where uid=?"
 	res, err1 := tx.Exec(sqlstr, uid)
 	//res.LastInsertId()

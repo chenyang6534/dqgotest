@@ -5,6 +5,7 @@ import (
 	"dq/datamsg"
 	"dq/db"
 	"dq/log"
+	//"dq/timer"
 	"dq/utils"
 	"sync"
 	"time"
@@ -215,6 +216,22 @@ func (user *UserTaskEveryday) doCheck() bool {
 	return true
 }
 
+func (taskE *TaskEveryday) DeleteUserTaskEveryday(uid1 interface{}) {
+
+	taskE.newUserLock.Lock()
+	defer taskE.newUserLock.Unlock()
+
+	uid := uid1.(int)
+
+	if taskE.PlayerTskEd.Check(uid) == true {
+		player := taskE.PlayerTskEd.Get(uid)
+
+		player.(*UserTaskEveryday).writeToDB()
+		taskE.PlayerTskEd.Delete(uid)
+	}
+
+}
+
 func (taskE *TaskEveryday) newUserTaskEveryday(uid int) {
 
 	taskE.newUserLock.Lock()
@@ -240,6 +257,8 @@ func (taskE *TaskEveryday) newUserTaskEveryday(uid int) {
 		player.readValueFromDB()
 		taskE.PlayerTskEd.Set(uid, player)
 		//return player
+
+		//timer.AddCallback(time.Second*60*30, taskE.DeleteUserTaskEveryday, uid)
 	}
 
 	//return player
