@@ -51,6 +51,8 @@ func (a *HallAgent) Init() {
 
 	GetMail().Init()
 
+	GetMail().getMailInfo(90, 5)
+
 	a.handles = make(map[string]func(data *datamsg.MsgBase))
 
 	a.handles["GetInfo"] = a.DoGetInfoData

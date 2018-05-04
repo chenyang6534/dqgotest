@@ -425,7 +425,7 @@ func (a *DB) GetJSON(sqlString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Info(string(jsonData))
+	//log.Info(string(jsonData))
 	return string(jsonData), nil
 }
 
@@ -514,6 +514,44 @@ func (a *DB) WritePrivateMailInfoFromPublic(uid int, mailInfo *datamsg.MailInfo,
 
 	err1 = tx.Commit()
 	return err1
+}
+
+//获取邮件数据库信息
+func (a *DB) GetMailInfo(mailid []int, mail *[]datamsg.MailInfo) error {
+
+	if len(mailid) <= 0 {
+		return nil
+	}
+
+	sqlstr := "SELECT * FROM mail where id = " + strconv.Itoa(mailid[0])
+	for i := 1; i < len(mailid); i++ {
+		sqlstr = sqlstr + " or id = " + strconv.Itoa(mailid[i])
+	}
+
+	str, err := a.GetJSON(sqlstr)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	//h2 := datamsg.MailInfo{}
+	err = json.Unmarshal([]byte(str), mail)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	for _, v := range *mail {
+
+		if len(v.Rewardstr) > 0 {
+			err = json.Unmarshal([]byte(v.Rewardstr), &v.Reward)
+			if err != nil {
+				log.Info(err.Error())
+			}
+		}
+		log.Info("--GetMailInfo--id:%d-----v:%v", v.Id, v)
+	}
+
+	return nil
 }
 
 //获取公共邮件数据库信息

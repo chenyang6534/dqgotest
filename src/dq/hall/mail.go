@@ -194,6 +194,7 @@ func (mail *Mail) getMailInfo(uid int, count int) *datamsg.SC_MailInfo {
 	//	ReadState int
 	//	GetState  int
 	//}
+	//log.Info("---getMailInfo---")
 
 	jd := &datamsg.SC_MailInfo{}
 	if count <= 0 {
@@ -202,33 +203,40 @@ func (mail *Mail) getMailInfo(uid int, count int) *datamsg.SC_MailInfo {
 
 	jd.Mails = make([]datamsg.MailInfo, count)
 	usermails := ""
-	err := db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "mails_id", usermails)
+	err := db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "mails_id", &usermails)
 	if err != nil || usermails == "" {
 		return jd
 	}
-	allmails := strings.Split(usermails, ",")
-	if len(allmails) > 0 {
-		startindex := 0
-		if len(allmails) > count {
-			startindex = len(allmails) - count
-		}
-		index := 0
-		for i := startindex; i < len(allmails); i++ {
-			mailid, err := strconv.Atoi(allmails[i])
-			if err != nil {
-				index++
-				continue
-			}
-			if mailid <= 0 {
-				index++
-				continue
-			}
-			jd.Mails[index] = datamsg.MailInfo{}
-			index++
-
-		}
-
+	ids := utils.SplitStringToIntArray(usermails)
+	if len(ids) > 0 {
+		db.DbOne.GetMailInfo(ids, &jd.Mails)
 	}
+
+	//log.Info("---usermails---%s", usermails)
+	//	allmails := strings.Split(usermails, ",")
+	//	if len(allmails) > 0 {
+	//		startindex := 0
+	//		if len(allmails) > count {
+	//			startindex = len(allmails) - count
+	//		}
+	//		index := 0
+	//		for i := startindex; i < len(allmails); i++ {
+	//			mailid, err := strconv.Atoi(allmails[i])
+	//			if err != nil {
+	//				//index++
+	//				continue
+	//			}
+	//			if mailid <= 0 {
+	//				//index++
+	//				continue
+	//			}
+	//			jd.Mails[index] = datamsg.MailInfo{}
+	//			db.DbOne.GetMailInfo(mailid, &jd.Mails[index])
+	//			index++
+
+	//		}
+
+	//	}
 
 	return jd
 
