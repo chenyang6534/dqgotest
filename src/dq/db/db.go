@@ -258,6 +258,46 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 }
 
 //获取信息
+func (a *DB) GetPlayerManyInfo(uid int, tablename string, field string, value ...interface{}) error {
+
+	if len(field) <= 0 {
+		return errors.New("no field")
+	}
+
+	idname := "uid"
+	if tablename == "mail" || tablename == "publicmail" {
+		idname = "id"
+	}
+	//	fieldstr := field[0]
+	//	for i := 1; i < len(field); i++ {
+	//		fieldstr = fieldstr + "," + field[i]
+	//	}
+	sqlstr := "SELECT " + field + " FROM " + tablename + " where " + idname + "=?"
+
+	stmt, err := a.Mydb.Prepare(sqlstr)
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(uid)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(value...)
+	} else {
+		log.Info("no user:%d", uid)
+		return errors.New("no user")
+	}
+
+}
+
+//获取信息
 func (a *DB) GetPlayerOneInfo(uid int, tablename string, field string, value interface{}) error {
 
 	sqlstr := "SELECT " + field + " FROM " + tablename + " where uid=?"
@@ -301,7 +341,7 @@ func (a *DB) SetPlayerOneInfo(uid int, tablename string, field string, value int
 	//res.LastInsertId()
 	n, e := res.RowsAffected()
 	if err1 != nil || n == 0 || e != nil {
-		log.Info("update err")
+		log.Info("update err--%d", n)
 		return tx.Rollback()
 	}
 
@@ -540,10 +580,10 @@ func (a *DB) GetMailInfo(mailid []int, mail *[]datamsg.MailInfo) error {
 		log.Info(err.Error())
 		return err
 	}
-	for _, v := range *mail {
+	for k, v := range *mail {
 
 		if len(v.Rewardstr) > 0 {
-			err = json.Unmarshal([]byte(v.Rewardstr), &v.Reward)
+			err = json.Unmarshal([]byte(v.Rewardstr), &((*mail)[k].Reward))
 			if err != nil {
 				log.Info(err.Error())
 			}
@@ -605,13 +645,13 @@ func (a *DB) GetMailRewards(uid int, mailid int) error {
 	isget := 0
 	err := a.GetPlayerOneInfo(mailid, "mail", "getstate", &isget)
 	if err != nil || isget != 0 {
-		log.Info(err.Error())
+		log.Info("err isget%d", isget)
 		return err
 	}
 	recuid := 0
 	err = a.GetPlayerOneInfo(mailid, "mail", "recUid", &recuid)
 	if err != nil || recuid != uid {
-		log.Info(err.Error())
+		log.Info("err recuid:%d", recuid)
 		return err
 	}
 

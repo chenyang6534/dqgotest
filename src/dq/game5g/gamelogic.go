@@ -25,8 +25,12 @@ type Game5GPlayer struct {
 	AvatarUrl   string
 	qiziId      int
 
-	firstqiziId  int
-	secondqiziId int
+	firstqiziId     int
+	secondqiziId    int
+	qizi_move       int
+	qizi_move_trail int
+	qizi_floor      int
+	qizi_lastplay   int
 
 	//游戏
 	Game *Game5GLogic
@@ -164,6 +168,11 @@ func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
 	jd.PlayerInfo.AvatarUrl = player.AvatarUrl
 	jd.PlayerInfo.QiZiId = player.qiziId
 
+	jd.PlayerInfo.Qizi_move = player.qizi_move
+	jd.PlayerInfo.Qizi_move_trail = player.qizi_move_trail
+	jd.PlayerInfo.Qizi_floor = player.qizi_floor
+	jd.PlayerInfo.Qizi_lastplay = player.qizi_lastplay
+
 	game.sendMsgToAll("SC_PlayerGoIn", jd)
 
 }
@@ -231,6 +240,10 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.SeasonScore = v.SeasonScore
 			p1.AvatarUrl = v.AvatarUrl
 			p1.QiZiId = v.qiziId
+			p1.Qizi_move = v.qizi_move
+			p1.Qizi_move_trail = v.qizi_move_trail
+			p1.Qizi_floor = v.qizi_floor
+			p1.Qizi_lastplay = v.qizi_lastplay
 
 			p1.WinCount = v.WinCount
 
@@ -266,6 +279,10 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.SeasonScore = v.SeasonScore
 			p1.AvatarUrl = v.AvatarUrl
 			p1.QiZiId = v.qiziId
+			p1.Qizi_move = v.qizi_move
+			p1.Qizi_move_trail = v.qizi_move_trail
+			p1.Qizi_floor = v.qizi_floor
+			p1.Qizi_lastplay = v.qizi_lastplay
 
 			p1.WinCount = v.WinCount
 

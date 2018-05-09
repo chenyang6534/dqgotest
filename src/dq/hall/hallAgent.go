@@ -51,17 +51,28 @@ func (a *HallAgent) Init() {
 
 	GetMail().Init()
 
-	GetMail().getMailInfo(90, 5)
+	//GetStore().getStoreInfo()Buy
+	//GetItemManager().GetItemsInfo(93)
 
 	a.handles = make(map[string]func(data *datamsg.MsgBase))
 
 	a.handles["GetInfo"] = a.DoGetInfoData
 
+	a.handles["CS_GetHallUIInfo"] = a.DoGetHallUIInfoData
+
 	//一场游戏比赛结束
 	a.handles["GameOverInfo"] = a.DoGameOverInfoData
 
 	a.handles["CS_GetTskInfo"] = a.DoGetTskInfoData
+	a.handles["CS_GetMailInfo"] = a.DoGetMailInfoData
+	a.handles["CS_GetStoreInfo"] = a.DoGetStoreInfoData
+	a.handles["CS_GetBagInfo"] = a.DoGetBagInfoData
+
 	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
+	a.handles["CS_GetMailRewards"] = a.DoGetMailRewardsData
+	a.handles["CS_BuyItem"] = a.DoBuyItemData
+	a.handles["CS_ZhuangBeiItem"] = a.DoZhuangBeiData
+
 	a.handles["CS_Share"] = a.DoShareData
 	a.handles["CS_Presenter"] = a.DoPresenterData
 
@@ -144,6 +155,92 @@ func (a *HallAgent) DoShareData(data *datamsg.MsgBase) {
 	GetTaskEveryday().doShare(data.Uid)
 }
 
+//DoZhuangBeiData
+func (a *HallAgent) DoZhuangBeiData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_ZhuangBeiItem{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	GetItemManager().SetUseItemType(data.Uid, h2.Type)
+	//GetStore().Buy(data.Uid, h2.Id,h2.Index)
+	//flag := GetStore().Buy(data.Uid, h2.Id, h2.Index)
+	flag := true
+	if flag == true {
+		//更新大厅信息
+		playerinfo := &datamsg.MsgPlayerInfo{}
+		err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
+		if err == nil {
+			data.ModeType = "Client"
+			data.MsgType = "SC_MsgHallInfo"
+			jd := datamsg.SC_MsgHallInfo{}
+			jd.PlayerInfo = *playerinfo
+			a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+		}
+
+	}
+
+}
+
+//DoBuyItemData
+func (a *HallAgent) DoBuyItemData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_BuyItem{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	//GetStore().Buy(data.Uid, h2.Id,h2.Index)
+	flag := GetStore().Buy(data.Uid, h2.Id, h2.Index)
+	if flag == true {
+		//更新大厅信息
+		playerinfo := &datamsg.MsgPlayerInfo{}
+		err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
+		if err == nil {
+			data.ModeType = "Client"
+			data.MsgType = "SC_MsgHallInfo"
+			jd := datamsg.SC_MsgHallInfo{}
+			jd.PlayerInfo = *playerinfo
+			a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+		}
+
+	}
+
+}
+
+//DoGetMailRewardsData
+func (a *HallAgent) DoGetMailRewardsData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_GetMailRewards{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	//GetMail().getMailRewards()
+	flag := GetMail().getMailRewards(data.Uid, h2.Id)
+	if flag == true {
+		//更新大厅信息
+		playerinfo := &datamsg.MsgPlayerInfo{}
+		err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
+		if err == nil {
+			data.ModeType = "Client"
+			data.MsgType = "SC_MsgHallInfo"
+			jd := datamsg.SC_MsgHallInfo{}
+			jd.PlayerInfo = *playerinfo
+			a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+		}
+		//
+		data.MsgType = "SC_GetMailRewards"
+		jd := datamsg.SC_GetMailRewards{}
+		jd.Code = 1
+		jd.Id = h2.Id
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+
+	}
+
+}
+
 func (a *HallAgent) DoGetTaskRewardsData(data *datamsg.MsgBase) {
 	h2 := &datamsg.CS_GetTaskRewards{}
 	err := json.Unmarshal([]byte(data.JsonData), h2)
@@ -172,6 +269,39 @@ func (a *HallAgent) DoGetTaskRewardsData(data *datamsg.MsgBase) {
 
 	}
 
+}
+
+func (a *HallAgent) DoGetBagInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_BagInfo"
+
+	tsdinfo := GetItemManager().GetItemsInfo(data.Uid)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
+func (a *HallAgent) DoGetStoreInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_StoreInfo"
+	//GetStore().getStoreInfo()
+	tsdinfo := GetStore().getStoreInfo()
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
+func (a *HallAgent) DoGetMailInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_MailInfo"
+
+	tsdinfo := GetMail().getMailInfo(data.Uid, 20)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
 }
 
 func (a *HallAgent) DoGetTskInfoData(data *datamsg.MsgBase) {
@@ -215,6 +345,7 @@ func (a *HallAgent) DoDisConnectData(data *datamsg.MsgBase) {
 	a.serchPoolFor5G.Delete(data.Uid)
 
 	GetTaskEveryday().DeleteUserTaskEveryday(data.Uid)
+	GetItemManager().DeletePlayer(data.Uid)
 
 }
 
@@ -270,10 +401,15 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 	//}
 }
 
-func (a *HallAgent) SendHallUIInfo(data *datamsg.MsgBase) {
+//func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
+
+//}
+
+func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 	//大厅界面信息
 	numTed := GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
 	numMail := GetMail().getNewMailNum(data.Uid)
+	//log.Info("ted:%d---mail:%d", numTed, numMail)
 	if numTed > 0 || numMail > 0 {
 		data.ModeType = "Client"
 		data.MsgType = "SC_HallUIInfo"
@@ -290,7 +426,7 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 	GetMail().CheckUserPublicMail(data.Uid)
 	GetMail().CheckUserMail(data.Uid)
 
-	a.SendHallUIInfo(data)
+	//a.SendHallUIInfo(data)
 
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}
@@ -433,6 +569,9 @@ func (a *HallAgent) doMessage(data []byte) {
 }
 
 func (a *HallAgent) OnClose() {
+
+	GetTaskEveryday().DeleteAll()
+	GetItemManager().DeleteAll()
 
 }
 

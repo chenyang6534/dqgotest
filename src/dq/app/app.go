@@ -119,6 +119,8 @@ func (app *DefaultApp) Run() error {
 
 	conf.LoadTaskEveryDayConfig() //加载每日任务
 
+	conf.LoadStoreConfig() //加载商店信息
+
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 
 	log.Info("dq starting up")

@@ -39,10 +39,10 @@ func (user *UserTaskEveryday) readValueFromDB() {
 	if err := db.DbOne.GetPlayerTaskEd(user.Uid, &user.Date, user.DBValue); err != nil {
 		log.Info(err.Error())
 	}
-	items := user.DBValue.Items()
-	for k, v := range items {
-		log.Info("---k:%s---value:%v", k, v)
-	}
+	//	items := user.DBValue.Items()
+	//	for k, v := range items {
+	//		log.Info("---k:%s---value:%v", k, v)
+	//	}
 	log.Info("---day:" + user.Date)
 
 }
@@ -229,6 +229,30 @@ func (taskE *TaskEveryday) DeleteUserTaskEveryday(uid1 interface{}) {
 		player.(*UserTaskEveryday).writeToDB()
 		taskE.PlayerTskEd.Delete(uid)
 	}
+
+}
+func (taskE *TaskEveryday) DeleteAll() {
+
+	taskE.newUserLock.Lock()
+	defer taskE.newUserLock.Unlock()
+	items := taskE.PlayerTskEd.Items()
+	for _, v := range items {
+		player := v.(*UserTaskEveryday)
+		if player != nil {
+			player.writeToDB()
+			//itemManager.Players.Delete(uid)
+		}
+	}
+	taskE.PlayerTskEd.DeleteAll()
+
+	//	uid := uid1.(int)
+
+	//	if taskE.PlayerTskEd.Check(uid) == true {
+	//		player := taskE.PlayerTskEd.Get(uid)
+
+	//		player.(*UserTaskEveryday).writeToDB()
+	//		taskE.PlayerTskEd.Delete(uid)
+	//	}
 
 }
 

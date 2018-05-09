@@ -77,10 +77,10 @@ func LoadTaskEveryDayConfig() {
 
 }
 
-func GetTaskEveryDayCfg() *TaskEveryDayConfig {
+func GetTaskEveryDayCfg() TaskEveryDayConfig {
 	lock.RLock()
 	defer lock.RUnlock()
-	return &taskEveryDayCfg
+	return taskEveryDayCfg
 }
 
 type TaskEveryDayConfig struct {

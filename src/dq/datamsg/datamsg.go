@@ -84,6 +84,22 @@ type CS_GetTaskRewards struct {
 	Id int //任务id
 }
 
+//获取邮件奖励
+type CS_GetMailRewards struct {
+	Id int //任务id
+}
+
+//购买商品
+type CS_BuyItem struct {
+	Id    int //任务id
+	Index int
+}
+
+//购买商品
+type CS_ZhuangBeiItem struct {
+	Type int
+}
+
 //上传推荐者
 type CS_Presenter struct {
 	PresenterUid int
@@ -91,6 +107,12 @@ type CS_Presenter struct {
 
 //大厅信息
 type SC_GetTaskRewards struct {
+	Code int //1表示成功
+	Id   int //任务ID
+}
+
+//大厅信息
+type SC_GetMailRewards struct {
 	Code int //1表示成功
 	Id   int //任务ID
 }
@@ -152,14 +174,18 @@ type GameOverInfo struct {
 //玩家
 type MsgGame5GPlayerInfo struct {
 	//基本数据
-	Uid         int
-	Name        string
-	Gold        int64
-	WinCount    int
-	LoseCount   int
-	SeasonScore int
-	AvatarUrl   string
-	QiZiId      int
+	Uid             int
+	Name            string
+	Gold            int64
+	WinCount        int
+	LoseCount       int
+	SeasonScore     int
+	AvatarUrl       string
+	QiZiId          int
+	Qizi_move       int
+	Qizi_move_trail int
+	Qizi_floor      int
+	Qizi_lastplay   int
 
 	//游戏中数据
 	SeatIndex  int //座位号
@@ -257,6 +283,47 @@ type MailInfo struct {
 //邮件信息
 type SC_MailInfo struct {
 	Mails []MailInfo
+}
+
+type StoreInfo struct {
+	conf.Commodity
+	IsStartSale bool
+}
+
+type ItemInfo struct {
+	Type       int
+	ExpiryTime string //到期时间
+	IsExpiry   bool   //是否到期
+}
+
+//商店信息
+type SC_StoreInfo struct {
+	Commoditys []StoreInfo
+}
+
+//	firstqizi := 0
+//	secondqizi := 0
+//	qizi_move := 0
+//	qizi_move_trail := 0
+//	qizi_floor := 0
+//	qizi_lastplay := 0
+//道具信息
+type SC_ItemInfo struct {
+	Firstqizi       int
+	Secondqizi      int
+	Qizi_move       int
+	Qizi_move_trail int
+	Qizi_floor      int
+	Qizi_lastplay   int
+	Items           []ItemInfo
+}
+type SC_UpdateUsedItem struct {
+	Firstqizi       int
+	Secondqizi      int
+	Qizi_move       int
+	Qizi_move_trail int
+	Qizi_floor      int
+	Qizi_lastplay   int
 }
 
 //每日任务信息

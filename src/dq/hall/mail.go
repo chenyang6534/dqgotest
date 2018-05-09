@@ -6,6 +6,7 @@ import (
 	"dq/db"
 	"dq/log"
 	"dq/utils"
+	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
@@ -30,23 +31,6 @@ func GetMail() *Mail {
 	return mail
 }
 
-//type RewardsConfig struct {
-//	Type  int
-//	Count int
-//	Time  int
-//}
-
-//type MailInfo struct {
-//	Id        int
-//	SendName  string
-//	Title     string
-//	Content   string
-//	RecUid    int
-//	Date      string
-//	Reward    []conf.RewardsConfig
-//	ReadState int
-//	GetState  int
-//}
 func (mail *Mail) DoPresenterMail(PresenterUid int, content string, goldCount int) {
 
 	mailp := &datamsg.MailInfo{}
@@ -137,23 +121,38 @@ func (mail *Mail) getNewMailNum(uid int) int {
 	mailnum := 0
 
 	usermails := ""
-	err := db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "mails_id", usermails)
+	err := db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "mails_id", &usermails)
+	//log.Info("sermails:%s", usermails)
 	if err != nil || usermails == "" {
 		return mailnum
 	}
-	allmails := strings.Split(usermails, ",")
-	if len(allmails) > 0 {
-		for i := 0; i < len(allmails)-mailMaxCount; i++ {
-			mailid, err := strconv.Atoi(allmails[i])
-			if err != nil {
-				continue
-			}
-			if mailid <= 0 {
+	//log.Info("fdsfds")
+
+	mails := utils.SplitStringToIntArray(usermails)
+
+	//allmails := strings.Split(usermails, ",")
+	if len(mails) > 0 {
+		for i := 0; i < len(mails); i++ {
+			//			mailid, err := strconv.Atoi(allmails[i])
+			//			if err != nil {
+			//				continue
+			//			}
+			mailid := mails[i]
+			if mailid < 0 {
 				continue
 			}
 			isget := -1
-			err = db.DbOne.GetPlayerOneInfo(mailid, "mail", "getstate", isget)
-			if isget == 0 {
+			rewardstr := ""
+			err = db.DbOne.GetPlayerManyInfo(mailid, "mail", "rewardstr,getstate", &rewardstr, &isget)
+			log.Info("--isget%d---rewardstr:%s", isget, rewardstr)
+
+			rewards := []conf.RewardsConfig{}
+			err = json.Unmarshal([]byte(rewardstr), &rewards)
+			if err != nil {
+				continue
+			}
+
+			if isget == 0 && len(rewards) > 0 {
 				mailnum++
 				return mailnum
 			}
@@ -170,31 +169,24 @@ func (mail *Mail) getNewMailNum(uid int) int {
 }
 
 //获取任务奖励
-func (mail *Mail) getMailRewards(uid int, mailid int) {
+func (mail *Mail) getMailRewards(uid int, mailid int) bool {
 	//user.lock.RLock()
 	//defer user.lock.RUnlock()
 	lockid := uid % 1000
 	mail.UserLock[lockid].Lock()
 	defer mail.UserLock[lockid].Unlock()
 
-	db.DbOne.GetMailRewards(uid, mailid)
+	err := db.DbOne.GetMailRewards(uid, mailid)
+
+	if err == nil {
+		return true
+	}
+	return false
 
 }
 
 //获取邮件信息
 func (mail *Mail) getMailInfo(uid int, count int) *datamsg.SC_MailInfo {
-	//	type MailInfo struct {
-	//	Id        int
-	//	SendName  string
-	//	Title     string
-	//	Content   string
-	//	RecUid    int
-	//	Date      string
-	//	Reward    []conf.RewardsConfig
-	//	ReadState int
-	//	GetState  int
-	//}
-	//log.Info("---getMailInfo---")
 
 	jd := &datamsg.SC_MailInfo{}
 	if count <= 0 {
@@ -212,61 +204,7 @@ func (mail *Mail) getMailInfo(uid int, count int) *datamsg.SC_MailInfo {
 		db.DbOne.GetMailInfo(ids, &jd.Mails)
 	}
 
-	//log.Info("---usermails---%s", usermails)
-	//	allmails := strings.Split(usermails, ",")
-	//	if len(allmails) > 0 {
-	//		startindex := 0
-	//		if len(allmails) > count {
-	//			startindex = len(allmails) - count
-	//		}
-	//		index := 0
-	//		for i := startindex; i < len(allmails); i++ {
-	//			mailid, err := strconv.Atoi(allmails[i])
-	//			if err != nil {
-	//				//index++
-	//				continue
-	//			}
-	//			if mailid <= 0 {
-	//				//index++
-	//				continue
-	//			}
-	//			jd.Mails[index] = datamsg.MailInfo{}
-	//			db.DbOne.GetMailInfo(mailid, &jd.Mails[index])
-	//			index++
-
-	//		}
-
-	//	}
-
 	return jd
-
-	//	for k, v := range cfg.Task {
-
-	//		jd.Task[k] = datamsg.MsgTaskInfo{}
-	//		jd.Task[k].Id = v.Id
-	//		jd.Task[k].Type = v.Type
-	//		jd.Task[k].DestValue = v.DestValue
-	//		jd.Task[k].ProgressValue = 0
-	//		jd.Task[k].State = 0
-	//		jd.Task[k].Rewards = v.Rewards
-	//		value := user.DBValue.Get(v.ProgressDBFieldName)
-	//		get := user.DBValue.Get(v.GetTagDBFieldName)
-	//		if value != nil && get != nil {
-	//			jd.Task[k].ProgressValue = value.(int)
-
-	//			if value.(int) >= v.DestValue && get.(int) == 1 {
-	//				jd.Task[k].State = 2
-	//				jd.Task[k].ProgressValue = v.DestValue
-	//			} else if value.(int) >= v.DestValue && get.(int) != 1 {
-	//				jd.Task[k].State = 1
-	//				jd.Task[k].ProgressValue = v.DestValue
-	//			} else if value.(int) < v.DestValue {
-	//				jd.Task[k].State = 0
-	//			}
-	//		}
-
-	//	}
-	//	return jd
 
 }
 

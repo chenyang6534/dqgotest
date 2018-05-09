@@ -178,8 +178,8 @@ func (server *WSServer) run() {
 	}
 
 	err := server.HttpServer.ListenAndServe()
-	//err := http.ListenAndServe(server.Addr, nil)
-	//checkErr(err, "ListenAndServe");
+	//err := server.HttpServer.ListenAndServeTLS("bin/conf/214571202380020.pem", "bin/conf/214571202380020.key")
+
 	if err != nil {
 		log.Info(err.Error())
 	}

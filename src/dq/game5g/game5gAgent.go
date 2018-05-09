@@ -236,6 +236,14 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 	player.secondqiziId = playerinfo.SecondQiZi
 	player.qiziId = -1
 
+	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay",
+		&player.qizi_move, &player.qizi_move_trail, &player.qizi_floor, &player.qizi_lastplay)
+
+	//	qizi_move       int
+	//	qizi_move_trail int
+	//	qizi_floor      int
+	//	qizi_lastplay   int
+
 	//玩家加入游戏
 	if player, err = game.(*Game5GLogic).GoIn(player); err != nil {
 		a.WriteMsgBytes(datamsg.NewMsgSC_Result(data.Uid, data.ConnectId, err.Error()))
