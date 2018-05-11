@@ -128,11 +128,6 @@ func (server *WSServer) SvrConnHandler1(w http.ResponseWriter, r *http.Request) 
 
 func (server *WSServer) init() {
 	http.HandleFunc("/connect", server.SvrConnHandler)
-	http.HandleFunc("/connect1", server.SvrConnHandler1)
-	//ln, err := net.Listen("tcp", server.Addr)
-	//	if err != nil {
-	//		log.Error("%v", err)
-	//	}
 
 	server.isCheckHeart = true
 

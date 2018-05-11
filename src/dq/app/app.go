@@ -14,6 +14,9 @@
 package app
 
 import (
+	"io"
+	"io/ioutil"
+	"net/http"
 	//"time"
 	//"encoding/json"
 	"flag"
@@ -143,27 +146,45 @@ func (app *DefaultApp) Run() error {
 		}()
 	}
 
-	//var pro sync.WaitGroup
-	//pro.Add(1)
-	//go func() {
-	// close
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
-	sig := <-c
-	log.Debug("dq closing down (signal: %v) %d", sig, len(allModsName))
-	for i := 0; i < len(allModsName); i++ {
-		//fmt.Println("over1")
-		closesig <- true
-		//fmt.Println("over2")
+	if false {
+
+		//http://127.0.0.1:8080/?a=123456&b=aaa&b1=bbb
+		httpserver := &http.Server{Addr: ":9090", Handler: nil}
+
+		http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "hello world!")
+
+			body, _ := ioutil.ReadAll(r.Body)
+			//    r.Body.Close()
+			body_str := string(body)
+			fmt.Println(body_str)
+
+			r.ParseForm()
+			fmt.Println("Form: ", r.Form)
+			fmt.Println("Path: ", r.URL.Path)
+			fmt.Println(r.Form["a"])
+			fmt.Println(r.Form["b"])
+			for k, v := range r.Form {
+				fmt.Println(k, "=>", v, strings.Join(v, "-"))
+			}
+
+			//httpserver.Close()
+		})
+
+		httpserver.ListenAndServe()
+	} else {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, os.Kill)
+		sig := <-c
+		log.Debug("dq closing down (signal: %v) %d", sig, len(allModsName))
 	}
-	//fmt.Println("over")
-	//pro.Done()
-	//}()
+
+	for i := 0; i < len(allModsName); i++ {
+
+		closesig <- true
+	}
 	pro.Wait()
 	fmt.Println("app over")
 
-	//fmt.Println("over5")
-	//time.Sleep(time.Second * 5)
-	//fmt.Println("over5")
 	return nil
 }
