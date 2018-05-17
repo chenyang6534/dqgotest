@@ -34,6 +34,10 @@ type serchInfo struct {
 
 	Time      int //游戏总时间 s
 	EveryTime int //游戏每一步棋时间 s
+
+	StartTime int64 //开始匹配时间
+	Score     int   //赛季分
+
 }
 
 func (a *HallAgent) GetConnectId() int {
@@ -325,6 +329,8 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 	sinfo.Uid = data.Uid
 	sinfo.Time = 60 * 1  //20分钟
 	sinfo.EveryTime = 30 //30秒
+	sinfo.StartTime = utils.Milliseconde()
+	sinfo.Score = 1000
 
 	a.serchPoolFor5G.Set(data.Uid, sinfo)
 
@@ -332,6 +338,8 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 	playerinfo := &datamsg.MsgPlayerInfo{}
 	err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
 	if err == nil {
+		sinfo.Score = playerinfo.SeasonScore
+
 		data.ModeType = "Client"
 		data.MsgType = "SC_SerchPlayer"
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, nil))
@@ -467,12 +475,27 @@ func (a *HallAgent) Update() {
 			utils.MySleep(t1, int64(oneUpdateTime))
 			continue
 		}
-
+		//算法开始
+		//匹配规则(如果双方匹配总时间超过15秒,)
 		fight := [2]int{}
 		i := 0
-		for k, _ := range serchPlayer {
+		for k, v := range serchPlayer {
 			fight[i] = k.(int)
-			delete(serchPlayer, k)
+			//			player1 := v.(*serchInfo)
+			//			maxpipeidu := 0
+			//			pipeiplayer := nil
+			//			delete(serchPlayer, k)
+			//			for k1, v1 := range serchPlayer {
+			//				player2 := v.(*serchInfo)
+			//				alltime := t1 - player1.StartTime + t1 - player2.StartTime
+			//				scoresub := math.Abs(player1.Score - player2.Score)
+			//				//
+			//				(1000-scoresub)*(alltime/20)
+			//				if true {
+			//					break
+			//				}
+			//			}
+
 			i++
 			if i >= 2 {
 				break
@@ -492,6 +515,8 @@ func (a *HallAgent) Update() {
 			//创建一个游戏
 			a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))
 		}
+
+		//时间
 		t2 := utils.Milliseconde()
 		if t2-t1 >= int64(oneUpdateTime) {
 			utils.MySleep(t1, int64(t2+1))
