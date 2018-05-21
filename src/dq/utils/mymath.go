@@ -36,7 +36,7 @@ func CheckTimeIsExpiry(timestr string) bool {
 	}
 }
 
-//毫秒
+//毫秒 从t1时间开始计算睡眠时间   睡眠sleeptime毫秒
 func MySleep(t1 int64, sleeptime int64) {
 	t2 := Milliseconde()
 	t3 := t2 - t1

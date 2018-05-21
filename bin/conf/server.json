@@ -25,8 +25,8 @@
         "CreateRoom_Time":60,
         "CreateRoom_EveryTime":30,
 
-        "WinScore":10,
-        "LoseScore":8
+        "WinScore":50,
+        "LoseScore":40
     },
     //数据库信息
     "DataBaseInfo":{

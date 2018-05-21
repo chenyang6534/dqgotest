@@ -8,6 +8,8 @@ import (
 	"dq/timer"
 	"dq/utils"
 	"errors"
+	"math"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -98,6 +100,8 @@ type Game5GLogic struct {
 
 	//5连棋子
 	WinQizi [5][2]int
+	//棋盘中棋子数
+	QiZiCount int
 
 	//创建者UID -1表示服务器自动创建
 	CreateId int
@@ -115,6 +119,7 @@ func (game *Game5GLogic) Init() {
 	game.Player[0] = nil
 	game.Player[1] = nil
 	game.WinQizi[0][0] = -1
+	game.QiZiCount = 0
 	game.CreateId = -1
 	game.CreateGameTime = utils.Milliseconde()
 	game.gameCreateTimer = timer.AddCallback(time.Second*15, game.TimeUpDismissGame)
@@ -297,7 +302,10 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 //游戏开始
 func (game *Game5GLogic) gameStart() {
 	//游戏开始
-	game.GameSeatIndex = -1
+
+	rad := rand.Intn(2)
+	log.Info("----random seatindex:%d", rad)
+	game.GameSeatIndex = rad - 1
 
 	game.Player[0].Time = game.Time
 	//Player[0].OperateStartTime = time.Now()
@@ -353,7 +361,7 @@ func (game *Game5GLogic) TimeUpDismissGame() {
 	game.dismissGame()
 }
 
-//游戏胜利 0表示玩家退出 1表示时间到 2表示棋子5连
+//游戏胜利 0表示玩家退出 1表示时间到 2表示棋子5连 3表示棋盘满了
 func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 	if game.State != Game5GState_Gaming {
 		return
@@ -367,10 +375,21 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 	}
 	loseplayer := game.Player[loseindex]
 
+	winscore := 0
+	losescore := 0
 	//更新数据库ng.GameMode = Game5GMode_SeasonMatching
 	if game.GameMode == Game5GMode_SeasonMatching {
-		winscore := int(conf.Conf.Game5GInfo["WinScore"].(float64))
-		losescore := int(conf.Conf.Game5GInfo["LoseScore"].(float64))
+		winscorexishu := (conf.Conf.Game5GInfo["WinScore"].(float64))
+		losescorexishu := (conf.Conf.Game5GInfo["LoseScore"].(float64))
+
+		allscore := winplayer.SeasonScore + loseplayer.SeasonScore
+
+		//tem := math.Round(float64(1-winplayer.SeasonScore/allscore) * winscorexishu)
+
+		winscore = int(math.Round(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * winscorexishu))
+		losescore = int(math.Round(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * losescorexishu))
+
+		//winplayer.SeasonScore
 		log.Info("----------win:%d-----lose:%d", winscore, losescore)
 		err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, winscore, loseplayer.Uid, losescore)
 		if err != nil {
@@ -434,6 +453,8 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 	jd.WinPlayerSeatIndex = seatIndex
 	jd.Reason = reason
 	jd.WinQiZi = game.WinQizi
+	jd.WinScore = winscore
+	jd.LoseScore = losescore
 	game.sendMsgToAll("SC_GameOver", jd)
 
 	game.dismissGame()
@@ -544,6 +565,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 
 	//走棋成功
 	game.QiPan[data.Y][data.X] = player.SeatIndex
+	game.QiZiCount++
 	player.OperateState = 2
 
 	//计算用时
@@ -564,6 +586,8 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	winFlag := game.judgment(data.Y, data.X)
 	if winFlag != -1 {
 		game.gameWin(winFlag, 2)
+	} else if game.QiZiCount >= 15*15 {
+		game.gameWin(int(math.Abs(float64(player.SeatIndex-1))), 3)
 	} else {
 		game.Lock.Unlock()
 		game.ChangeGameTurn()

@@ -14,6 +14,11 @@ import (
 	"dq/utils"
 )
 
+type ScoreAndTime struct {
+	Time  int64
+	Score int
+}
+
 type HallAgent struct {
 	conn network.Conn
 
@@ -26,6 +31,8 @@ type HallAgent struct {
 
 	//五指棋 玩家匹配表[id] =
 	serchPoolFor5G *utils.BeeMap
+
+	ScoreTime []ScoreAndTime
 }
 
 type serchInfo struct {
@@ -49,6 +56,18 @@ func (a *HallAgent) GetModeType() string {
 }
 
 func (a *HallAgent) Init() {
+
+	a.ScoreTime = make([]ScoreAndTime, 10)
+	a.ScoreTime[0] = ScoreAndTime{Time: 0 * 1000, Score: 5}
+	a.ScoreTime[1] = ScoreAndTime{Time: 2 * 1000, Score: 20}
+	a.ScoreTime[2] = ScoreAndTime{Time: 3 * 1000, Score: 50}
+	a.ScoreTime[3] = ScoreAndTime{Time: 5 * 1000, Score: 100}
+	a.ScoreTime[4] = ScoreAndTime{Time: 10 * 1000, Score: 200}
+	a.ScoreTime[5] = ScoreAndTime{Time: 20 * 1000, Score: 500}
+	a.ScoreTime[6] = ScoreAndTime{Time: 30 * 1000, Score: 1000}
+	a.ScoreTime[7] = ScoreAndTime{Time: 40 * 1000, Score: 2000}
+	a.ScoreTime[8] = ScoreAndTime{Time: 50 * 1000, Score: 4000}
+	a.ScoreTime[9] = ScoreAndTime{Time: 60 * 1000, Score: 100000}
 
 	a.serchPoolFor5G = utils.NewBeeMap()
 	a.closeFlag = utils.NewBeeVar(false)
@@ -455,6 +474,17 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 
 }
 
+func (a *HallAgent) MatchGetScoreFromTime(time int64) int {
+	size := len(a.ScoreTime)
+	for i := size - 1; i >= 0; i-- {
+		if a.ScoreTime[i].Time < time {
+			//log.Info("--getscore:%d", a.ScoreTime[i].Score)
+			return a.ScoreTime[i].Score
+		}
+	}
+	return 1000000
+}
+
 func (a *HallAgent) Update() {
 
 	//500毫秒循环一次
@@ -468,7 +498,7 @@ func (a *HallAgent) Update() {
 		serchPlayer := a.serchPoolFor5G.Items()
 
 		//算法忽略
-	loop:
+		//loop:
 		//
 		size := len(serchPlayer)
 		if size <= 1 {
@@ -478,50 +508,64 @@ func (a *HallAgent) Update() {
 		//算法开始
 		//匹配规则(如果双方匹配总时间超过15秒,)
 		fight := [2]int{}
-		i := 0
+		//i := 0
 		for k, v := range serchPlayer {
-			fight[i] = k.(int)
-			//			player1 := v.(*serchInfo)
-			//			maxpipeidu := 0
-			//			pipeiplayer := nil
-			//			delete(serchPlayer, k)
-			//			for k1, v1 := range serchPlayer {
-			//				player2 := v.(*serchInfo)
-			//				alltime := t1 - player1.StartTime + t1 - player2.StartTime
-			//				scoresub := math.Abs(player1.Score - player2.Score)
-			//				//
-			//				(1000-scoresub)*(alltime/20)
-			//				if true {
-			//					break
-			//				}
-			//			}
-
-			i++
-			if i >= 2 {
-				break
+			fight[0] = k.(int)
+			player1 := v.(*serchInfo)
+			maxpipeidu := 1000000            //匹配度(分差最小)
+			var pipeiplayer *serchInfo = nil //当前最匹配的玩家var pi *int = nil
+			pipeiindex := -1
+			delete(serchPlayer, k)
+			for k1, v1 := range serchPlayer {
+				player2 := v1.(*serchInfo)
+				alltime := t1 - player1.StartTime + t1 - player2.StartTime
+				//log.Info("time %d", alltime)
+				scoresub := int(math.Abs(float64(player1.Score - player2.Score)))
+				//log.Info("score %d", scoresub)
+				//
+				//(1000 - scoresub) * (alltime / 20)
+				if a.MatchGetScoreFromTime(alltime) > scoresub {
+					if maxpipeidu > scoresub {
+						maxpipeidu = scoresub
+						pipeiplayer = player2
+						pipeiindex = k1.(int)
+					}
+				}
 			}
-		}
+			//匹配成功
+			if pipeiplayer != nil {
+				delete(serchPlayer, pipeiindex)
+				fight[1] = pipeiindex
 
-		//算法结束
-		if a.closeFlag.Get() == true {
-			return
-		}
+				//算法结束
+				if a.closeFlag.Get() == true {
+					return
+				}
 
-		p1 := a.serchPoolFor5G.Get(fight[0])
-		p2 := a.serchPoolFor5G.Get(fight[1])
-		if p1 != nil && p2 != nil {
-			a.serchPoolFor5G.Delete(fight[0])
-			a.serchPoolFor5G.Delete(fight[1])
-			//创建一个游戏
-			a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))
+				p1 := a.serchPoolFor5G.Get(fight[0])
+				p2 := a.serchPoolFor5G.Get(fight[1])
+				if p1 != nil && p2 != nil {
+					a.serchPoolFor5G.Delete(fight[0])
+					a.serchPoolFor5G.Delete(fight[1])
+					//创建一个游戏
+					a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))
+					log.Info("CreateGame:%d---%d---", p1.(*serchInfo).Score, p2.(*serchInfo).Score)
+				}
+			}
+
+			//			i++
+			//			if i >= 2 {
+			//				break
+			//			}
 		}
 
 		//时间
 		t2 := utils.Milliseconde()
 		if t2-t1 >= int64(oneUpdateTime) {
-			utils.MySleep(t1, int64(t2+1))
+			utils.MySleep(t1, int64(t2-t1+1))
 		} else {
-			goto loop
+			utils.MySleep(t1, int64(oneUpdateTime))
+			//goto loop
 		}
 
 		//utils.MySleep(t1, int64(oneUpdateTime))

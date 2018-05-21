@@ -255,6 +255,8 @@ type SC_GameOver struct {
 	WinPlayerSeatIndex int
 	Reason             int //0表示玩家退出 1表示时间到 2表示棋子5连
 	WinQiZi            [5][2]int
+	WinScore           int
+	LoseScore          int
 }
 
 type MsgTaskInfo struct {
