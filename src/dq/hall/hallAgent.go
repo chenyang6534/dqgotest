@@ -67,12 +67,13 @@ func (a *HallAgent) Init() {
 	a.ScoreTime[6] = ScoreAndTime{Time: 30 * 1000, Score: 1000}
 	a.ScoreTime[7] = ScoreAndTime{Time: 40 * 1000, Score: 2000}
 	a.ScoreTime[8] = ScoreAndTime{Time: 50 * 1000, Score: 4000}
-	a.ScoreTime[9] = ScoreAndTime{Time: 60 * 1000, Score: 100000}
+	a.ScoreTime[9] = ScoreAndTime{Time: 60 * 1000, Score: 10000000}
 
 	a.serchPoolFor5G = utils.NewBeeMap()
 	a.closeFlag = utils.NewBeeVar(false)
 
 	GetMail().Init()
+	GetRank().Init()
 
 	//GetStore().getStoreInfo()Buy
 	//GetItemManager().GetItemsInfo(93)
@@ -90,6 +91,7 @@ func (a *HallAgent) Init() {
 	a.handles["CS_GetMailInfo"] = a.DoGetMailInfoData
 	a.handles["CS_GetStoreInfo"] = a.DoGetStoreInfoData
 	a.handles["CS_GetBagInfo"] = a.DoGetBagInfoData
+	a.handles["CS_GetRankInfo"] = a.DoGetRankInfoData
 
 	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
 	a.handles["CS_GetMailRewards"] = a.DoGetMailRewardsData
@@ -294,6 +296,25 @@ func (a *HallAgent) DoGetTaskRewardsData(data *datamsg.MsgBase) {
 
 }
 
+//
+func (a *HallAgent) DoGetRankInfoData(data *datamsg.MsgBase) {
+
+	h2 := &datamsg.CS_GetRankInfo{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_RankInfo"
+
+	tsdinfo := GetRank().RankInfo(h2.StartRank, h2.EndRank)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
 func (a *HallAgent) DoGetBagInfoData(data *datamsg.MsgBase) {
 
 	data.ModeType = "Client"
@@ -400,6 +421,17 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 		log.Info(err.Error())
 		return
 	}
+
+	//排行数据
+	winrank := datamsg.RankNodeInfo{}
+	winrank.Uid = h2.WinId
+	db.DbOne.GetPlayerManyInfo(h2.WinId, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
+	GetRank().SetValue(winrank)
+	loserank := datamsg.RankNodeInfo{}
+	loserank.Uid = h2.LoseId
+	db.DbOne.GetPlayerManyInfo(h2.LoseId, "userbaseinfo", "seasonscore,name,avatarurl", &loserank.Score, &loserank.Name, &loserank.Avatar)
+	GetRank().SetValue(loserank)
+
 	//设置每日任务数据
 	GetTaskEveryday().Play(h2.WinId)
 	GetTaskEveryday().Play(h2.LoseId)
@@ -452,6 +484,12 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 
 	GetMail().CheckUserPublicMail(data.Uid)
 	GetMail().CheckUserMail(data.Uid)
+
+	//ce shi
+	winrank := datamsg.RankNodeInfo{}
+	winrank.Uid = data.Uid
+	db.DbOne.GetPlayerManyInfo(data.Uid, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
+	GetRank().SetValue(winrank)
 
 	//a.SendHallUIInfo(data)
 
@@ -641,6 +679,7 @@ func (a *HallAgent) OnClose() {
 
 	GetTaskEveryday().DeleteAll()
 	GetItemManager().DeleteAll()
+	GetRank().WriteDB()
 
 }
 

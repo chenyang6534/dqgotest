@@ -556,6 +556,48 @@ func (a *DB) WritePrivateMailInfoFromPublic(uid int, mailInfo *datamsg.MailInfo,
 	return err1
 }
 
+//获取排行榜数据库信息
+func (a *DB) GetRankInfo(rank *[]datamsg.RankNodeInfo) error {
+
+	sqlstr := "SELECT * FROM rank "
+	str, err := a.GetJSON(sqlstr)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	//h2 := datamsg.MailInfo{}
+	err = json.Unmarshal([]byte(str), rank)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+//持久化排行榜数据库信息
+func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo) error {
+	tx, _ := a.Mydb.Begin()
+
+	_, err := tx.Exec("delete from rank")
+	if err != nil {
+		log.Error("delete rank err%s", err.Error())
+
+	}
+
+	for _, v := range rank {
+		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar) values (?,?,?,?)", v.Uid, v.Score, v.Name, v.Avatar)
+
+		if err1 != nil {
+			log.Error("INSERT rank err%s", err1.Error())
+			//return tx.Rollback()
+		}
+	}
+	err2 := tx.Commit()
+	return err2
+}
+
 //获取邮件数据库信息
 func (a *DB) GetMailInfo(mailid []int, mail *[]datamsg.MailInfo) error {
 
@@ -778,8 +820,10 @@ func (a *DB) SetPlayerTaskEd(uid int, date string, info *utils.BeeMap) error {
 		if e != nil {
 			log.Error(e.Error())
 		}
+		if n != 0 {
+			log.Info("n:%d", n)
+		}
 
-		log.Info("n:%d", n)
 		return tx.Rollback()
 	}
 

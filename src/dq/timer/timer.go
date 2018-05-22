@@ -21,7 +21,7 @@ type Timer struct {
 	fireTime time.Time
 	interval time.Duration
 	callback interface{}
-	params	 []interface{}
+	params   []interface{}
 	repeat   bool
 	addseq   uint
 }
@@ -79,7 +79,7 @@ func (h *_TimerHeap) Pop() (ret interface{}) {
 var (
 	timerHeap     _TimerHeap
 	timerHeapLock sync.Mutex
-	isClose 	  bool
+	isClose       bool
 )
 
 func init() {
@@ -88,20 +88,36 @@ func init() {
 	//---
 	isClose = false
 	StartTicks(MIN_TIMER_INTERVAL)
-	
+
 }
 
 // Add a callback which will be called after specified duration
-func AddCallback(d time.Duration, callback interface{},params ...interface{}) *Timer {
-	
-	
-	
+func AddCallback(d time.Duration, callback interface{}, params ...interface{}) *Timer {
+
 	t := &Timer{
 		fireTime: time.Now().Add(d),
 		interval: d,
 		callback: callback,
-		params : params,
+		params:   params,
 		repeat:   false,
+	}
+	timerHeapLock.Lock()
+	t.addseq = nextAddSeq // set addseq when locked
+	nextAddSeq += 1
+
+	heap.Push(&timerHeap, t)
+	timerHeapLock.Unlock()
+	return t
+}
+
+func AddRepeatCallback(d time.Duration, callback interface{}, params ...interface{}) *Timer {
+
+	t := &Timer{
+		fireTime: time.Now().Add(d),
+		interval: d,
+		callback: callback,
+		params:   params,
+		repeat:   true,
 	}
 	timerHeapLock.Lock()
 	t.addseq = nextAddSeq // set addseq when locked
@@ -142,7 +158,7 @@ func Tick() {
 		if timerHeap.Len() <= 0 {
 			break
 		}
-		
+
 		//fmt.Println( fmt.Sprintln("len:%d",timerHeap.Len()))
 
 		nextFireTime := timerHeap.timers[0].fireTime
@@ -163,7 +179,7 @@ func Tick() {
 		}
 		// unlock the lock to run callback, because callback may add more callbacks / timers
 		timerHeapLock.Unlock()
-		runCallback(callback,t.params)
+		runCallback(callback, t.params)
 		timerHeapLock.Lock()
 
 		if t.repeat {
@@ -184,18 +200,18 @@ func Tick() {
 func StartTicks(tickInterval time.Duration) {
 	go selfTickRoutine(tickInterval)
 }
-func ExitTicks(){
+func ExitTicks() {
 	isClose = true
 }
 
 func selfTickRoutine(tickInterval time.Duration) {
-	for !isClose{
+	for !isClose {
 		time.Sleep(tickInterval)
 		Tick()
 	}
 }
 
-func runCallback(callback interface{},args []interface{}) {
+func runCallback(callback interface{}, args []interface{}) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -203,14 +219,14 @@ func runCallback(callback interface{},args []interface{}) {
 			debug.PrintStack()
 		}
 	}()
-	
-	if len(args) == 3 { 
-        callback.(func(interface{},interface{},interface{}))(args[0],args[1],args[2])
-    } else if len(args) == 2 { 
-        callback.(func(interface{},interface{}))(args[0],args[1])
-    }else if len(args) == 1 { 
-        callback.(func(interface{}))(args[0])
-    } else {
-        callback.(func())()
-    }
+
+	if len(args) == 3 {
+		callback.(func(interface{}, interface{}, interface{}))(args[0], args[1], args[2])
+	} else if len(args) == 2 {
+		callback.(func(interface{}, interface{}))(args[0], args[1])
+	} else if len(args) == 1 {
+		callback.(func(interface{}))(args[0])
+	} else {
+		callback.(func())()
+	}
 }

@@ -100,6 +100,12 @@ type CS_ZhuangBeiItem struct {
 	Type int
 }
 
+//获取排行信息
+type CS_GetRankInfo struct {
+	StartRank int
+	EndRank   int
+}
+
 //上传推荐者
 type CS_Presenter struct {
 	PresenterUid int
@@ -165,10 +171,12 @@ type SC_NewGame struct {
 //GameOverInfo
 //游戏结束信息
 type GameOverInfo struct {
-	GameMode   int
-	WinId      int
-	LoseId     int
-	ObserverId []int
+	GameMode        int
+	WinId           int
+	LoseId          int
+	ObserverId      []int
+	WinPlayerScore  int
+	LosePlayerScore int
 }
 
 //玩家
@@ -268,6 +276,17 @@ type MsgTaskInfo struct {
 
 	Rewards []conf.RewardsConfig
 }
+type RankNodeInfo struct {
+	Uid    int
+	Score  int
+	Name   string
+	Avatar string
+}
+
+type RankNodeMessage struct {
+	RankNodeInfo
+	RankNum int
+}
 
 type MailInfo struct {
 	Id        int
@@ -280,6 +299,10 @@ type MailInfo struct {
 	Rewardstr string
 	ReadState int
 	GetState  int
+}
+
+type SC_RankInfo struct {
+	Ranks []RankNodeMessage
 }
 
 //邮件信息

@@ -437,7 +437,11 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 		jd.WinId = winplayer.Uid
 		jd.LoseId = loseplayer.Uid
 		jd.GameMode = game.GameMode
+		jd.WinPlayerScore = winscore + winplayer.SeasonScore
+		jd.LosePlayerScore = losescore + loseplayer.SeasonScore
+		size := game.Observer.Size()
 		allObserve := game.Observer.Items()
+		jd.ObserverId = make([]int, size)
 		count := 0
 		for _, v := range allObserve {
 			if v != nil {
