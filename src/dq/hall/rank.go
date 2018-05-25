@@ -1,12 +1,12 @@
 package hall
 
 import (
-	//"dq/conf"
+	"dq/conf"
 	"dq/datamsg"
 	"dq/db"
 	"dq/log"
 	"dq/utils"
-	//"strconv"
+	"strconv"
 	//"strings"
 	"dq/timer"
 	"sort"
@@ -16,7 +16,7 @@ import (
 
 var (
 	rank      = &Rank{Lock: new(sync.Mutex)}
-	RankCount = 500
+	RankCount = 1000
 )
 
 //type RankNode struct {
@@ -29,9 +29,13 @@ var (
 type Rank struct {
 	Lock *sync.Mutex
 
-	RankList  []datamsg.RankNodeInfo
-	RankMap   *utils.BeeMap
-	RankTimer *timer.Timer
+	RankList      []datamsg.RankNodeInfo
+	RankMap       *utils.BeeMap
+	RankTimer     *timer.Timer
+	SeasonIdIndex int
+
+	SeasonOverTimerCheck *timer.Timer
+	DoSeason             sync.WaitGroup
 }
 
 func GetRank() *Rank {
@@ -44,24 +48,121 @@ func (s RankSlice) Len() int           { return len(s) }
 func (s RankSlice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s RankSlice) Less(i, j int) bool { return s[i].Score > s[j].Score }
 
+func GetCurSeasonIdIndex() int {
+	seasons := conf.GetSeasonConfig().Seasons
+	for _, v := range seasons {
+		//
+		if utils.CheckTimeIsExpiry(v.StartTime) == true && utils.CheckTimeIsExpiry(v.EndTime) == false {
+
+			return v.IdIndex
+		}
+
+	}
+
+	return -1
+
+}
+
+func GetSeasonRewardFromRank(seasonidindex int, ranknum int) int {
+	seasons := conf.GetSeasonConfig().Seasons
+	for _, v := range seasons {
+		//
+		if v.IdIndex == seasonidindex {
+			for _, v1 := range v.RewardList {
+				if ranknum >= v1.RankStart && ranknum <= v1.RankEnd {
+
+					return v1.Gold
+				}
+			}
+
+			return -1
+
+		}
+
+	}
+	return -1
+}
+
+//派发上赛季奖励
+func (rank *Rank) GaveReward(seasonidindex int) {
+
+	ranklist := make([]datamsg.RankNodeInfo, 0)
+	db.DbOne.GetRankInfo(&ranklist, seasonidindex)
+
+	log.Info("---seasonidindex--%d--size-%d", seasonidindex, len(ranklist))
+
+	//排序
+	sort.Sort(RankSlice(ranklist))
+
+	ismail := false
+
+	for k, v := range ranklist {
+		//log.Info("---rank--%d", v.Rewardgold)
+		ranknum := k + 1
+		if v.Rewardgold == 0 { //没有发放奖励
+			//发奖励
+			rewardgold := GetSeasonRewardFromRank(seasonidindex, ranknum)
+			//log.Info("---rewardgold--%d---rank:%d", rewardgold, ranknum)
+
+			if rewardgold > 0 {
+				//发送奖励邮件
+				mailp := &datamsg.MailInfo{}
+				mailp.SendName = "宝石五子棋"
+				mailp.Title = "赛季奖励"
+				mailp.Content = "恭喜你在本赛季获得第" + strconv.Itoa(ranknum) + "名,特此奖励!"
+				mailp.RecUid = v.Uid
+				mailp.Date = time.Now().Format("2006-01-02")
+				tt := conf.RewardsConfig{Type: 1, Count: rewardgold, Time: -1}
+				mailp.Reward = append(mailp.Reward, tt)
+				mailp.ReadState = 0
+				mailp.GetState = 0
+				db.DbOne.WritePrivateMailInfo(v.Uid, mailp)
+			}
+
+			//
+			ranklist[k].Rewardgold = rewardgold
+
+			ismail = true
+
+		}
+	}
+	//入库
+	if ismail {
+		db.DbOne.WriteRankInfo(ranklist, seasonidindex)
+
+		//赛季结束后的积分变换
+		db.DbOne.ResetAllPlayerSeasonScore()
+	}
+
+}
+
 func (rank *Rank) Init() {
 	rank.RankMap = utils.NewBeeMap()
 	rank.RankList = make([]datamsg.RankNodeInfo, 0)
 
+	rank.SeasonIdIndex = GetCurSeasonIdIndex()
+
+	//检查上个赛季的奖励是否发放完毕
+	rank.GaveReward(rank.SeasonIdIndex - 1)
+
+	//GetRankInfo
+
 	//从数据库读取数据
-	db.DbOne.GetRankInfo(&rank.RankList)
+	db.DbOne.GetRankInfo(&rank.RankList, rank.SeasonIdIndex)
 
 	//排序
 	sort.Sort(RankSlice(rank.RankList))
 
-	for k, v := range rank.RankList {
-		log.Info("----11-name:%s---score:%d---rank%d", v.Name, v.Score, k)
-	}
+	//	for k, v := range rank.RankList {
+	//		log.Info("----11-name:%s---score:%d---rank%d", v.Name, v.Score, k)
+	//	}
 	//map
 	rank.ListToMap()
 
 	//--
 	rank.RankTimer = timer.AddRepeatCallback(time.Second*30, rank.Sort)
+
+	rank.SeasonOverTimerCheck = timer.AddRepeatCallback(time.Second*30, rank.CheckSeasonOver)
 	//t.repeat = true
 
 }
@@ -73,6 +174,43 @@ func (rank *Rank) SetValue(data datamsg.RankNodeInfo) {
 
 	rank.RankMap.Set(data.Uid, data)
 
+}
+
+func (rank *Rank) DoSeasonOver() {
+
+	curseason := GetCurSeasonIdIndex()
+
+	rank.Sort()
+
+	db.DbOne.WriteRankInfo(rank.RankList, rank.SeasonIdIndex)
+	rank.SeasonIdIndex = curseason
+
+	//检查上个赛季的奖励是否发放完毕
+	rank.GaveReward(rank.SeasonIdIndex - 1)
+
+	//赛季结束后的积分变换
+	//db.DbOne.ResetAllPlayerSeasonScore()
+
+	//删除所有缓存数据
+	rank.RankList = make([]datamsg.RankNodeInfo, 0)
+	rank.RankMap.DeleteAll()
+
+	rank.DoSeason.Done()
+
+	log.Info("---DoSeasonOver---")
+}
+
+//检查是否赛季到期
+func (rank *Rank) CheckSeasonOver() {
+	log.Info("---CheckSeasonOver---")
+	curseason := GetCurSeasonIdIndex()
+	//赛季到期
+	if curseason > rank.SeasonIdIndex {
+
+		rank.DoSeason.Add(1)
+		go rank.DoSeasonOver()
+
+	}
 }
 
 //重新排序
@@ -163,7 +301,9 @@ func (rank *Rank) WriteDB() {
 	rank.Lock.Lock()
 	defer rank.Lock.Unlock()
 
-	db.DbOne.WriteRankInfo(rank.RankList)
+	db.DbOne.WriteRankInfo(rank.RankList, rank.SeasonIdIndex)
+
+	rank.DoSeason.Wait()
 
 }
 
@@ -175,4 +315,6 @@ func (rank *Rank) ListToMap() {
 	for _, v := range rank.RankList {
 		rank.RankMap.Set(v.Uid, v)
 	}
+
+	log.Info("---rankmap size:%d", rank.RankMap.Size())
 }

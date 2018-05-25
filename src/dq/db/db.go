@@ -378,6 +378,25 @@ func (a *DB) GetPlayerOneOtherInfo(uid int, field string, value interface{}) err
 
 }
 
+//重置所有玩家赛季分
+func (a *DB) ResetAllPlayerSeasonScore() error {
+
+	sqlstr := "UPDATE userbaseinfo SET seasonscore=1000"
+
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec(sqlstr)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err")
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+
 //设置玩家一项其他信息
 func (a *DB) SetPlayerOneOtherInfo(uid int, field string, value interface{}) error {
 
@@ -557,9 +576,9 @@ func (a *DB) WritePrivateMailInfoFromPublic(uid int, mailInfo *datamsg.MailInfo,
 }
 
 //获取排行榜数据库信息
-func (a *DB) GetRankInfo(rank *[]datamsg.RankNodeInfo) error {
+func (a *DB) GetRankInfo(rank *[]datamsg.RankNodeInfo, seasonidindex int) error {
 
-	sqlstr := "SELECT * FROM rank "
+	sqlstr := "SELECT * FROM rank where seasonidindex=" + strconv.Itoa(seasonidindex)
 	str, err := a.GetJSON(sqlstr)
 	if err != nil {
 		log.Info(err.Error())
@@ -577,17 +596,18 @@ func (a *DB) GetRankInfo(rank *[]datamsg.RankNodeInfo) error {
 }
 
 //持久化排行榜数据库信息
-func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo) error {
+func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo, idindex int) error {
 	tx, _ := a.Mydb.Begin()
 
-	_, err := tx.Exec("delete from rank")
+	_, err := tx.Exec("delete from rank where seasonidindex=" + strconv.Itoa(idindex))
 	if err != nil {
 		log.Error("delete rank err%s", err.Error())
 
 	}
 
 	for _, v := range rank {
-		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar) values (?,?,?,?)", v.Uid, v.Score, v.Name, v.Avatar)
+		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar,rewardgold,seasonidindex) values (?,?,?,?,?,?)",
+			v.Uid, v.Score, v.Name, v.Avatar, v.Rewardgold, idindex)
 
 		if err1 != nil {
 			log.Error("INSERT rank err%s", err1.Error())
@@ -886,7 +906,7 @@ func (a *DB) GetPlayerTaskEd(uid int, date *string, info *utils.BeeMap) error {
 	defer rows.Close()
 
 	if rows.Next() {
-		log.Info("---len:%d", len(values))
+		//log.Info("---len:%d", len(values))
 		//return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi)
 		err = rows.Scan(values...)
 		if err != nil {

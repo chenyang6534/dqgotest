@@ -43,7 +43,7 @@ func (user *UserTaskEveryday) readValueFromDB() {
 	//	for k, v := range items {
 	//		log.Info("---k:%s---value:%v", k, v)
 	//	}
-	log.Info("---day:" + user.Date)
+	//log.Info("---day:" + user.Date)
 
 }
 func (user *UserTaskEveryday) doShare() {

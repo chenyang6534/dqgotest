@@ -304,7 +304,7 @@ func (game *Game5GLogic) gameStart() {
 	//游戏开始
 
 	rad := rand.Intn(2)
-	log.Info("----random seatindex:%d", rad)
+	//log.Info("----random seatindex:%d", rad)
 	game.GameSeatIndex = rad - 1
 
 	game.Player[0].Time = game.Time
@@ -330,6 +330,9 @@ func (game *Game5GLogic) gameStart() {
 	}
 
 	timer.AddCallback(time.Millisecond*3000, game.ChangeGameTurn)
+
+	score := (game.Player[0].SeasonScore + game.Player[1].SeasonScore) / 2
+	game.GameAgent.Showgames.AddShowGame(game.GameId, score)
 }
 
 //时间到
@@ -486,6 +489,8 @@ func (game *Game5GLogic) dismissGame() {
 	game.GameAgent.Creators.Delete(game.CreateId)
 
 	game.GameAgent.Games.Delete(game.GameId)
+
+	game.GameAgent.Showgames.RemoveShowGame(game.GameId)
 }
 
 //时间到
@@ -732,6 +737,7 @@ func (game *Game5GLogic) Disconnect(player *Game5GPlayer) bool {
 
 	//观察者
 	game.Observer.Delete(player.Uid)
+	game.GameAgent.Players.Delete(player.Uid)
 
 	//给所有人发送玩家离开
 	jd := &datamsg.SC_PlayerGoOut{}

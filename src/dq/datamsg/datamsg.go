@@ -281,6 +281,7 @@ type RankNodeInfo struct {
 	Score  int
 	Name   string
 	Avatar string
+	Rewardgold int
 }
 
 type RankNodeMessage struct {

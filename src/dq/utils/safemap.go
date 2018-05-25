@@ -49,6 +49,23 @@ func (m *BeeVar) Set(v interface{}) bool {
 	return true
 }
 
+////排序list
+//type SortList struct {
+//	lock      *sync.RWMutex
+//	bm        []interface{}
+//	size      int
+//	limitSize int
+//}
+
+//// NewBeeMap return new safemap
+//func NewSortList() *SortList {
+//	return &SortList{
+//		lock: new(sync.RWMutex),
+//		bm:   make([]interface{}, 0),
+//		size: 0,
+//	}
+//}
+
 // BeeMap is a map with lock
 type BeeMap struct {
 	lock *sync.RWMutex

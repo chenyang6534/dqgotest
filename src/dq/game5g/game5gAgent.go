@@ -10,11 +10,113 @@ import (
 	"net"
 	//"strconv"
 	//"time"
+	"container/list"
 	"dq/conf"
 	"dq/db"
 	"dq/utils"
+	"sync"
 )
 
+type ShowGame struct {
+	GameId int
+	Score  int
+}
+
+//当前进行的游戏表(展示性)
+type ShowGameList struct {
+	lock      *sync.RWMutex
+	bm        *list.List
+	size      int
+	limitSize int
+}
+
+func NewShowGameList(limitsize int) *ShowGameList {
+	return &ShowGameList{
+		lock:      new(sync.RWMutex),
+		bm:        list.New(),
+		size:      0,
+		limitSize: limitsize,
+	}
+}
+
+func (a *ShowGameList) AddShowGame(gameid int, score int) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	if a.bm.Len() == 0 {
+		tem := ShowGame{GameId: gameid, Score: score}
+		a.bm.PushBack(tem)
+	}
+
+	if a.bm.Len() >= a.limitSize {
+		little := a.bm.Back()
+		littlesg := little.Value.(ShowGame)
+		if score <= littlesg.Score {
+			return
+		}
+	}
+
+	for e := a.bm.Front(); e != nil; e = e.Next() {
+
+		sg := e.Value.(ShowGame)
+		if score >= sg.Score {
+			tem := ShowGame{GameId: gameid, Score: score}
+			a.bm.InsertBefore(tem, e)
+
+			if a.bm.Len() > a.limitSize {
+				a.bm.Remove(a.bm.Back())
+			}
+
+			return
+		}
+
+	}
+
+	if a.bm.Len() < a.limitSize {
+		tem := ShowGame{GameId: gameid, Score: score}
+		a.bm.InsertAfter(tem, a.bm.Back())
+	}
+
+}
+func (a *ShowGameList) RemoveShowGame(gameid int) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	for e := a.bm.Front(); e != nil; e = e.Next() {
+
+		sg := e.Value.(ShowGame)
+		if gameid == sg.GameId {
+
+			a.bm.Remove(e)
+			return
+		}
+
+	}
+}
+func (a *ShowGameList) GetShowGame(count int) []ShowGame {
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+
+	showGames := make([]ShowGame, 0)
+
+	addcount := 0
+
+	for e := a.bm.Front(); e != nil; e = e.Next() {
+
+		sg := e.Value.(ShowGame)
+
+		showGames = append(showGames, sg)
+
+		addcount++
+		if addcount >= count {
+			return showGames
+		}
+
+	}
+	return showGames
+}
+
+//游戏部分
 type Game5GAgent struct {
 	conn network.Conn
 
@@ -25,6 +127,8 @@ type Game5GAgent struct {
 	Games    *utils.BeeMap //游戏
 	Players  *utils.BeeMap //游戏中的玩家
 	Creators *utils.BeeMap //创建了游戏，但是还不是玩家
+
+	Showgames *ShowGameList
 }
 
 func (a *Game5GAgent) GetConnectId() int {
@@ -40,6 +144,8 @@ func (a *Game5GAgent) Init() {
 	a.Games = utils.NewBeeMap()
 	a.Players = utils.NewBeeMap()
 	a.Creators = utils.NewBeeMap()
+
+	a.Showgames = NewShowGameList(30)
 
 	//time.Time.After()
 
@@ -82,22 +188,28 @@ func (a *Game5GAgent) DoGetGamingInfoData(data *datamsg.MsgBase) {
 	}
 	//---------------
 	//if( a.Games > 0)
-	items := a.Games.Items()
+	items := a.Showgames.GetShowGame(h2.Count)
 
 	jd := &datamsg.SC_GetGamingInfo{}
 	jd.GameInfo = make([]datamsg.MsgGame5GingInfo, 0)
 	count := 0
-	for k, v := range items {
+	for _, v := range items {
 		if count >= h2.Count {
 			break
 		}
-		game := v.(*Game5GLogic)
+		//sg := v
+		g := a.Games.Get(v.GameId)
+		if g == nil {
+			continue
+		}
+
+		game := g.(*Game5GLogic)
 		if game.State == Game5GState_Gaming {
 			gameinfo := datamsg.MsgGame5GingInfo{}
 			gameinfo.PlayerOneName = game.Player[0].Name
 			gameinfo.PlayerTwoName = game.Player[1].Name
-			gameinfo.GameId = k.(int)
-			gameinfo.Score = (game.Player[0].SeasonScore + game.Player[1].SeasonScore) / 2
+			gameinfo.GameId = v.GameId
+			gameinfo.Score = v.Score //(game.Player[0].SeasonScore + game.Player[1].SeasonScore) / 2
 			gameinfo.GameName = "game_" + strconv.Itoa(gameinfo.GameId)
 			jd.GameInfo = append(jd.GameInfo, gameinfo)
 			count++
@@ -402,7 +514,7 @@ func (a *Game5GAgent) DoCreateRoomData(data *datamsg.MsgBase) {
 //
 func (a *Game5GAgent) DoNewGameData(data *datamsg.MsgBase) {
 
-	log.Info("----DoNewGameData--")
+	//log.Info("----DoNewGameData--")
 	h2 := make(map[string]interface{})
 	err := json.Unmarshal([]byte(data.JsonData), &h2)
 	if err != nil {
