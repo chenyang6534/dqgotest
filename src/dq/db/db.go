@@ -132,13 +132,24 @@ func (a *DB) newUser(machineid string, platfom string, phonenumber string, openi
 		return -1, tx.Rollback()
 	}
 	if name == "" {
-		name = "xiaoming_" + strconv.Itoa(int(id))
+		name = "yk_" + strconv.Itoa(int(id))
 	}
 
 	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
-		id, name, 0, 0, 0, 1, 0, 1000, "", 1, 2)
+		id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002)
+	//插入名字失败
+	if err1 != nil {
+
+		name = "yk_" + strconv.Itoa(int(id))
+		res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
+			id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002)
+		if err1 != nil {
+			log.Info("INSERT userbaseinfo err")
+			return -1, tx.Rollback()
+		}
+	}
 	n, e = res.RowsAffected()
-	if err1 != nil || n == 0 || e != nil {
+	if n == 0 || e != nil {
 		log.Info("INSERT userbaseinfo err")
 		return -1, tx.Rollback()
 	}

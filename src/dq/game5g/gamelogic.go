@@ -389,8 +389,8 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 
 		//tem := math.Round(float64(1-winplayer.SeasonScore/allscore) * winscorexishu)
 
-		winscore = int(math.Round(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * winscorexishu))
-		losescore = int(math.Round(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * losescorexishu))
+		winscore = int(math.Ceil(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * winscorexishu))
+		losescore = int(math.Ceil(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * losescorexishu))
 
 		//winplayer.SeasonScore
 		log.Info("----------win:%d-----lose:%d", winscore, losescore)

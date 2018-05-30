@@ -96,6 +96,7 @@ func (a *LoginAgent) DoWeiXingLoginData(data *datamsg.MsgBase) {
 	if uid = db.DbOne.CheckWSOpenidLogin(openid); uid > 0 {
 		log.Info("---------user login:%d", uid)
 	} else {
+		log.Info("---------user login name:%s", h2.Name)
 		uid = db.DbOne.CreateQuickWSOpenidPlayer(openid, h2.Name)
 		if uid < 0 {
 			log.Info("---------new user lose", uid)

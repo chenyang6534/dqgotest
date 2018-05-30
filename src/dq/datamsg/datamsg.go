@@ -277,10 +277,10 @@ type MsgTaskInfo struct {
 	Rewards []conf.RewardsConfig
 }
 type RankNodeInfo struct {
-	Uid    int
-	Score  int
-	Name   string
-	Avatar string
+	Uid        int
+	Score      int
+	Name       string
+	Avatar     string
 	Rewardgold int
 }
 
@@ -303,7 +303,9 @@ type MailInfo struct {
 }
 
 type SC_RankInfo struct {
-	Ranks []RankNodeMessage
+	Ranks      []RankNodeMessage
+	SeasonInfo conf.Season
+	MyRank     int
 }
 
 //邮件信息

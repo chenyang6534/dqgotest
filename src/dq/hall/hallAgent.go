@@ -309,7 +309,10 @@ func (a *HallAgent) DoGetRankInfoData(data *datamsg.MsgBase) {
 	data.ModeType = "Client"
 	data.MsgType = "SC_RankInfo"
 
-	tsdinfo := GetRank().RankInfo(h2.StartRank, h2.EndRank)
+	myscore := 0
+	db.DbOne.GetPlayerOneInfo(data.Uid, "userbaseinfo", "seasonscore", &myscore)
+
+	tsdinfo := GetRank().RankInfo(h2.StartRank, h2.EndRank, data.Uid, myscore)
 	if tsdinfo != nil {
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
 	}
@@ -486,10 +489,10 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 	GetMail().CheckUserMail(data.Uid)
 
 	//ce shi
-	winrank := datamsg.RankNodeInfo{}
-	winrank.Uid = data.Uid
-	db.DbOne.GetPlayerManyInfo(data.Uid, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
-	GetRank().SetValue(winrank)
+	//	winrank := datamsg.RankNodeInfo{}
+	//	winrank.Uid = data.Uid
+	//	db.DbOne.GetPlayerManyInfo(data.Uid, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
+	//	GetRank().SetValue(winrank)
 
 	//a.SendHallUIInfo(data)
 

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	//"strings"
 	"dq/timer"
+	//"math"
 	"sort"
 	"sync"
 	"time"
@@ -29,8 +30,11 @@ var (
 type Rank struct {
 	Lock *sync.Mutex
 
-	RankList      []datamsg.RankNodeInfo
-	RankMap       *utils.BeeMap
+	RankList     []datamsg.RankNodeInfo //排行榜缓存
+	RankNumOfUid *utils.BeeMap          //玩家排名缓存
+
+	RankMap *utils.BeeMap //需要排行的数据
+
 	RankTimer     *timer.Timer
 	SeasonIdIndex int
 
@@ -138,6 +142,7 @@ func (rank *Rank) GaveReward(seasonidindex int) {
 
 func (rank *Rank) Init() {
 	rank.RankMap = utils.NewBeeMap()
+	rank.RankNumOfUid = utils.NewBeeMap()
 	rank.RankList = make([]datamsg.RankNodeInfo, 0)
 
 	rank.SeasonIdIndex = GetCurSeasonIdIndex()
@@ -153,9 +158,10 @@ func (rank *Rank) Init() {
 	//排序
 	sort.Sort(RankSlice(rank.RankList))
 
-	//	for k, v := range rank.RankList {
-	//		log.Info("----11-name:%s---score:%d---rank%d", v.Name, v.Score, k)
-	//	}
+	for k, v := range rank.RankList {
+		//log.Info("----11-name:%s---score:%d---rank%d", v.Name, v.Score, k)
+		rank.RankNumOfUid.Set(v.Uid, k+1)
+	}
 	//map
 	rank.ListToMap()
 
@@ -176,6 +182,7 @@ func (rank *Rank) SetValue(data datamsg.RankNodeInfo) {
 
 }
 
+//当赛季结束时的操作
 func (rank *Rank) DoSeasonOver() {
 
 	curseason := GetCurSeasonIdIndex()
@@ -193,6 +200,7 @@ func (rank *Rank) DoSeasonOver() {
 
 	//删除所有缓存数据
 	rank.RankList = make([]datamsg.RankNodeInfo, 0)
+	rank.RankNumOfUid.DeleteAll()
 	rank.RankMap.DeleteAll()
 
 	rank.DoSeason.Done()
@@ -256,6 +264,8 @@ func (rank *Rank) Sort() {
 			break
 		}
 		rank.RankList[k] = v
+		rank.RankNumOfUid.Set(v.Uid, k+1)
+
 		rank.RankMap.Set(v.Uid, v)
 
 	}
@@ -265,9 +275,59 @@ func (rank *Rank) Sort() {
 
 }
 
+////2分查找法
+//func (rank *Rank) TwoPointFindRankNum(score int, uid int) int {
+
+//	left, right, mid := 0, len(rank.RankList), 0
+//	for {
+//		// mid向下取整
+//		mid = int(math.Floor(float64((left + right) / 2)))
+//		if rank.RankList[mid].Score > score {
+//			// 如果当前元素大于k，那么把right指针移到mid - 1的位置
+//			left = mid + 1
+//			log.Info("---left:%d-", left)
+
+//		} else if rank.RankList[mid].Score < score {
+//			// 如果当前元素小于k，那么把left指针移到mid + 1的位置
+//			right = mid - 1
+//			log.Info("---right:%d-", right)
+//		} else {
+//			// 否则就是相等了，退出循环
+//			log.Info("---left:%d---right:%d---mid:%d", left, right, mid)
+//			for i := left; i <= right; i++ {
+//				if rank.RankList[i].Uid == uid {
+//					return i + 1
+//				}
+//			}
+
+//			break
+//		}
+//		// 判断如果left大于right，那么这个元素是不存在的。返回-1并且退出循环
+//		if left > right {
+//			log.Info("-lefg:%d--right:%d-", left, right)
+//			mid = -1
+//			break
+//		}
+//	}
+//	// 输入元素的下标
+//	return mid + 1
+//}
+
 //
-func (rank *Rank) RankInfo(start int, end int) *datamsg.SC_RankInfo {
+func (rank *Rank) RankInfo(start int, end int, uid int, myscore int) *datamsg.SC_RankInfo {
+
 	rankinfo := &datamsg.SC_RankInfo{}
+
+	seasons := conf.GetSeasonConfig().Seasons
+	for _, v := range seasons {
+		//
+		if v.IdIndex == rank.SeasonIdIndex {
+			rankinfo.SeasonInfo = v
+			break
+		}
+	}
+
+	rankinfo.MyRank = RankCount + 1
 	if start >= end || start < 0 {
 		return rankinfo
 	}
@@ -276,6 +336,9 @@ func (rank *Rank) RankInfo(start int, end int) *datamsg.SC_RankInfo {
 	defer rank.Lock.Unlock()
 
 	ranklen := len(rank.RankList)
+	if ranklen <= 0 {
+		return rankinfo
+	}
 
 	for i := start; i < end; i++ {
 
@@ -283,8 +346,17 @@ func (rank *Rank) RankInfo(start int, end int) *datamsg.SC_RankInfo {
 			msg := datamsg.RankNodeMessage{rank.RankList[i], i + 1}
 			rankinfo.Ranks = append(rankinfo.Ranks, msg)
 		}
-
 	}
+
+	//自己的排名
+	if rank.RankNumOfUid.Check(uid) == true {
+		rankinfo.MyRank = (rank.RankNumOfUid.Get(uid)).(int)
+	}
+
+	//	if rank.RankList[ranklen-1].Score <= myscore {
+	//		rankinfo.MyRank = rank.TwoPointFindRankNum(myscore, uid)
+	//		log.Info("----------myrank:%d---myscore:%d--uid:%d", rankinfo.MyRank, myscore, uid)
+	//	}
 
 	return rankinfo
 

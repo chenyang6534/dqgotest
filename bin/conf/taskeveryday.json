@@ -20,80 +20,12 @@
             ]
         },
         {
-            "Id":105,
-            "Type":3,
-            "DestValue":2,
-            "DBTableName":"taskeveryday",
-            "GetTagDBFieldName":"get_105",
-            "ProgressDBFieldName":"share_count",
-            "InitialValue":0,
-            "Rewards":
-            [
-                {
-                    "Type":1,
-                    "Count":15,
-                    "Time":-1
-                }
-            ]
-        },
-        {
-            "Id":106,
-            "Type":3,
-            "DestValue":3,
-            "DBTableName":"taskeveryday",
-            "GetTagDBFieldName":"get_106",
-            "ProgressDBFieldName":"share_count",
-            "InitialValue":0,
-            "Rewards":
-            [
-                {
-                    "Type":1,
-                    "Count":20,
-                    "Time":-1
-                }
-            ]
-        },
-        {
-            "Id":100,
-            "Type":1,
-            "DestValue":5,
-            "DBTableName":"taskeveryday",
-            "GetTagDBFieldName":"get_100",
-            "ProgressDBFieldName":"play_count",
-            "InitialValue":0,
-            "Rewards":
-            [
-                {
-                    "Type":1,
-                    "Count":10,
-                    "Time":-1
-                }
-            ]
-        },
-        {
-            "Id":101,
-            "Type":1,
-            "DestValue":10,
-            "DBTableName":"taskeveryday",
-            "GetTagDBFieldName":"get_101",
-            "ProgressDBFieldName":"play_count",
-            "InitialValue":0,
-            "Rewards":
-            [
-                {
-                    "Type":1,
-                    "Count":20,
-                    "Time":-1
-                }
-            ]
-        },
-        {
             "Id":102,
             "Type":2,
             "DestValue":2,
             "DBTableName":"taskeveryday",
             "GetTagDBFieldName":"get_102",
-            "ProgressDBFieldName":"win_count",
+            "ProgressDBFieldName":"sm_win_count",
             "InitialValue":0,
             "Rewards":
             [
@@ -107,10 +39,44 @@
         {
             "Id":103,
             "Type":2,
-            "DestValue":4,
+            "DestValue":5,
             "DBTableName":"taskeveryday",
             "GetTagDBFieldName":"get_103",
-            "ProgressDBFieldName":"win_count",
+            "ProgressDBFieldName":"sm_win_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":16,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":105,
+            "Type":4,
+            "DestValue":2,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_105",
+            "ProgressDBFieldName":"fm_win_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":8,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":106,
+            "Type":4,
+            "DestValue":5,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_106",
+            "ProgressDBFieldName":"fm_win_count",
             "InitialValue":0,
             "Rewards":
             [
