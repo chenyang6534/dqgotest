@@ -333,6 +333,7 @@ func (game *Game5GLogic) gameStart() {
 
 	score := (game.Player[0].SeasonScore + game.Player[1].SeasonScore) / 2
 	game.GameAgent.Showgames.AddShowGame(game.GameId, score)
+
 }
 
 //时间到

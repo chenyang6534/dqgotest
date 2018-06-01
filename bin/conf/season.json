@@ -1,5 +1,5 @@
 {
-    "Version":"1.5",
+    "Version":"1.6",
     "Seasons":
     [
         {
@@ -30,8 +30,23 @@
                 },
                 {
                     "RankStart":101,
-                    "RankEnd":500,
+                    "RankEnd":200,
                     "Gold":1000
+                },
+                {
+                    "RankStart":201,
+                    "RankEnd":400,
+                    "Gold":800
+                },
+                {
+                    "RankStart":401,
+                    "RankEnd":700,
+                    "Gold":600
+                },
+                {
+                    "RankStart":701,
+                    "RankEnd":999,
+                    "Gold":500
                 }
             ]
         },

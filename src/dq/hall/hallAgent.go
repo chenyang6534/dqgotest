@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"net"
 	//"strconv"
-	//"time"
+
 	"dq/db"
 	"dq/utils"
 )
@@ -44,6 +44,8 @@ type serchInfo struct {
 
 	StartTime int64 //开始匹配时间
 	Score     int   //赛季分
+
+	IsAndroid int //是否是机器人
 
 }
 
@@ -117,6 +119,10 @@ func (a *HallAgent) DoPresenterData(data *datamsg.MsgBase) {
 		return
 	}
 	if h2.PresenterUid <= 0 {
+		return
+	}
+	//如果是推荐的自己
+	if h2.PresenterUid == data.Uid {
 		return
 	}
 
@@ -374,6 +380,9 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 	sinfo.EveryTime = 30 //30秒
 	sinfo.StartTime = utils.Milliseconde()
 	sinfo.Score = 1000
+	sinfo.IsAndroid = 0
+
+	//sinfo.IsAndroid =
 
 	a.serchPoolFor5G.Set(data.Uid, sinfo)
 
@@ -382,6 +391,7 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 	err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
 	if err == nil {
 		sinfo.Score = playerinfo.SeasonScore
+		sinfo.IsAndroid = playerinfo.IsAndroid
 
 		data.ModeType = "Client"
 		data.MsgType = "SC_SerchPlayer"
@@ -531,6 +541,10 @@ func (a *HallAgent) Update() {
 	//500毫秒循环一次
 	oneUpdateTime := 500
 
+	androidPlayOnce := int64(1000 * 60 * 3)
+	//lastAndroidPlayTime := utils.Milliseconde()
+	lastAndroidPlayTime := int64(0)
+
 	for {
 		t1 := utils.Milliseconde()
 		if a.closeFlag.Get() == true {
@@ -551,6 +565,7 @@ func (a *HallAgent) Update() {
 		fight := [2]int{}
 		//i := 0
 		for k, v := range serchPlayer {
+			//log.Info("--1--serchsize:%d", len(serchPlayer))
 			fight[0] = k.(int)
 			player1 := v.(*serchInfo)
 			maxpipeidu := 1000000            //匹配度(分差最小)
@@ -559,6 +574,20 @@ func (a *HallAgent) Update() {
 			delete(serchPlayer, k)
 			for k1, v1 := range serchPlayer {
 				player2 := v1.(*serchInfo)
+
+				//2个机器人之间需要3分钟
+				if player1.IsAndroid == 1 && player2.IsAndroid == 1 {
+					if t1-lastAndroidPlayTime < androidPlayOnce {
+						continue
+					}
+				}
+				//一个机器人 需要至少5秒
+				if player1.IsAndroid == 1 || player2.IsAndroid == 1 {
+					if t1-player1.StartTime < 5000 || t1-player2.StartTime < 5000 {
+						continue
+					}
+				}
+
 				alltime := t1 - player1.StartTime + t1 - player2.StartTime
 				//log.Info("time %d", alltime)
 				scoresub := int(math.Abs(float64(player1.Score - player2.Score)))
@@ -566,6 +595,7 @@ func (a *HallAgent) Update() {
 				//
 				//(1000 - scoresub) * (alltime / 20)
 				if a.MatchGetScoreFromTime(alltime) > scoresub {
+
 					if maxpipeidu > scoresub {
 						maxpipeidu = scoresub
 						pipeiplayer = player2
@@ -578,6 +608,8 @@ func (a *HallAgent) Update() {
 				delete(serchPlayer, pipeiindex)
 				fight[1] = pipeiindex
 
+				//log.Info("--2--serchsize:%d", len(serchPlayer))
+
 				//算法结束
 				if a.closeFlag.Get() == true {
 					return
@@ -588,6 +620,13 @@ func (a *HallAgent) Update() {
 				if p1 != nil && p2 != nil {
 					a.serchPoolFor5G.Delete(fight[0])
 					a.serchPoolFor5G.Delete(fight[1])
+					//机器人之间需要3分钟
+					if p1.(*serchInfo).IsAndroid == 1 && p2.(*serchInfo).IsAndroid == 1 {
+						lastAndroidPlayTime = utils.Milliseconde()
+
+					}
+					log.Info("t1:%d---lastAndroidPlayTime%d---", t1, lastAndroidPlayTime)
+
 					//创建一个游戏
 					a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))
 					log.Info("CreateGame:%d---%d---", p1.(*serchInfo).Score, p2.(*serchInfo).Score)

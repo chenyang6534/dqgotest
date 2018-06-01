@@ -135,14 +135,19 @@ func (a *DB) newUser(machineid string, platfom string, phonenumber string, openi
 		name = "yk_" + strconv.Itoa(int(id))
 	}
 
-	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
-		id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002)
+	isandroid := 0
+	if platfom == "android" {
+		isandroid = 1
+	}
+
+	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid) values (?,?,?,?,?,?,?,?,?,?,?,?)",
+		id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid)
 	//插入名字失败
 	if err1 != nil {
 
 		name = "yk_" + strconv.Itoa(int(id))
-		res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi) values (?,?,?,?,?,?,?,?,?,?,?)",
-			id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002)
+		res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid) values (?,?,?,?,?,?,?,?,?,?,?,?)",
+			id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid)
 		if err1 != nil {
 			log.Info("INSERT userbaseinfo err")
 			return -1, tx.Rollback()
@@ -245,7 +250,7 @@ func (a *DB) CheckQuickLogin(machineid string, platfom string) int {
 //获取玩家基本信息
 func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	info.Uid = uid
-	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore,avatarurl,firstqizi,secondqizi FROM userbaseinfo where uid=?")
+	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore,avatarurl,firstqizi,secondqizi,isandroid FROM userbaseinfo where uid=?")
 
 	if err != nil {
 		log.Info(err.Error())
@@ -260,7 +265,7 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	defer rows.Close()
 
 	if rows.Next() {
-		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi)
+		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi, &info.IsAndroid)
 	} else {
 		log.Info("no user:%d", uid)
 		return errors.New("no user")
@@ -533,6 +538,7 @@ func (a *DB) WritePrivateMailInfo(uid int, mailInfo *datamsg.MailInfo) error {
 	}
 
 	addmail := strconv.Itoa(int(id))
+	log.Info("add mail id:%d", int(id))
 
 	res, err1 = tx.Exec("UPDATE userbaseinfo SET mails_id=concat_ws(',',mails_id,?) where uid=?", addmail, uid)
 	n, e = res.RowsAffected()

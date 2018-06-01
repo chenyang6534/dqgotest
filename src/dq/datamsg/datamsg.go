@@ -36,6 +36,7 @@ type MsgPlayerInfo struct {
 	AvatarUrl   string
 	FirstQiZi   int
 	SecondQiZi  int
+	IsAndroid   int
 }
 
 //微信登录

@@ -46,6 +46,8 @@ func (a *ShowGameList) AddShowGame(gameid int, score int) {
 	if a.bm.Len() == 0 {
 		tem := ShowGame{GameId: gameid, Score: score}
 		a.bm.PushBack(tem)
+
+		return
 	}
 
 	if a.bm.Len() >= a.limitSize {
@@ -75,6 +77,7 @@ func (a *ShowGameList) AddShowGame(gameid int, score int) {
 	if a.bm.Len() < a.limitSize {
 		tem := ShowGame{GameId: gameid, Score: score}
 		a.bm.InsertAfter(tem, a.bm.Back())
+
 	}
 
 }
