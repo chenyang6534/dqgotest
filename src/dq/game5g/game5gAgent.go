@@ -212,7 +212,10 @@ func (a *Game5GAgent) DoGetGamingInfoData(data *datamsg.MsgBase) {
 			gameinfo.PlayerOneName = game.Player[0].Name
 			gameinfo.PlayerTwoName = game.Player[1].Name
 			gameinfo.GameId = v.GameId
-			gameinfo.Score = v.Score //(game.Player[0].SeasonScore + game.Player[1].SeasonScore) / 2
+			gameinfo.ScoreOne = game.Player[0].SeasonScore
+			gameinfo.ScoreTwo = game.Player[1].SeasonScore
+			gameinfo.AvatarOne = game.Player[0].AvatarUrl
+			gameinfo.AvatarTwo = game.Player[1].AvatarUrl
 			gameinfo.GameName = "game_" + strconv.Itoa(gameinfo.GameId)
 			jd.GameInfo = append(jd.GameInfo, gameinfo)
 			count++

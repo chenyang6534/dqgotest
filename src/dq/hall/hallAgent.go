@@ -541,7 +541,8 @@ func (a *HallAgent) Update() {
 	//500毫秒循环一次
 	oneUpdateTime := 500
 
-	androidPlayOnce := int64(1000 * 60 * 3)
+	//androidPlayOnce := int64(1000 * 60 * 3)
+	androidPlayOnce := int64(1000 * 3)
 	//lastAndroidPlayTime := utils.Milliseconde()
 	lastAndroidPlayTime := int64(0)
 

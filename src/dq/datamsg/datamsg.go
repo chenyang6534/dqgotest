@@ -137,7 +137,10 @@ type MsgGame5GingInfo struct {
 	GameName      string
 	PlayerOneName string
 	PlayerTwoName string
-	Score         int
+	ScoreOne      int
+	ScoreTwo      int
+	AvatarOne     string
+	AvatarTwo     string
 }
 
 //当前进行中的游戏信息
