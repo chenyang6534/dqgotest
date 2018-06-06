@@ -32,6 +32,9 @@ type HallAgent struct {
 	//五指棋 玩家匹配表[id] =
 	serchPoolFor5G *utils.BeeMap
 
+	//玩家游戏状态 //0离线 1大厅 2比赛中 3观战中
+	PlayerGameState *utils.BeeMap
+
 	ScoreTime []ScoreAndTime
 }
 
@@ -59,6 +62,7 @@ func (a *HallAgent) GetModeType() string {
 
 func (a *HallAgent) Init() {
 
+	//匹配机制
 	a.ScoreTime = make([]ScoreAndTime, 10)
 	a.ScoreTime[0] = ScoreAndTime{Time: 0 * 1000, Score: 5}
 	a.ScoreTime[1] = ScoreAndTime{Time: 2 * 1000, Score: 20}
@@ -72,10 +76,17 @@ func (a *HallAgent) Init() {
 	a.ScoreTime[9] = ScoreAndTime{Time: 60 * 1000, Score: 10000000}
 
 	a.serchPoolFor5G = utils.NewBeeMap()
+	a.PlayerGameState = utils.NewBeeMap()
 	a.closeFlag = utils.NewBeeVar(false)
 
 	GetMail().Init()
 	GetRank().Init()
+
+	//GetFriends().getFriendsInfo(2301, 50, a)
+
+	//GetFriends().AddFriends(2302, 2304)
+
+	//GetFriends().UpdateRecord(2301, 2303)
 
 	//GetStore().getStoreInfo()Buy
 	//GetItemManager().GetItemsInfo(93)
@@ -88,6 +99,8 @@ func (a *HallAgent) Init() {
 
 	//一场游戏比赛结束
 	a.handles["GameOverInfo"] = a.DoGameOverInfoData
+	//玩家游戏状态切换
+	a.handles["GameStateChange"] = a.DoGameStateChangeData
 
 	a.handles["CS_GetTskInfo"] = a.DoGetTskInfoData
 	a.handles["CS_GetMailInfo"] = a.DoGetMailInfoData
@@ -95,10 +108,14 @@ func (a *HallAgent) Init() {
 	a.handles["CS_GetBagInfo"] = a.DoGetBagInfoData
 	a.handles["CS_GetRankInfo"] = a.DoGetRankInfoData
 
+	a.handles["CS_GetFriendsInfo"] = a.DoGetFriendsInfoData
+
 	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
 	a.handles["CS_GetMailRewards"] = a.DoGetMailRewardsData
 	a.handles["CS_BuyItem"] = a.DoBuyItemData
 	a.handles["CS_ZhuangBeiItem"] = a.DoZhuangBeiData
+
+	a.handles["CS_YaoQingFriend"] = a.DoYaoQingFriendData
 
 	a.handles["CS_Share"] = a.DoShareData
 	a.handles["CS_Presenter"] = a.DoPresenterData
@@ -125,6 +142,9 @@ func (a *HallAgent) DoPresenterData(data *datamsg.MsgBase) {
 	if h2.PresenterUid == data.Uid {
 		return
 	}
+
+	//推荐者和自己 互加为好友
+	GetFriends().AddFriends(h2.PresenterUid, data.Uid)
 
 	//查看是否已经有推荐者了
 	mypre := -1
@@ -184,6 +204,28 @@ func (a *HallAgent) DoPresenterData(data *datamsg.MsgBase) {
 
 func (a *HallAgent) DoShareData(data *datamsg.MsgBase) {
 	GetTaskEveryday().doShare(data.Uid)
+}
+
+func (a *HallAgent) DoYaoQingFriendData(data *datamsg.MsgBase) {
+
+	log.Info("do CS_YaoQingFriend")
+
+	h2 := &datamsg.CS_YaoQingFriend{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	data.ModeType = "Client"
+	data.MsgType = "SC_YaoQingFriend"
+	data.Uid = h2.FriendUid
+	data.ConnectId = -1
+	jd := datamsg.SC_YaoQingFriend{}
+	jd.Name = h2.MyName
+	jd.Uid = data.Uid
+	jd.GameId = h2.GameId
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+
 }
 
 //DoZhuangBeiData
@@ -302,6 +344,24 @@ func (a *HallAgent) DoGetTaskRewardsData(data *datamsg.MsgBase) {
 
 }
 
+//获取好友信息
+func (a *HallAgent) DoGetFriendsInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_FriendsInfo"
+
+	friendsinfo := GetFriends().getFriendsInfo(data.Uid, 100, a)
+
+	for _, v := range friendsinfo.Friends {
+		//用户在线状态信息
+
+		log.Info("----friend uid:%d-- name:%s--Seasonscore:%d--mywin:%d---friendwin:%d",
+			v.Uid, v.Name, v.Seasonscore, v.MyWin, v.FriendWin)
+	}
+
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, friendsinfo))
+}
+
 //
 func (a *HallAgent) DoGetRankInfoData(data *datamsg.MsgBase) {
 
@@ -403,6 +463,10 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 func (a *HallAgent) DoDisConnectData(data *datamsg.MsgBase) {
 
 	log.Info("----DoDisConnectData uid:%d--", data.Uid)
+
+	//玩家游戏状态更新
+	a.PlayerGameState.Delete(data.Uid)
+
 	a.serchPoolFor5G.Delete(data.Uid)
 
 	GetTaskEveryday().DeleteUserTaskEveryday(data.Uid)
@@ -425,6 +489,21 @@ func (a *HallAgent) DoQuickGameExitData(data *datamsg.MsgBase) {
 
 }
 
+//玩家游戏状态切换
+func (a *HallAgent) DoGameStateChangeData(data *datamsg.MsgBase) {
+	////大厅中
+	//a.PlayerGameState.Set(data.Uid, 1)
+	h2 := &datamsg.GameStateChangeInfo{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+
+	a.PlayerGameState.Change(h2.Uid, h2.State)
+
+}
+
 //游戏结束信息
 func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 
@@ -434,6 +513,17 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 		log.Info(err.Error())
 		return
 	}
+
+	a.PlayerGameState.Change(h2.WinId, 1)
+	a.PlayerGameState.Change(h2.LoseId, 1)
+	for _, v := range h2.ObserverId {
+		a.PlayerGameState.Change(v, 1)
+	}
+
+	//更新游戏状态Change
+	//	if a.PlayerGameState.Check(h2.WinId) == true {
+	//		a.PlayerGameState.Set()
+	//	}
 
 	//排行数据
 	winrank := datamsg.RankNodeInfo{}
@@ -454,6 +544,8 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 		GetTaskEveryday().FriendMatchPlay(h2.LoseId)
 
 		GetTaskEveryday().FriendMatchWin(h2.WinId)
+
+		GetFriends().UpdateRecord(h2.WinId, h2.LoseId)
 	} else if h2.GameMode == 3 { //赛季天梯匹配
 		GetTaskEveryday().SeasonMatchPlay(h2.WinId)
 		GetTaskEveryday().SeasonMatchPlay(h2.LoseId)
@@ -494,9 +586,14 @@ func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 }
 
 func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
+	//大厅中
+	a.PlayerGameState.Set(data.Uid, 1)
 
 	GetMail().CheckUserPublicMail(data.Uid)
 	GetMail().CheckUserMail(data.Uid)
+
+	//测试
+	//GetFriends().getFriendsInfo(data.Uid, 50, a)
 
 	//ce shi
 	//	winrank := datamsg.RankNodeInfo{}
@@ -541,8 +638,8 @@ func (a *HallAgent) Update() {
 	//500毫秒循环一次
 	oneUpdateTime := 500
 
-	//androidPlayOnce := int64(1000 * 60 * 3)
-	androidPlayOnce := int64(1000 * 3)
+	androidPlayOnce := int64(1000 * 60 * 3)
+	//androidPlayOnce := int64(1000 * 3)
 	//lastAndroidPlayTime := utils.Milliseconde()
 	lastAndroidPlayTime := int64(0)
 

@@ -8,14 +8,14 @@ import (
 	"dq/utils"
 	"encoding/json"
 	"strconv"
-	"strings"
+	//"strings"
 	"sync"
 	"time"
 )
 
 var (
 	mail         = &Mail{Lock: new(sync.Mutex)}
-	mailMaxCount = 10
+	mailMaxCount = 3
 )
 
 type Mail struct {
@@ -83,16 +83,12 @@ func (mail *Mail) CheckUserMail(uid int) {
 		return
 	}
 
-	log.Info("------usermails---:" + usermails)
-	allmails := strings.Split(usermails, ",")
+	allmails := utils.SplitStringToIntArray(usermails)
 	log.Info("------usermails--count-:%d", len(allmails))
 	if len(allmails) > mailMaxCount {
 		for i := 0; i < len(allmails)-mailMaxCount; i++ {
-			mailid, err := strconv.Atoi(allmails[i])
-			if err != nil {
-				log.Info(err.Error())
-				continue
-			}
+			mailid := allmails[i]
+
 			log.Info("----id:%d", mailid)
 			if mailid <= 0 {
 
@@ -107,7 +103,7 @@ func (mail *Mail) CheckUserMail(uid int) {
 		newmailstr := ""
 		for i := len(allmails) - mailMaxCount; i < len(allmails); i++ {
 
-			newmailstr = newmailstr + allmails[i]
+			newmailstr = newmailstr + "," + strconv.Itoa(allmails[i])
 
 		}
 		db.DbOne.SetPlayerOneInfo(uid, "userbaseinfo", "mails_id", newmailstr)

@@ -397,7 +397,7 @@ func (a *DB) GetPlayerOneOtherInfo(uid int, field string, value interface{}) err
 //重置所有玩家赛季分
 func (a *DB) ResetAllPlayerSeasonScore() error {
 
-	sqlstr := "UPDATE userbaseinfo SET seasonscore=1000"
+	sqlstr := "UPDATE userbaseinfo SET seasonscore=ceil(sqrt(seasonscore/1000)*1000)"
 
 	tx, _ := a.Mydb.Begin()
 
@@ -515,6 +515,80 @@ func (a *DB) GetJSON(sqlString string) (string, error) {
 //	ReadState int
 //	GetState  int
 //}
+
+func (a *DB) UpdateRecord(winuid int, loseuid int) error {
+	tx, _ := a.Mydb.Begin()
+
+	twouidstr := utils.GetMinMaxUidStr(winuid, loseuid)
+	minuid := utils.GetMin(winuid, loseuid)
+	maxuid := utils.GetMax(winuid, loseuid)
+
+	minadd := 1
+	maxadd := 1
+	if minuid == loseuid {
+		minadd = 0
+	}
+	if maxuid == loseuid {
+		maxadd = 0
+	}
+	log.Info("----UpdateRecord--")
+
+	//基础表
+	res, err1 := tx.Exec("UPDATE relation SET win1=win1+?,win2=win2+? where twouid=?", minadd, maxadd, twouidstr)
+	//
+	if err1 != nil {
+		log.Info("UPDATE UpdateRecord err")
+		return tx.Rollback()
+	}
+	n, _ := res.RowsAffected()
+	if n == 0 {
+		res, err1 = tx.Exec("INSERT relation (twouid,uid1,uid2,win1,win2,u1rewardtime,u2rewardtime) values (?,?,?,?,?,?,?)",
+			twouidstr, minuid, maxuid, minadd, maxadd, "2018-06-08 08:50:00", "2018-06-08 08:50:00")
+		if err1 != nil {
+			log.Error("INSERT relation err %s", err1.Error())
+			return tx.Rollback()
+		}
+	}
+
+	err1 = tx.Commit()
+	return err1
+}
+
+//相互加为好友
+func (a *DB) AddToFriends(uid1 int, uid2 int) error {
+	tx, _ := a.Mydb.Begin()
+
+	//基础表
+	res, err1 := tx.Exec("UPDATE userbaseinfo SET friends_id=concat_ws(',',friends_id,?) where uid=?", uid1, uid2)
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("UPDATE AddToFriends err")
+		return tx.Rollback()
+	}
+	res, err1 = tx.Exec("UPDATE userbaseinfo SET friends_id=concat_ws(',',friends_id,?) where uid=?", uid2, uid1)
+	n, e = res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("UPDATE AddToFriends err")
+		return tx.Rollback()
+	}
+
+	twouidstr := utils.GetMinMaxUidStr(uid1, uid2)
+	minuid := utils.GetMin(uid1, uid2)
+	maxuid := utils.GetMax(uid1, uid2)
+
+	//关系表
+	res, err1 = tx.Exec("INSERT relation (twouid,uid1,uid2,win1,win2,u1rewardtime,u2rewardtime) values (?,?,?,?,?,?,?)",
+		twouidstr, minuid, maxuid, 0, 0, "2018-06-08 08:50:00", "2018-06-08 08:50:00")
+	if err1 != nil {
+		log.Error("INSERT relation err %s", err1.Error())
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+
+}
+
 //给用户写邮件
 func (a *DB) WritePrivateMailInfo(uid int, mailInfo *datamsg.MailInfo) error {
 	tx, _ := a.Mydb.Begin()
@@ -538,7 +612,7 @@ func (a *DB) WritePrivateMailInfo(uid int, mailInfo *datamsg.MailInfo) error {
 	}
 
 	addmail := strconv.Itoa(int(id))
-	log.Info("add mail id:%d", int(id))
+	//log.Info("add mail id:%d", int(id))
 
 	res, err1 = tx.Exec("UPDATE userbaseinfo SET mails_id=concat_ws(',',mails_id,?) where uid=?", addmail, uid)
 	n, e = res.RowsAffected()
@@ -633,6 +707,95 @@ func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo, idindex int) error {
 	}
 	err2 := tx.Commit()
 	return err2
+}
+
+//获取信息
+func (a *DB) GetBattleManyInfo(idstr string, field string, value ...interface{}) error {
+
+	if len(field) <= 0 {
+		return errors.New("no field")
+	}
+
+	idname := "twouid"
+
+	sqlstr := "SELECT " + field + " FROM relation where " + idname + "=?"
+
+	stmt, err := a.Mydb.Prepare(sqlstr)
+
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(idstr)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(value...)
+	} else {
+		log.Info("no user:%s", idstr)
+		return errors.New("no user")
+	}
+
+}
+
+//获取好友对战数据库信息
+func (a *DB) GetFriendsBattleInfo(myuid int, friendinfo *[]datamsg.FriendInfo) error {
+
+	if friendinfo == nil || len(*friendinfo) <= 0 || myuid <= 0 {
+		return nil
+	}
+	//FriendWin   int //朋友赢得次数
+	//	MyWin       int //我赢得次数
+	//tx, _ := a.Mydb.Begin()
+
+	for k, v := range *friendinfo {
+		idstr := utils.GetMinMaxUidStr(myuid, v.Uid)
+		minwin := 0
+		maxwin := 0
+		a.GetBattleManyInfo(idstr, "win1,win2", &minwin, &maxwin)
+		if myuid < v.Uid {
+			(*friendinfo)[k].MyWin = minwin
+			(*friendinfo)[k].FriendWin = maxwin
+		} else {
+			(*friendinfo)[k].MyWin = maxwin
+			(*friendinfo)[k].FriendWin = minwin
+		}
+	}
+
+	return nil
+}
+
+//获取好友基本数据库信息
+func (a *DB) GetFriendsBaseInfo(frienduid []int, friendinfo *[]datamsg.FriendInfo) error {
+
+	if len(frienduid) <= 0 {
+		return nil
+	}
+
+	sqlstr := "SELECT uid,name,avatarurl,seasonscore FROM userbaseinfo where uid = " + strconv.Itoa(frienduid[0])
+	for i := 1; i < len(frienduid); i++ {
+		sqlstr = sqlstr + " or uid = " + strconv.Itoa(frienduid[i])
+	}
+
+	str, err := a.GetJSON(sqlstr)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	//h2 := datamsg.MailInfo{}
+	err = json.Unmarshal([]byte(str), friendinfo)
+	if err != nil {
+		log.Info(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 //获取邮件数据库信息

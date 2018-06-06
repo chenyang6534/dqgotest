@@ -113,10 +113,13 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 	//	delete(server.conns, conn)
 	//	server.mutexConns.Unlock()
 	server.conns.Delete(tcpConn)
+	server.Agents.Delete(agent.GetConnectId())
 	agent.OnClose()
 
 	server.wgConns.Done()
 	//}()
+
+	log.Info("agents len:%d", server.Agents.Size())
 
 }
 

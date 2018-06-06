@@ -9,13 +9,10 @@ import (
 	"dq/utils"
 )
 
-
 type Server interface {
 	GetLoginedConnect() *utils.BeeMap
 	GetAgents() *utils.BeeMap
 }
-
-
 
 type ServerData struct {
 	Addr            string
@@ -23,27 +20,27 @@ type ServerData struct {
 	PendingWriteNum int
 	NewAgent        func(Conn) Agent
 	ln              net.Listener
-	
+
 	//Agents			map[int]interface{}
-	Agents			*utils.BeeMap
-	LoginedConnect	*utils.BeeMap
-	mutexConns      sync.Mutex
-	wgLn            sync.WaitGroup
-	wgConns         sync.WaitGroup
+	Agents         *utils.BeeMap
+	LoginedConnect *utils.BeeMap
+	mutexConns     sync.Mutex
+	wgLn           sync.WaitGroup
+	wgConns        sync.WaitGroup
 
 	// msg parser
-	msgParser    *MsgParser
+	msgParser *MsgParser
 }
 
 type TCPServer struct {
 	ServerData
-	conns           ConnSet
+	conns ConnSet
 }
 
-func (server *TCPServer) GetLoginedConnect() *utils.BeeMap{
+func (server *TCPServer) GetLoginedConnect() *utils.BeeMap {
 	return server.LoginedConnect
 }
-func (server *TCPServer) GetAgents() *utils.BeeMap{
+func (server *TCPServer) GetAgents() *utils.BeeMap {
 	return server.Agents
 }
 
@@ -81,8 +78,8 @@ func (server *TCPServer) init() {
 	//msgParser.SetMsgLen(server.LenMsgLen, server.MinMsgLen, server.MaxMsgLen)
 	//msgParser.SetByteOrder(server.LittleEndian)
 	server.msgParser = msgParser
-	
-	log.Info("------Listen:"+server.Addr)
+
+	log.Info("------Listen:" + server.Addr)
 }
 
 func (server *TCPServer) run() {
@@ -118,19 +115,19 @@ func (server *TCPServer) run() {
 			continue
 		}
 		server.conns[conn] = struct{}{}
-		
+
 		server.mutexConns.Unlock()
 
 		server.wgConns.Add(1)
 
 		tcpConn := newTCPConn(conn, server.PendingWriteNum, server.msgParser)
 		agent := server.NewAgent(tcpConn)
-		
+
 		//server.mutexConns.Lock()
-		server.Agents.Set(agent.GetConnectId(),agent)
-		
+		server.Agents.Set(agent.GetConnectId(), agent)
+
 		//server.mutexConns.Unlock()
-		
+
 		go func() {
 			agent.Run()
 
@@ -140,7 +137,7 @@ func (server *TCPServer) run() {
 			delete(server.conns, conn)
 			//delete(server.Agents, agent.GetCreateId())
 			server.mutexConns.Unlock()
-			//server.Agents.Delete(agent.GetConnectId())
+			server.Agents.Delete(agent.GetConnectId())
 			agent.OnClose()
 
 			server.wgConns.Done()
@@ -159,7 +156,7 @@ func (server *TCPServer) Close() {
 	server.conns = nil
 	server.mutexConns.Unlock()
 	//server.Agents = nil
-	
+
 	server.wgConns.Wait()
-	log.Info("tcp Close :%s",server.Addr)
+	log.Info("tcp Close :%s", server.Addr)
 }

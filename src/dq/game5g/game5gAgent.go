@@ -324,9 +324,22 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 	//---------------
 	game := a.Games.Get(h2.GameId)
 	if game == nil {
-		a.WriteMsgBytes(datamsg.NewMsgSC_Result(data.Uid, data.ConnectId, "no game!"))
 
-		return
+		//游戏中的其他玩家UID
+		if h2.OtherPlayerUid > 0 {
+			if a.Players.Check(h2.OtherPlayerUid) == true {
+				player := a.Players.Get(h2.OtherPlayerUid)
+				if player.(*Game5GPlayer).Game != nil {
+					game = player.(*Game5GPlayer).Game
+				}
+			}
+		}
+		if game == nil {
+			a.WriteMsgBytes(datamsg.NewMsgSC_Result(data.Uid, data.ConnectId, "no game!"))
+
+			return
+		}
+
 	}
 	if game.(*Game5GLogic).State >= Game5GState_Result {
 		a.WriteMsgBytes(datamsg.NewMsgSC_Result(data.Uid, data.ConnectId, "game over!"))

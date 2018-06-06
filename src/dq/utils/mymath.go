@@ -70,3 +70,51 @@ func SplitStringToIntArray(str string) []int {
 	return re
 
 }
+
+func GetMinMaxUidStr(uid1 int, uid2 int) string {
+	minuid := uid1
+	maxuid := uid2
+	if minuid > maxuid {
+		minuid = uid2
+		maxuid = uid1
+	}
+	twouidstr := strconv.Itoa(minuid) + "_" + strconv.Itoa(maxuid)
+
+	return twouidstr
+}
+func GetMin(uid1 int, uid2 int) int {
+	if uid1 > uid2 {
+		return uid2
+	}
+
+	return uid1
+}
+func GetMax(uid1 int, uid2 int) int {
+	if uid1 > uid2 {
+		return uid1
+	}
+
+	return uid2
+}
+
+func SplitStringToIntMap(str string) map[int]interface{} {
+
+	re := make(map[int]interface{})
+
+	strs := strings.Split(str, ",")
+	if len(strs) > 0 {
+
+		for i := 0; i < len(strs); i++ {
+			mailid, err := strconv.Atoi(strs[i])
+			if err != nil {
+				//index++
+				continue
+			}
+			re[mailid] = true
+		}
+
+	}
+
+	return re
+
+}

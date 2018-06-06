@@ -212,6 +212,17 @@ func (game *Game5GLogic) sendMsgToAll(msgType string, jd interface{}) {
 
 }
 
+func (game *Game5GLogic) sendUpdateGameState(uid int, state int) {
+	data := &datamsg.MsgBase{}
+	data.ModeType = "Hall"
+	data.MsgType = "GameStateChange"
+	jd := datamsg.GameStateChangeInfo{}
+	jd.State = state
+	jd.Uid = uid
+	jd.GameId = game.GameId
+	game.GameAgent.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+}
+
 func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 
 	//
@@ -393,17 +404,21 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 		winscore = int(math.Ceil(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * winscorexishu))
 		losescore = int(math.Ceil(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * losescorexishu))
 
+		//不能输为负分
+		if loseplayer.SeasonScore <= losescore {
+			losescore = loseplayer.SeasonScore
+		}
 		//winplayer.SeasonScore
 		log.Info("----------win:%d-----lose:%d", winscore, losescore)
 		err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, winscore, loseplayer.Uid, losescore)
 		if err != nil {
-			log.Info(err.Error())
+			log.Error(err.Error())
 			return
 		}
 	} else {
 		err := db.DbOne.UpdatePlayerWinLose(winplayer.Uid, 0, loseplayer.Uid, 0)
 		if err != nil {
-			log.Info(err.Error())
+			log.Error(err.Error())
 			return
 		}
 	}
@@ -648,6 +663,9 @@ func (game *Game5GLogic) GoIn(player *Game5GPlayer) (*Game5GPlayer, error) {
 			//检查玩家是否到齐  游戏能否开始
 			game.checkStart()
 
+			//更新玩家状态GameStateChange
+			game.sendUpdateGameState(player.Uid, 2)
+
 			return game.Player[k], nil
 
 		}
@@ -660,6 +678,8 @@ func (game *Game5GLogic) GoIn(player *Game5GPlayer) (*Game5GPlayer, error) {
 	game.notifyAllPlayerGoIn(player)
 	game.Observer.Set(player.Uid, player)
 	game.sendGameInfoToPlayer(player)
+	//更新玩家状态GameStateChange
+	game.sendUpdateGameState(player.Uid, 3)
 	return player, nil
 
 }
@@ -682,6 +702,8 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 			jd := &datamsg.SC_PlayerGoOut{}
 			jd.Uid = player.Uid
 			game.sendMsgToAll("SC_PlayerGoOut", jd)
+
+			game.sendUpdateGameState(player.Uid, 1)
 
 			game.dismissGame()
 			return true
@@ -709,6 +731,7 @@ func (game *Game5GLogic) GoOut(player *Game5GPlayer) bool {
 	jd.Uid = player.Uid
 	game.sendMsgToAll("SC_PlayerGoOut", jd)
 
+	game.sendUpdateGameState(player.Uid, 1)
 	//观察者
 	game.Observer.Delete(player.Uid)
 

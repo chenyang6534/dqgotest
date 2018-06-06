@@ -111,6 +111,23 @@ func (m *BeeMap) Set(k interface{}, v interface{}) bool {
 	return true
 }
 
+//如果找不到就不改变值
+func (m *BeeMap) Change(k interface{}, v interface{}) bool {
+	m.lock.Lock()
+	if val, ok := m.bm[k]; !ok {
+		//		m.bm[k] = v
+		//		m.size++
+		m.lock.Unlock()
+	} else if val != v {
+		m.bm[k] = v
+		m.lock.Unlock()
+	} else {
+		m.lock.Unlock()
+		return false
+	}
+	return true
+}
+
 func (m *BeeMap) AddInt(k interface{}, addcount int) bool {
 	m.lock.Lock()
 	if _, ok := m.bm[k]; !ok {

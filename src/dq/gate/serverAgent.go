@@ -108,12 +108,26 @@ func (a *ServersAgent) DoGateData(data *datamsg.MsgBase) {
 func (a *ServersAgent) DoClientData(data *datamsg.MsgBase) {
 	h1 := data
 	connectid := (h1.ConnectId)
+	uid := (h1.Uid)
 	//向客户端隐藏connectid 和 uid
 	h1.ConnectId = 0
 	h1.Uid = 0
 	data1, err1 := json.Marshal(h1)
 	if err1 == nil {
 		ag := a.gate.TcpServer.GetAgents().Get(connectid)
+		if ag == nil {
+
+			items := a.gate.TcpServer.GetLoginedConnect().Items()
+			for k, v := range items {
+				log.Info("--uid:%d---connectid:%d---k:%d--v:%d", uid, connectid, k, v.(int))
+			}
+			con := a.gate.TcpServer.GetLoginedConnect().Get(uid)
+			if con != nil {
+				connectid = (con).(int)
+				ag = a.gate.TcpServer.GetAgents().Get(connectid)
+			}
+
+		}
 
 		if ag != nil {
 			ag.(*agent).WriteMsgBytes(data1)

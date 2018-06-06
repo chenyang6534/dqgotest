@@ -55,7 +55,8 @@ type CS_MsgQuickLogin struct {
 
 //进入游戏
 type CS_GoIn struct {
-	GameId int
+	GameId         int
+	OtherPlayerUid int
 }
 
 //退出游戏
@@ -99,6 +100,20 @@ type CS_BuyItem struct {
 //购买商品
 type CS_ZhuangBeiItem struct {
 	Type int
+}
+
+//邀请好友来战
+type CS_YaoQingFriend struct {
+	MyName    string
+	FriendUid int
+	GameId    int
+}
+
+//邀请好友来战
+type SC_YaoQingFriend struct {
+	Name   string
+	Uid    int
+	GameId int
 }
 
 //获取排行信息
@@ -181,6 +196,13 @@ type GameOverInfo struct {
 	ObserverId      []int
 	WinPlayerScore  int
 	LosePlayerScore int
+}
+
+//
+type GameStateChangeInfo struct {
+	Uid    int
+	State  int
+	GameId int
 }
 
 //玩家
@@ -304,6 +326,23 @@ type MailInfo struct {
 	Rewardstr string
 	ReadState int
 	GetState  int
+}
+
+type FriendInfo struct {
+	Uid         int
+	Name        string
+	Avatar      string
+	Seasonscore int
+	State       int //0离线 1大厅 2比赛中 3观战中
+	FriendWin   int //朋友赢得次数
+	MyWin       int //我赢得次数
+	GiveState   int //打赏状态 0表示还没打赏 1表示已经打赏
+
+}
+
+//好友信息
+type SC_FriendsInfo struct {
+	Friends []FriendInfo
 }
 
 type SC_RankInfo struct {
