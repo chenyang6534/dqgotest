@@ -79,13 +79,15 @@ func (player *PlayerItem) writeDB() {
 	}
 }
 
+//Beiyongtime     int
+//	Steptime        int
 func (player *PlayerItem) getItemsInfo() *datamsg.SC_ItemInfo {
 	player.lock.RLock()
 	defer player.lock.RUnlock()
 
 	jd := &datamsg.SC_ItemInfo{}
-	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "firstqizi,secondqizi,qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay",
-		&jd.Firstqizi, &jd.Secondqizi, &jd.Qizi_move, &jd.Qizi_move_trail, &jd.Qizi_floor, &jd.Qizi_lastplay)
+	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "firstqizi,secondqizi,qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay,beiyongtime,steptime",
+		&jd.Firstqizi, &jd.Secondqizi, &jd.Qizi_move, &jd.Qizi_move_trail, &jd.Qizi_floor, &jd.Qizi_lastplay, &jd.Beiyongtime, &jd.Steptime)
 
 	jd.Items = make([]datamsg.ItemInfo, len(player.Items))
 
@@ -195,6 +197,10 @@ func (player *PlayerItem) SetUseItemType(itemType int) bool {
 		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "qizi_floor", itemType)
 	} else if itemType < 1500 {
 		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "qizi_lastplay", itemType)
+	} else if itemType < 1600 {
+		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "beiyongtime", itemType)
+	} else if itemType < 1700 {
+		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "steptime", itemType)
 	}
 	return true
 }
@@ -210,9 +216,11 @@ func (player *PlayerItem) CheckItemsTime() {
 	qizi_move_trail := 0
 	qizi_floor := 0
 	qizi_lastplay := 0
+	beiyongtime := 0
+	steptime := 0
 
-	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "firstqizi,secondqizi,qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay",
-		&firstqizi, &secondqizi, &qizi_move, &qizi_move_trail, &qizi_floor, &qizi_lastplay)
+	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "firstqizi,secondqizi,qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay,beiyongtime,steptime",
+		&firstqizi, &secondqizi, &qizi_move, &qizi_move_trail, &qizi_floor, &qizi_lastplay, &beiyongtime, &steptime)
 
 	//log.Info("--%d-%d-%d-%d-%d-%d-", firstqizi, secondqizi, qizi_move, qizi_move_trail, qizi_floor, qizi_lastplay)
 	//itemIndex := player.getItemIndex(firstqizi)
@@ -236,6 +244,12 @@ func (player *PlayerItem) CheckItemsTime() {
 	}
 	if player.CheckOneItemTime(qizi_lastplay) && qizi_lastplay != 0 {
 		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "qizi_lastplay", 0)
+	}
+	if player.CheckOneItemTime(beiyongtime) && beiyongtime != 0 {
+		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "beiyongtime", 0)
+	}
+	if player.CheckOneItemTime(steptime) && steptime != 0 {
+		db.DbOne.SetPlayerOneInfo(player.Uid, "userbaseinfo", "steptime", 0)
 	}
 
 }

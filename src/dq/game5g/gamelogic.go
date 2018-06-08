@@ -34,6 +34,17 @@ type Game5GPlayer struct {
 	qizi_floor      int
 	qizi_lastplay   int
 
+	beiyongtime int
+	steptime    int
+
+	//备用增加时间
+	beiyongAddTime int
+	//单步增加时间
+	stepAddTime int
+
+	//每一步的总时间
+	StepEveryTime int
+
 	//游戏
 	Game *Game5GLogic
 
@@ -178,6 +189,9 @@ func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
 	jd.PlayerInfo.Qizi_floor = player.qizi_floor
 	jd.PlayerInfo.Qizi_lastplay = player.qizi_lastplay
 
+	jd.PlayerInfo.Beiyongtime = player.beiyongtime
+	jd.PlayerInfo.Steptime = player.steptime
+
 	game.sendMsgToAll("SC_PlayerGoIn", jd)
 
 }
@@ -261,11 +275,14 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.Qizi_floor = v.qizi_floor
 			p1.Qizi_lastplay = v.qizi_lastplay
 
+			p1.Beiyongtime = v.beiyongtime
+			p1.Steptime = v.steptime
+
 			p1.WinCount = v.WinCount
 
 			if game.State == Game5GState_Gaming && game.GameSeatIndex == v.SeatIndex {
 				//计算用时
-				t1 := int((time.Duration(utils.Milliseconde())-v.OperateStartTime)/1000) - game.EveryTime
+				t1 := int((time.Duration(utils.Milliseconde())-v.OperateStartTime)/1000) - v.StepEveryTime
 				if t1 > 0 {
 					p1.EveryTime = 0
 					p1.Time = v.Time - t1
@@ -275,7 +292,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 				}
 
 			} else {
-				p1.EveryTime = game.EveryTime
+				p1.EveryTime = v.StepEveryTime
 				p1.Time = v.Time
 			}
 
@@ -300,6 +317,9 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.Qizi_floor = v.qizi_floor
 			p1.Qizi_lastplay = v.qizi_lastplay
 
+			p1.Beiyongtime = v.beiyongtime
+			p1.Steptime = v.steptime
+
 			p1.WinCount = v.WinCount
 
 			jd.ObserveInfo = append(jd.ObserveInfo, p1)
@@ -318,10 +338,18 @@ func (game *Game5GLogic) gameStart() {
 	//log.Info("----random seatindex:%d", rad)
 	game.GameSeatIndex = rad - 1
 
-	game.Player[0].Time = game.Time
+	game.Player[0].beiyongAddTime = conf.GetItemAddTime(game.Player[0].beiyongtime)
+	game.Player[0].stepAddTime = conf.GetItemAddTime(game.Player[0].steptime)
+	game.Player[0].StepEveryTime = game.Player[0].stepAddTime + game.EveryTime
+
+	game.Player[1].beiyongAddTime = conf.GetItemAddTime(game.Player[1].beiyongtime)
+	game.Player[1].stepAddTime = conf.GetItemAddTime(game.Player[1].steptime)
+	game.Player[1].StepEveryTime = game.Player[1].stepAddTime + game.EveryTime
+
+	game.Player[0].Time = game.Time + game.Player[0].beiyongAddTime
 	//Player[0].OperateStartTime = time.Now()
 
-	game.Player[1].Time = game.Time
+	game.Player[1].Time = game.Time + game.Player[1].beiyongAddTime
 
 	game.State = Game5GState_Gaming
 	//	firstqiziId  int
@@ -399,6 +427,10 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 
 		allscore := winplayer.SeasonScore + loseplayer.SeasonScore
 
+		if allscore <= 0 {
+			allscore = 1
+		}
+
 		//tem := math.Round(float64(1-winplayer.SeasonScore/allscore) * winscorexishu)
 
 		winscore = int(math.Ceil(float64(1-float64(winplayer.SeasonScore)/float64(allscore)) * winscorexishu))
@@ -407,6 +439,9 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 		//不能输为负分
 		if loseplayer.SeasonScore <= losescore {
 			losescore = loseplayer.SeasonScore
+		}
+		if losescore <= 0 {
+			losescore = 0
 		}
 		//winplayer.SeasonScore
 		log.Info("----------win:%d-----lose:%d", winscore, losescore)
@@ -514,7 +549,7 @@ func (game *Game5GLogic) createTimeUp(seatIndex int) {
 	if game.gameTimer != nil {
 		game.gameTimer.Cancel()
 	}
-	game.gameTimer = timer.AddCallback(time.Second*time.Duration(game.Player[game.GameSeatIndex].Time+game.EveryTime), game.TimeUp, seatIndex)
+	game.gameTimer = timer.AddCallback(time.Second*time.Duration(game.Player[game.GameSeatIndex].Time+game.Player[game.GameSeatIndex].StepEveryTime), game.TimeUp, seatIndex)
 }
 
 func (game *Game5GLogic) ChangeGameTurn() {
@@ -536,7 +571,7 @@ func (game *Game5GLogic) ChangeGameTurn() {
 	jd := &datamsg.SC_ChangeGameTurn{}
 	jd.GameSeatIndex = game.GameSeatIndex
 	jd.Time = game.Player[game.GameSeatIndex].Time
-	jd.EveryTime = game.EveryTime
+	jd.EveryTime = game.Player[game.GameSeatIndex].StepEveryTime
 	game.sendMsgToAll("SC_ChangeGameTurn", jd)
 
 }
@@ -594,7 +629,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	player.OperateState = 2
 
 	//计算用时
-	t1 := int((time.Duration(utils.Milliseconde())-player.OperateStartTime)/1000) - game.EveryTime
+	t1 := int((time.Duration(utils.Milliseconde())-player.OperateStartTime)/1000) - player.StepEveryTime
 	if t1 > 0 {
 		player.Time = player.Time - t1
 	}

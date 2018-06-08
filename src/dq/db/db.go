@@ -397,7 +397,7 @@ func (a *DB) GetPlayerOneOtherInfo(uid int, field string, value interface{}) err
 //重置所有玩家赛季分
 func (a *DB) ResetAllPlayerSeasonScore() error {
 
-	sqlstr := "UPDATE userbaseinfo SET seasonscore=ceil(sqrt(seasonscore/1000)*1000)"
+	sqlstr := "UPDATE userbaseinfo SET seasonscore=ceil(sqrt(abs((seasonscore-1000+abs(seasonscore-1000))/2+1000)/1000)*1000)"
 
 	tx, _ := a.Mydb.Begin()
 
@@ -686,6 +686,33 @@ func (a *DB) GetRankInfo(rank *[]datamsg.RankNodeInfo, seasonidindex int) error 
 	return nil
 }
 
+//获取赛季排名
+func (a *DB) GetRankNum(seasonidindex int, uid int) int {
+
+	ranknum := 1001
+	stmt, err := a.Mydb.Prepare("SELECT ranknum FROM rank where BINARY (seasonidindex=? and uid=?)")
+
+	if err != nil {
+		log.Info(err.Error())
+		return -1
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(seasonidindex, uid)
+	if err != nil {
+		log.Info(err.Error())
+		return ranknum
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		rows.Scan(&ranknum)
+	} else {
+		//log.Info("no user:%s,%s", machineid, platfom)
+	}
+
+	return ranknum
+}
+
 //持久化排行榜数据库信息
 func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo, idindex int) error {
 	tx, _ := a.Mydb.Begin()
@@ -696,9 +723,9 @@ func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo, idindex int) error {
 
 	}
 
-	for _, v := range rank {
-		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar,rewardgold,seasonidindex) values (?,?,?,?,?,?)",
-			v.Uid, v.Score, v.Name, v.Avatar, v.Rewardgold, idindex)
+	for k, v := range rank {
+		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar,rewardgold,seasonidindex,ranknum) values (?,?,?,?,?,?,?)",
+			v.Uid, v.Score, v.Name, v.Avatar, v.Rewardgold, idindex, k+1)
 
 		if err1 != nil {
 			log.Error("INSERT rank err%s", err1.Error())

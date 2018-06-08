@@ -126,6 +126,8 @@ func (app *DefaultApp) Run() error {
 
 	conf.LoadSeasonConfig() //加载赛季信息
 
+	conf.LoadItemConfig() //加载道具信息
+
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 
 	log.Info("dq starting up")

@@ -375,10 +375,10 @@ func (a *HallAgent) DoGetRankInfoData(data *datamsg.MsgBase) {
 	data.ModeType = "Client"
 	data.MsgType = "SC_RankInfo"
 
-	myscore := 0
-	db.DbOne.GetPlayerOneInfo(data.Uid, "userbaseinfo", "seasonscore", &myscore)
+	//myscore := 0
+	//db.DbOne.GetPlayerOneInfo(data.Uid, "userbaseinfo", "seasonscore", &myscore)
 
-	tsdinfo := GetRank().RankInfo(h2.StartRank, h2.EndRank, data.Uid, myscore)
+	tsdinfo := GetRank().RankInfo(h2.StartRank, h2.EndRank, data.Uid)
 	if tsdinfo != nil {
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
 	}
@@ -721,9 +721,11 @@ func (a *HallAgent) Update() {
 					//机器人之间需要3分钟
 					if p1.(*serchInfo).IsAndroid == 1 && p2.(*serchInfo).IsAndroid == 1 {
 						lastAndroidPlayTime = utils.Milliseconde()
+						log.Info("t1:%d--111-lastAndroidPlayTime%d---", t1, lastAndroidPlayTime)
 
+					} else {
+						log.Info("t1:%d--222-lastAndroidPlayTime%d---", t1, lastAndroidPlayTime)
 					}
-					log.Info("t1:%d---lastAndroidPlayTime%d---", t1, lastAndroidPlayTime)
 
 					//创建一个游戏
 					a.CreateGame(p1.(*serchInfo), p2.(*serchInfo))

@@ -365,10 +365,11 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 	player.AvatarUrl = playerinfo.AvatarUrl
 	player.firstqiziId = playerinfo.FirstQiZi
 	player.secondqiziId = playerinfo.SecondQiZi
+	//player.steptime =
 	player.qiziId = -1
 
-	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay",
-		&player.qizi_move, &player.qizi_move_trail, &player.qizi_floor, &player.qizi_lastplay)
+	db.DbOne.GetPlayerManyInfo(player.Uid, "userbaseinfo", "qizi_move,qizi_move_trail,qizi_floor,qizi_lastplay,beiyongtime,steptime",
+		&player.qizi_move, &player.qizi_move_trail, &player.qizi_floor, &player.qizi_lastplay, &player.beiyongtime, &player.steptime)
 
 	//	qizi_move       int
 	//	qizi_move_trail int

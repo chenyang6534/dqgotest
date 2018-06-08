@@ -220,6 +220,8 @@ type MsgGame5GPlayerInfo struct {
 	Qizi_move_trail int
 	Qizi_floor      int
 	Qizi_lastplay   int
+	Beiyongtime     int
+	Steptime        int
 
 	//游戏中数据
 	SeatIndex  int //座位号
@@ -386,6 +388,8 @@ type SC_ItemInfo struct {
 	Qizi_move_trail int
 	Qizi_floor      int
 	Qizi_lastplay   int
+	Beiyongtime     int
+	Steptime        int
 	Items           []ItemInfo
 }
 type SC_UpdateUsedItem struct {
@@ -395,6 +399,8 @@ type SC_UpdateUsedItem struct {
 	Qizi_move_trail int
 	Qizi_floor      int
 	Qizi_lastplay   int
+	Beiyongtime     int
+	Steptime        int
 }
 
 //每日任务信息

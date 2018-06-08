@@ -275,46 +275,25 @@ func (rank *Rank) Sort() {
 
 }
 
-////2分查找法
-//func (rank *Rank) TwoPointFindRankNum(score int, uid int) int {
+//获取前3个赛季的最高排名
+func (rank *Rank) GetMaxRankNum3(uid int) int {
 
-//	left, right, mid := 0, len(rank.RankList), 0
-//	for {
-//		// mid向下取整
-//		mid = int(math.Floor(float64((left + right) / 2)))
-//		if rank.RankList[mid].Score > score {
-//			// 如果当前元素大于k，那么把right指针移到mid - 1的位置
-//			left = mid + 1
-//			log.Info("---left:%d-", left)
+	maxrank := 10000
+	for i := 1; i <= 3; i++ {
+		index := rank.SeasonIdIndex - i
+		ranknum := db.DbOne.GetRankNum(index, uid)
+		if ranknum < maxrank {
+			maxrank = ranknum
+		}
 
-//		} else if rank.RankList[mid].Score < score {
-//			// 如果当前元素小于k，那么把left指针移到mid + 1的位置
-//			right = mid - 1
-//			log.Info("---right:%d-", right)
-//		} else {
-//			// 否则就是相等了，退出循环
-//			log.Info("---left:%d---right:%d---mid:%d", left, right, mid)
-//			for i := left; i <= right; i++ {
-//				if rank.RankList[i].Uid == uid {
-//					return i + 1
-//				}
-//			}
+	}
 
-//			break
-//		}
-//		// 判断如果left大于right，那么这个元素是不存在的。返回-1并且退出循环
-//		if left > right {
-//			log.Info("-lefg:%d--right:%d-", left, right)
-//			mid = -1
-//			break
-//		}
-//	}
-//	// 输入元素的下标
-//	return mid + 1
-//}
+	return maxrank
+
+}
 
 //
-func (rank *Rank) RankInfo(start int, end int, uid int, myscore int) *datamsg.SC_RankInfo {
+func (rank *Rank) RankInfo(start int, end int, uid int) *datamsg.SC_RankInfo {
 
 	rankinfo := &datamsg.SC_RankInfo{}
 

@@ -85,6 +85,28 @@
             "StartTime":"2018-05-07 08:50:29",
             "EndTime":"2018-05-30 08:50:29"
                
+        },
+        {
+            "Id":1501,
+            "Type":1501,
+            "Time":30,
+            "SaleGoldType":1,
+            "SalePrice":400,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
+        },
+        {
+            "Id":1601,
+            "Type":1601,
+            "Time":30,
+            "SaleGoldType":1,
+            "SalePrice":400,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
         }
         
         
