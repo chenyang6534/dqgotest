@@ -102,6 +102,8 @@ type Game5GLogic struct {
 
 	//棋盘
 	QiPan [15][15]int
+	//步数
+	StepNum [15][15]int
 
 	//时间到 倒计时
 	gameTimer *timer.Timer
@@ -139,9 +141,15 @@ func (game *Game5GLogic) Init() {
 	for y, value := range game.QiPan {
 		for x, _ := range value {
 			game.QiPan[y][x] = -1
-
 		}
 	}
+	//初始化棋盘
+	for y, value := range game.StepNum {
+		for x, _ := range value {
+			game.StepNum[y][x] = 0
+		}
+	}
+
 	//	game.QiPan[1][0] = 0
 	//	game.QiPan[1][1] = 0
 	//	game.QiPan[1][2] = 0
@@ -253,6 +261,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 	jd.GameInfo.EveryTime = game.EveryTime
 	jd.GameInfo.GameSeatIndex = game.GameSeatIndex
 	jd.GameInfo.QiPan = game.QiPan
+	jd.GameInfo.StepNum = game.StepNum
 	jd.GameInfo.GameMode = game.GameMode
 	jd.GameInfo.CreateGameTime = game.CreateGameTime
 
@@ -626,6 +635,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	//走棋成功
 	game.QiPan[data.Y][data.X] = player.SeatIndex
 	game.QiZiCount++
+	game.StepNum[data.Y][data.X] = game.QiZiCount
 	player.OperateState = 2
 
 	//计算用时
@@ -639,6 +649,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	jd.GameSeatIndex = player.SeatIndex
 	jd.X = data.X
 	jd.Y = data.Y
+	jd.StepNum = game.QiZiCount
 	jd.Time = player.Time
 	game.sendMsgToAll("SC_DoGame5G", jd)
 

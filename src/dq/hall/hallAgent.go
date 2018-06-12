@@ -638,8 +638,8 @@ func (a *HallAgent) Update() {
 	//500毫秒循环一次
 	oneUpdateTime := 500
 
-	androidPlayOnce := int64(1000 * 60 * 3)
-	//androidPlayOnce := int64(1000 * 3)
+	//androidPlayOnce := int64(1000 * 60 * 3)
+	androidPlayOnce := int64(1000 * 3)
 	//lastAndroidPlayTime := utils.Milliseconde()
 	lastAndroidPlayTime := int64(0)
 
@@ -686,7 +686,15 @@ func (a *HallAgent) Update() {
 					}
 				}
 
+				//其中有一方为机器人时，机器人的匹配时间不算进去
 				alltime := t1 - player1.StartTime + t1 - player2.StartTime
+				if player1.IsAndroid == 1 && player2.IsAndroid != 1 {
+					alltime = t1 - player2.StartTime
+				}
+				if player1.IsAndroid != 1 && player2.IsAndroid == 1 {
+					alltime = t1 - player1.StartTime
+				}
+
 				//log.Info("time %d", alltime)
 				scoresub := int(math.Abs(float64(player1.Score - player2.Score)))
 				//log.Info("score %d", scoresub)

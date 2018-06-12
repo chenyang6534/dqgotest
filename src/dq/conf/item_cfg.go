@@ -91,7 +91,7 @@ func GetItemAddTime(k int) int {
 	itemlock.RLock()
 	defer itemlock.RUnlock()
 
-	log.Info("---k:%d", k)
+	//log.Info("---k:%d", k)
 
 	if v, ok := itemmap[k]; ok {
 		log.Info("---addtime:%d", v.AddTime)

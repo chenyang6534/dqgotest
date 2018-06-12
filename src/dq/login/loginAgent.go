@@ -154,13 +154,18 @@ func (a *LoginAgent) DoQuickLoginData(data *datamsg.MsgBase) {
 	if uid = db.DbOne.CheckQuickLogin(h2.MachineId, h2.Platform); uid > 0 {
 		log.Info("---------user login:%d", uid)
 	} else {
-		uid = db.DbOne.CreateQuickPlayer(h2.MachineId, h2.Platform, "")
+		uid = db.DbOne.CreateQuickPlayer(h2.MachineId, h2.Platform, h2.Name)
 		if uid < 0 {
 			log.Info("---------new user lose", uid)
 			return
 		}
 		log.Info("---------new user:%d", uid)
 	}
+	if len(h2.Avatar) > 0 {
+		//更新头像信息h2.AvatarUrl
+		db.DbOne.UpdatePlayerAvatar(h2.Avatar, uid)
+	}
+
 	//--------------------
 	a.NotifyGateLogined(int(data.ConnectId), uid)
 

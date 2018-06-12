@@ -50,6 +50,8 @@ type CS_MsgWeiXingLogin struct {
 type CS_MsgQuickLogin struct {
 	Platform  string
 	MachineId string
+	Name      string
+	Avatar    string
 	//Abc			[10][10]int
 }
 
@@ -247,6 +249,9 @@ type MsgGame5GInfo struct {
 
 	//棋盘信息
 	QiPan [15][15]int
+	//
+	//步数信息
+	StepNum [15][15]int
 
 	//游戏创建时间戳
 	CreateGameTime int64
@@ -284,6 +289,7 @@ type SC_DoGame5G struct {
 	X             int
 	Y             int
 	Time          int
+	StepNum       int
 }
 
 //游戏结束
@@ -348,9 +354,11 @@ type SC_FriendsInfo struct {
 }
 
 type SC_RankInfo struct {
-	Ranks      []RankNodeMessage
-	SeasonInfo conf.Season
-	MyRank     int
+	Ranks       []RankNodeMessage
+	SeasonInfo  conf.Season
+	MyRank      int
+	RankCount   int //参与排名的人数
+	LastMaxRank int //前2个赛季的最高排名
 }
 
 //邮件信息

@@ -314,6 +314,9 @@ func (rank *Rank) RankInfo(start int, end int, uid int) *datamsg.SC_RankInfo {
 	rank.Lock.Lock()
 	defer rank.Lock.Unlock()
 
+	rankinfo.RankCount = len(rank.RankList) //参与排名的人数
+	rankinfo.LastMaxRank = 1000             // //前2个赛季的最高排名
+
 	ranklen := len(rank.RankList)
 	if ranklen <= 0 {
 		return rankinfo

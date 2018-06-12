@@ -1,5 +1,5 @@
 {
-    "Version":"1.0",
+    "Version":"1.1",
     "Task":
     [
         {
@@ -14,7 +14,7 @@
             [
                 {
                     "Type":1,
-                    "Count":10,
+                    "Count":30,
                     "Time":-1
                 }
             ]
@@ -31,7 +31,7 @@
             [
                 {
                     "Type":1,
-                    "Count":8,
+                    "Count":10,
                     "Time":-1
                 }
             ]
@@ -48,7 +48,41 @@
             [
                 {
                     "Type":1,
-                    "Count":16,
+                    "Count":20,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":107,
+            "Type":2,
+            "DestValue":8,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_107",
+            "ProgressDBFieldName":"sm_win_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":30,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":108,
+            "Type":2,
+            "DestValue":12,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_108",
+            "ProgressDBFieldName":"sm_win_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":50,
                     "Time":-1
                 }
             ]
@@ -65,7 +99,7 @@
             [
                 {
                     "Type":1,
-                    "Count":8,
+                    "Count":20,
                     "Time":-1
                 }
             ]
@@ -82,7 +116,7 @@
             [
                 {
                     "Type":1,
-                    "Count":16,
+                    "Count":50,
                     "Time":-1
                 }
             ]
