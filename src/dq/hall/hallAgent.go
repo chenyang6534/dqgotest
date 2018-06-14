@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"net"
 	//"strconv"
-
+	"dq/conf"
 	"dq/db"
 	"dq/utils"
 )
@@ -96,6 +96,8 @@ func (a *HallAgent) Init() {
 	a.handles["GetInfo"] = a.DoGetInfoData
 
 	a.handles["CS_GetHallUIInfo"] = a.DoGetHallUIInfoData
+
+	a.handles["CS_GetNoticeInfo"] = a.DoGetNoticeInfoData
 
 	//一场游戏比赛结束
 	a.handles["GameOverInfo"] = a.DoGameOverInfoData
@@ -568,6 +570,17 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 //func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 
 //}
+func (a *HallAgent) DoGetNoticeInfoData(data *datamsg.MsgBase) {
+
+	if len(conf.GetNoticeConfig().Notice) > 0 {
+		data.ModeType = "Client"
+		data.MsgType = "SC_NoticeInfo"
+		jd := datamsg.SC_NoticeInfo{}
+		jd.NoticeMsg = conf.GetNoticeConfig().Notice
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	}
+
+}
 
 func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 	//大厅界面信息

@@ -1157,10 +1157,17 @@ func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, lose
 }
 
 //更新玩家头像
-func (a *DB) UpdatePlayerAvatar(avatarurl string, uid int) error {
+func (a *DB) UpdatePlayerAvatarAndName(avatarurl string, name string, uid int) error {
 	tx, _ := a.Mydb.Begin()
+	//	res := nil
+	//	err1 := nil
 
-	res, err1 := tx.Exec("UPDATE userbaseinfo SET avatarurl=? where uid=?", avatarurl, uid)
+	//if len(name) > 0 {
+	res, err1 := tx.Exec("UPDATE userbaseinfo SET avatarurl=?,name=? where uid=?", avatarurl, name, uid)
+	//	} else {
+	//		res, err1 := tx.Exec("UPDATE userbaseinfo SET avatarurl=? where uid=?", avatarurl, uid)
+	//	}
+
 	//res.LastInsertId()
 	n, e := res.RowsAffected()
 	if err1 != nil || n == 0 || e != nil {

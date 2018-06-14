@@ -128,6 +128,8 @@ func (app *DefaultApp) Run() error {
 
 	conf.LoadItemConfig() //加载道具信息
 
+	conf.LoadNoticeConfig() //加载公共信息
+
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 
 	log.Info("dq starting up")

@@ -105,7 +105,9 @@ func (a *LoginAgent) DoWeiXingLoginData(data *datamsg.MsgBase) {
 		log.Info("---------new user:%d", uid)
 	}
 	//更新头像信息h2.AvatarUrl
-	db.DbOne.UpdatePlayerAvatar(h2.AvatarUrl, uid)
+	if len(h2.AvatarUrl) > 0 && len(h2.Name) > 0 {
+		db.DbOne.UpdatePlayerAvatarAndName(h2.AvatarUrl, h2.Name, uid)
+	}
 
 	//--------------------
 	a.NotifyGateLogined(int(data.ConnectId), uid)
@@ -163,7 +165,7 @@ func (a *LoginAgent) DoQuickLoginData(data *datamsg.MsgBase) {
 	}
 	if len(h2.Avatar) > 0 {
 		//更新头像信息h2.AvatarUrl
-		db.DbOne.UpdatePlayerAvatar(h2.Avatar, uid)
+		db.DbOne.UpdatePlayerAvatarAndName(h2.Avatar, h2.Name, uid)
 	}
 
 	//--------------------

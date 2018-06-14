@@ -172,6 +172,11 @@ type SC_MsgHallInfo struct {
 	PlayerInfo MsgPlayerInfo
 }
 
+//
+type SC_NoticeInfo struct {
+	NoticeMsg string
+}
+
 //大厅UI信息
 type SC_HallUIInfo struct {
 	TaskED_ShowNum int
