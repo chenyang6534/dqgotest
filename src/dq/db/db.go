@@ -250,7 +250,7 @@ func (a *DB) CheckQuickLogin(machineid string, platfom string) int {
 //获取玩家基本信息
 func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	info.Uid = uid
-	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore,avatarurl,firstqizi,secondqizi,isandroid FROM userbaseinfo where uid=?")
+	stmt, err := a.Mydb.Prepare("SELECT name,gold,wincount,losecount,seasonscore,avatarurl,firstqizi,secondqizi,isandroid,RankNum FROM userbaseinfo where uid=?")
 
 	if err != nil {
 		log.Info(err.Error())
@@ -265,7 +265,7 @@ func (a *DB) GetPlayerInfo(uid int, info *datamsg.MsgPlayerInfo) error {
 	defer rows.Close()
 
 	if rows.Next() {
-		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi, &info.IsAndroid)
+		return rows.Scan(&info.Name, &info.Gold, &info.WinCount, &info.LoseCount, &info.SeasonScore, &info.AvatarUrl, &info.FirstQiZi, &info.SecondQiZi, &info.IsAndroid, &info.RankNum)
 	} else {
 		log.Info("no user:%d", uid)
 		return errors.New("no user")
@@ -804,7 +804,7 @@ func (a *DB) GetFriendsBaseInfo(frienduid []int, friendinfo *[]datamsg.FriendInf
 		return nil
 	}
 
-	sqlstr := "SELECT uid,name,avatarurl,seasonscore FROM userbaseinfo where uid = " + strconv.Itoa(frienduid[0])
+	sqlstr := "SELECT uid,name,avatarurl,seasonscore,RankNum FROM userbaseinfo where uid = " + strconv.Itoa(frienduid[0])
 	for i := 1; i < len(frienduid); i++ {
 		sqlstr = sqlstr + " or uid = " + strconv.Itoa(frienduid[i])
 	}
@@ -1132,11 +1132,16 @@ func (a *DB) GetPlayerTaskEd(uid int, date *string, info *utils.BeeMap) error {
 
 }
 
-//更新玩家胜负 事务
-func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, loseseasonscore int) error {
+//增加玩家游戏结束后的 奖励分数
+func (a *DB) AddPlayerScore(uid int, score int) error {
+
+	if score <= 0 || uid <= 0 {
+		return nil
+	}
+
 	tx, _ := a.Mydb.Begin()
 
-	res, err1 := tx.Exec("UPDATE userbaseinfo SET wincount=wincount+1,seasonscore=seasonscore+? where uid=?", winseasonscore, winid)
+	res, err1 := tx.Exec("UPDATE userbaseinfo SET seasonscore=seasonscore+?,gameover_addscore=? where uid=? and gameover_addscore<=0", score, score, uid)
 	//res.LastInsertId()
 	n, e := res.RowsAffected()
 	if err1 != nil || n == 0 || e != nil {
@@ -1144,14 +1149,51 @@ func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, lose
 		return tx.Rollback()
 	}
 
-	res, err1 = tx.Exec("UPDATE userbaseinfo SET losecount=losecount+1,seasonscore=seasonscore-? where uid=?", loseseasonscore, loseid)
-	n, e = res.RowsAffected()
-	if err1 != nil || n == 0 || e != nil {
-		log.Info("update err")
-		return tx.Rollback()
+	err1 = tx.Commit()
+	return err1
+
+}
+
+//更新玩家胜负 事务
+func (a *DB) UpdatePlayerWinLose(winid int, winseasonscore int, loseid int, loseseasonscore int) error {
+	tx, _ := a.Mydb.Begin()
+
+	if winseasonscore > 0 {
+		res, err1 := tx.Exec("UPDATE userbaseinfo SET wincount=wincount+1,seasonscore=seasonscore+?,gameover_addscore=0 where uid=?", winseasonscore, winid)
+		//res.LastInsertId()
+		n, e := res.RowsAffected()
+		if err1 != nil || n == 0 || e != nil {
+			log.Info("update err")
+			return tx.Rollback()
+		}
+	} else {
+		res, err1 := tx.Exec("UPDATE userbaseinfo SET wincount=wincount+1,seasonscore=seasonscore+? where uid=?", winseasonscore, winid)
+		//res.LastInsertId()
+		n, e := res.RowsAffected()
+		if err1 != nil || n == 0 || e != nil {
+			log.Info("update err")
+			return tx.Rollback()
+		}
 	}
 
-	err1 = tx.Commit()
+	if loseseasonscore > 0 {
+		//重置gameover_addscore 游戏结束后的加分值
+		res, err1 := tx.Exec("UPDATE userbaseinfo SET losecount=losecount+1,seasonscore=seasonscore-?,gameover_addscore=0 where uid=?", loseseasonscore, loseid)
+		n, e := res.RowsAffected()
+		if err1 != nil || n == 0 || e != nil {
+			log.Info("update err")
+			return tx.Rollback()
+		}
+	} else {
+		res, err1 := tx.Exec("UPDATE userbaseinfo SET losecount=losecount+1,seasonscore=seasonscore-? where uid=?", loseseasonscore, loseid)
+		n, e := res.RowsAffected()
+		if err1 != nil || n == 0 || e != nil {
+			log.Info("update err")
+			return tx.Rollback()
+		}
+	}
+
+	err1 := tx.Commit()
 	return err1
 
 }

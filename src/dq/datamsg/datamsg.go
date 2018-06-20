@@ -33,6 +33,7 @@ type MsgPlayerInfo struct {
 	WinCount    int
 	LoseCount   int
 	SeasonScore int
+	RankNum     int
 	AvatarUrl   string
 	FirstQiZi   int
 	SecondQiZi  int
@@ -156,6 +157,8 @@ type MsgGame5GingInfo struct {
 	PlayerTwoName string
 	ScoreOne      int
 	ScoreTwo      int
+	RankNumOne    int
+	RankNumTwo    int
 	AvatarOne     string
 	AvatarTwo     string
 }
@@ -175,6 +178,11 @@ type SC_MsgHallInfo struct {
 //
 type SC_NoticeInfo struct {
 	NoticeMsg string
+}
+
+//
+type CS_AddScore struct {
+	Score int
 }
 
 //大厅UI信息
@@ -221,6 +229,7 @@ type MsgGame5GPlayerInfo struct {
 	WinCount        int
 	LoseCount       int
 	SeasonScore     int
+	RankNum         int
 	AvatarUrl       string
 	QiZiId          int
 	Qizi_move       int
@@ -316,8 +325,9 @@ type MsgTaskInfo struct {
 	Rewards []conf.RewardsConfig
 }
 type RankNodeInfo struct {
-	Uid        int
-	Score      int
+	Uid   int
+	Score int
+	//RankNum    int
 	Name       string
 	Avatar     string
 	Rewardgold int
@@ -344,8 +354,9 @@ type MailInfo struct {
 type FriendInfo struct {
 	Uid         int
 	Name        string
-	Avatar      string
+	Avatarurl   string
 	Seasonscore int
+	RankNum     int
 	State       int //0离线 1大厅 2比赛中 3观战中
 	FriendWin   int //朋友赢得次数
 	MyWin       int //我赢得次数

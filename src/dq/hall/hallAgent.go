@@ -99,6 +99,10 @@ func (a *HallAgent) Init() {
 
 	a.handles["CS_GetNoticeInfo"] = a.DoGetNoticeInfoData
 
+	a.handles["CS_AddScore"] = a.DoAddScoreData
+
+	//
+
 	//一场游戏比赛结束
 	a.handles["GameOverInfo"] = a.DoGameOverInfoData
 	//玩家游戏状态切换
@@ -566,6 +570,43 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 	//	ObserverId []int
 	//}
 }
+func (a *HallAgent) DoAddScoreData(data *datamsg.MsgBase) {
+	h2 := &datamsg.CS_AddScore{}
+	err := json.Unmarshal([]byte(data.JsonData), h2)
+	if err != nil {
+		log.Info(err.Error())
+		return
+	}
+	if h2.Score > 10 {
+		return
+	}
+	//db.DbOne.SetPlayerOneInfo(uid, "userbaseinfo", "gold", gold-price) CS_AddScore
+	gameoverscore := 0
+	db.DbOne.GetPlayerOneInfo(data.Uid, "userbaseinfo", "gameover_addscore", &gameoverscore)
+	if gameoverscore > 0 {
+		return
+	}
+	db.DbOne.AddPlayerScore(data.Uid, h2.Score)
+
+	//回复客户端
+	playerinfo := &datamsg.MsgPlayerInfo{}
+	err = db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
+	if err == nil {
+		data.ModeType = "Client"
+		data.MsgType = "SC_MsgHallInfo"
+		jd := datamsg.SC_MsgHallInfo{}
+		jd.PlayerInfo = *playerinfo
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+	} else {
+		log.Info(err.Error())
+	}
+
+	//
+
+	//db.DbOne.SetPlayerOneInfo(data.Uid, "userbaseinfo", "gameover_addscore", h2.Score)
+	//db.DbOne.SetPlayerOneInfo(data.Uid, "userbaseinfo", "gameover_addscore", h2.Score)
+
+}
 
 //func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 
@@ -602,19 +643,13 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 	//大厅中
 	a.PlayerGameState.Set(data.Uid, 1)
 
+	//检查公共邮件
 	GetMail().CheckUserPublicMail(data.Uid)
+	//邮件数量大于50就自动领奖并删除
 	GetMail().CheckUserMail(data.Uid)
 
-	//测试
-	//GetFriends().getFriendsInfo(data.Uid, 50, a)
-
-	//ce shi
-	//	winrank := datamsg.RankNodeInfo{}
-	//	winrank.Uid = data.Uid
-	//	db.DbOne.GetPlayerManyInfo(data.Uid, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
-	//	GetRank().SetValue(winrank)
-
-	//a.SendHallUIInfo(data)
+	//刷新段位
+	GetRank().FreshRankNum(data.Uid)
 
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}

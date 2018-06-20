@@ -24,6 +24,7 @@ type Game5GPlayer struct {
 	WinCount    int
 	LoseCount   int
 	SeasonScore int
+	RankNum     int
 	AvatarUrl   string
 	qiziId      int
 
@@ -189,6 +190,7 @@ func (game *Game5GLogic) notifyAllPlayerGoIn(player *Game5GPlayer) {
 	jd.PlayerInfo.Time = player.Time
 	jd.PlayerInfo.EveryTime = game.EveryTime
 	jd.PlayerInfo.SeasonScore = player.SeasonScore
+	jd.PlayerInfo.RankNum = player.RankNum
 	jd.PlayerInfo.AvatarUrl = player.AvatarUrl
 	jd.PlayerInfo.QiZiId = player.qiziId
 
@@ -277,6 +279,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
 			p1.SeasonScore = v.SeasonScore
+			p1.RankNum = v.RankNum
 			p1.AvatarUrl = v.AvatarUrl
 			p1.QiZiId = v.qiziId
 			p1.Qizi_move = v.qizi_move
@@ -319,6 +322,7 @@ func (game *Game5GLogic) sendGameInfoToPlayer(player *Game5GPlayer) {
 			p1.PlayerType = v.PlayerType
 			p1.SeatIndex = v.SeatIndex
 			p1.SeasonScore = v.SeasonScore
+			p1.RankNum = v.RankNum
 			p1.AvatarUrl = v.AvatarUrl
 			p1.QiZiId = v.qiziId
 			p1.Qizi_move = v.qizi_move

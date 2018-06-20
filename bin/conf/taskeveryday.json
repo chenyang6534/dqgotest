@@ -1,24 +1,8 @@
 {
-    "Version":"1.1",
+    "Version":"1.3",
     "Task":
     [
-        {
-            "Id":104,
-            "Type":3,
-            "DestValue":1,
-            "DBTableName":"taskeveryday",
-            "GetTagDBFieldName":"get_104",
-            "ProgressDBFieldName":"share_count",
-            "InitialValue":0,
-            "Rewards":
-            [
-                {
-                    "Type":1,
-                    "Count":30,
-                    "Time":-1
-                }
-            ]
-        },
+        
         {
             "Id":102,
             "Type":2,
@@ -117,6 +101,40 @@
                 {
                     "Type":1,
                     "Count":50,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":104,
+            "Type":3,
+            "DestValue":1,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_104",
+            "ProgressDBFieldName":"share_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":30,
+                    "Time":-1
+                }
+            ]
+        },
+        {
+            "Id":109,
+            "Type":3,
+            "DestValue":3,
+            "DBTableName":"taskeveryday",
+            "GetTagDBFieldName":"get_109",
+            "ProgressDBFieldName":"share_count",
+            "InitialValue":0,
+            "Rewards":
+            [
+                {
+                    "Type":1,
+                    "Count":80,
                     "Time":-1
                 }
             ]

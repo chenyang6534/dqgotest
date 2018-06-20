@@ -216,6 +216,9 @@ func (a *Game5GAgent) DoGetGamingInfoData(data *datamsg.MsgBase) {
 			gameinfo.ScoreTwo = game.Player[1].SeasonScore
 			gameinfo.AvatarOne = game.Player[0].AvatarUrl
 			gameinfo.AvatarTwo = game.Player[1].AvatarUrl
+			gameinfo.RankNumOne = game.Player[0].RankNum
+			gameinfo.RankNumTwo = game.Player[1].RankNum
+			
 			gameinfo.GameName = "game_" + strconv.Itoa(gameinfo.GameId)
 			jd.GameInfo = append(jd.GameInfo, gameinfo)
 			count++
@@ -362,6 +365,7 @@ func (a *Game5GAgent) DoGoInData(data *datamsg.MsgBase) {
 	player.Name = playerinfo.Name
 	player.WinCount = playerinfo.WinCount
 	player.SeasonScore = playerinfo.SeasonScore
+	player.RankNum = playerinfo.RankNum
 	player.AvatarUrl = playerinfo.AvatarUrl
 	player.firstqiziId = playerinfo.FirstQiZi
 	player.secondqiziId = playerinfo.SecondQiZi

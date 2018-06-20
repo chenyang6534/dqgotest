@@ -292,6 +292,56 @@ func (rank *Rank) GetMaxRankNum3(uid int) int {
 
 }
 
+//刷新玩家段位
+func (rank *Rank) FreshRankNum(uid int) int {
+	ranknum := rank.GetRankNum(uid)
+
+	//log.Info("ranknum---%d-", ranknum)
+
+	db.DbOne.SetPlayerOneInfo(uid, "userbaseinfo", "RankNum", ranknum)
+
+	return ranknum
+}
+
+//获取前8个赛季中排名前4的 平局排名
+func (rank *Rank) GetRankNum(uid int) int {
+
+	allrank := 8  //最近的总赛季数
+	usedrank := 4 //最近的有效赛季数
+
+	ranks := make([]int, usedrank)
+	for k, _ := range ranks {
+		ranks[k] = 1001
+	}
+
+	for i := 1; i <= allrank; i++ {
+		index := rank.SeasonIdIndex - i
+		ranknum := db.DbOne.GetRankNum(index, uid)
+
+		//log.Info("rank1---%d---k:%d", ranknum, index)
+
+		if len(ranks) >= usedrank {
+			for k, v := range ranks {
+				if ranknum < v {
+					ranks[k] = ranknum
+					break
+				}
+			}
+		} else {
+			ranks[i-1] = ranknum
+		}
+
+	}
+	ranknum := 0
+	for _, v := range ranks {
+		ranknum += v
+		//log.Info("v---%d--", v)
+	}
+
+	return ranknum / usedrank
+
+}
+
 //
 func (rank *Rank) RankInfo(start int, end int, uid int) *datamsg.SC_RankInfo {
 

@@ -1,5 +1,5 @@
 {
-    "Version":"1.6",
+    "Version":"1.8",
     "Commoditys":
     [
         {
@@ -91,7 +91,7 @@
             "Type":1501,
             "Time":30,
             "SaleGoldType":1,
-            "SalePrice":3000,
+            "SalePrice":1000,
             "SaleDiscount":10,
             "StartTime":"2018-05-07 08:50:29",
             "EndTime":"2018-06-30 08:50:29"
@@ -102,7 +102,51 @@
             "Type":1601,
             "Time":30,
             "SaleGoldType":1,
+            "SalePrice":1000,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
+        },
+        {
+            "Id":1602,
+            "Type":1602,
+            "Time":30,
+            "SaleGoldType":1,
             "SalePrice":3000,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
+        },
+        {
+            "Id":1603,
+            "Type":1603,
+            "Time":30,
+            "SaleGoldType":1,
+            "SalePrice":10000,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
+        },
+        {
+            "Id":1604,
+            "Type":1604,
+            "Time":30,
+            "SaleGoldType":1,
+            "SalePrice":20000,
+            "SaleDiscount":10,
+            "StartTime":"2018-05-07 08:50:29",
+            "EndTime":"2018-06-30 08:50:29"
+               
+        },
+        {
+            "Id":1605,
+            "Type":1605,
+            "Time":30,
+            "SaleGoldType":1,
+            "SalePrice":50000,
             "SaleDiscount":10,
             "StartTime":"2018-05-07 08:50:29",
             "EndTime":"2018-06-30 08:50:29"
