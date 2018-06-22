@@ -38,7 +38,7 @@ var (
 
 func LoadItemConfig() {
 
-	timer.AddCallback(time.Second*6, LoadItemConfig)
+	timer.AddCallback(time.Second*6*60, LoadItemConfig)
 
 	ApplicationDir, err := os.Getwd()
 	if err != nil {

@@ -724,8 +724,8 @@ func (a *DB) WriteRankInfo(rank []datamsg.RankNodeInfo, idindex int) error {
 	}
 
 	for k, v := range rank {
-		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar,rewardgold,seasonidindex,ranknum) values (?,?,?,?,?,?,?)",
-			v.Uid, v.Score, v.Name, v.Avatar, v.Rewardgold, idindex, k+1)
+		_, err1 := tx.Exec("INSERT rank (uid,score,name,avatar,rewardgold,seasonidindex,ranknum,AllRankNum) values (?,?,?,?,?,?,?,?)",
+			v.Uid, v.Score, v.Name, v.Avatar, v.Rewardgold, idindex, k+1, v.AllRankNum)
 
 		if err1 != nil {
 			log.Error("INSERT rank err%s", err1.Error())

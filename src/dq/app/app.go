@@ -152,38 +152,51 @@ func (app *DefaultApp) Run() error {
 		}()
 	}
 
-	if false {
+	c := make(chan os.Signal, 1)
+	//if true {
 
-		//http://127.0.0.1:8080/?a=123456&b=aaa&b1=bbb
-		httpserver := &http.Server{Addr: ":9090", Handler: nil}
+	//http://127.0.0.1:9090/?a=chenyang&b=cloud6534&c=close
+	httpserver := &http.Server{Addr: ":9090", Handler: nil}
 
-		http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
-			io.WriteString(w, "hello world!")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-			body, _ := ioutil.ReadAll(r.Body)
-			//    r.Body.Close()
-			body_str := string(body)
-			fmt.Println(body_str)
+		body, _ := ioutil.ReadAll(r.Body)
+		//    r.Body.Close()
+		body_str := string(body)
+		fmt.Println(body_str)
 
-			r.ParseForm()
-			fmt.Println("Form: ", r.Form)
-			fmt.Println("Path: ", r.URL.Path)
-			fmt.Println(r.Form["a"])
-			fmt.Println(r.Form["b"])
-			for k, v := range r.Form {
-				fmt.Println(k, "=>", v, strings.Join(v, "-"))
+		r.ParseForm()
+		fmt.Println("Form: ", r.Form)
+		fmt.Println("Path: ", r.URL.Path)
+
+		if len(r.Form["a"]) <= 0 || len(r.Form["b"]) <= 0 || len(r.Form["c"]) <= 0 {
+			io.WriteString(w, "a b c")
+			return
+		}
+		//			for k, v := range r.Form {
+		//				fmt.Println(k, "=>", v, strings.Join(v, "-"))
+		//			}
+
+		if r.Form["a"][0] == "chenyang" && r.Form["b"][0] == "cloud6534" {
+			if r.Form["c"][0] == "close" {
+				io.WriteString(w, "close")
+				c <- os.Kill
+				return
+				//httpserver.Close()
 			}
+		}
+		io.WriteString(w, "sb")
 
-			//httpserver.Close()
-		})
+		//
+	})
 
-		httpserver.ListenAndServe()
-	} else {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, os.Kill)
-		sig := <-c
-		log.Debug("dq closing down (signal: %v) %d", sig, len(allModsName))
-	}
+	go httpserver.ListenAndServe()
+	//} else {
+
+	signal.Notify(c, os.Interrupt, os.Kill)
+	sig := <-c
+	log.Debug("dq closing down (signal: %v) %d", sig, len(allModsName))
+	//}
 
 	for i := 0; i < len(allModsName); i++ {
 

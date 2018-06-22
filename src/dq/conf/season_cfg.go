@@ -37,7 +37,7 @@ var (
 
 func LoadSeasonConfig() {
 
-	timer.AddCallback(time.Second*5, LoadSeasonConfig)
+	timer.AddCallback(time.Second*5*60, LoadSeasonConfig)
 
 	ApplicationDir, err := os.Getwd()
 	if err != nil {

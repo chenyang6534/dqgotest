@@ -325,9 +325,9 @@ type MsgTaskInfo struct {
 	Rewards []conf.RewardsConfig
 }
 type RankNodeInfo struct {
-	Uid   int
-	Score int
-	//RankNum    int
+	Uid        int
+	Score      int
+	AllRankNum int
 	Name       string
 	Avatar     string
 	Rewardgold int

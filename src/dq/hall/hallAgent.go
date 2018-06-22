@@ -534,11 +534,11 @@ func (a *HallAgent) DoGameOverInfoData(data *datamsg.MsgBase) {
 	//排行数据
 	winrank := datamsg.RankNodeInfo{}
 	winrank.Uid = h2.WinId
-	db.DbOne.GetPlayerManyInfo(h2.WinId, "userbaseinfo", "seasonscore,name,avatarurl", &winrank.Score, &winrank.Name, &winrank.Avatar)
+	db.DbOne.GetPlayerManyInfo(h2.WinId, "userbaseinfo", "seasonscore,name,avatarurl,RankNum", &winrank.Score, &winrank.Name, &winrank.Avatar, &winrank.AllRankNum)
 	GetRank().SetValue(winrank)
 	loserank := datamsg.RankNodeInfo{}
 	loserank.Uid = h2.LoseId
-	db.DbOne.GetPlayerManyInfo(h2.LoseId, "userbaseinfo", "seasonscore,name,avatarurl", &loserank.Score, &loserank.Name, &loserank.Avatar)
+	db.DbOne.GetPlayerManyInfo(h2.LoseId, "userbaseinfo", "seasonscore,name,avatarurl,RankNum", &loserank.Score, &loserank.Name, &loserank.Avatar, &loserank.AllRankNum)
 	GetRank().SetValue(loserank)
 
 	//设置每日任务数据

@@ -36,7 +36,7 @@ var (
 
 func LoadStoreConfig() {
 
-	timer.AddCallback(time.Second*5, LoadStoreConfig)
+	timer.AddCallback(time.Second*5*60, LoadStoreConfig)
 
 	ApplicationDir, err := os.Getwd()
 	if err != nil {
