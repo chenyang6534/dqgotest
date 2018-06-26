@@ -40,6 +40,9 @@ func (a *DB) Init() {
 	}
 	a.Mydb = db
 
+	a.Mydb.SetMaxOpenConns(10000)
+	a.Mydb.SetMaxIdleConns(500)
+	a.Mydb.Ping()
 }
 
 //创建微信openid玩家

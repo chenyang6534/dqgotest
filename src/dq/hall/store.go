@@ -87,7 +87,7 @@ func (store *Store) getStoreInfo() *datamsg.SC_StoreInfo {
 		} else {
 			jd.Commoditys[k].IsStartSale = false
 		}
-		log.Info("---getStoreInfo------id:%d----isstartsale:%t-", jd.Commoditys[k].Id, jd.Commoditys[k].IsStartSale)
+		//log.Info("---getStoreInfo------id:%d----isstartsale:%t-", jd.Commoditys[k].Id, jd.Commoditys[k].IsStartSale)
 	}
 
 	return jd
