@@ -143,14 +143,16 @@ func (a *DB) newUser(machineid string, platfom string, phonenumber string, openi
 		isandroid = 1
 	}
 
-	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid) values (?,?,?,?,?,?,?,?,?,?,?,?)",
-		id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid)
+	day := time.Now().Format("2006-01-02")
+
+	res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid,rigesterday) values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+		id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid, day)
 	//插入名字失败
 	if err1 != nil {
 
 		name = "yk_" + strconv.Itoa(int(id))
-		res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid) values (?,?,?,?,?,?,?,?,?,?,?,?)",
-			id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid)
+		res, err1 = tx.Exec("INSERT userbaseinfo (uid,name,gold,wincount,losecount,level,experience,seasonscore,avatarurl,firstqizi,secondqizi,isandroid,rigesterday) values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			id, name, 0, 0, 0, 1, 0, 1000, "", 1001, 1002, isandroid, day)
 		if err1 != nil {
 			log.Info("INSERT userbaseinfo err")
 			return -1, tx.Rollback()
@@ -162,7 +164,6 @@ func (a *DB) newUser(machineid string, platfom string, phonenumber string, openi
 		return -1, tx.Rollback()
 	}
 
-	day := time.Now().Format("2006-01-02")
 	res, err1 = tx.Exec("INSERT taskeveryday (uid,day) values (?,?)", id, day)
 	n, e = res.RowsAffected()
 	if err1 != nil || n == 0 || e != nil {

@@ -501,6 +501,7 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 		data.ModeType = "Hall"
 		data.MsgType = "GameOverInfo"
 		jd := datamsg.GameOverInfo{}
+
 		jd.WinId = winplayer.Uid
 		jd.LoseId = loseplayer.Uid
 		jd.GameMode = game.GameMode
@@ -526,6 +527,7 @@ func (game *Game5GLogic) gameWin(seatIndex int, reason int) {
 	jd.WinQiZi = game.WinQizi
 	jd.WinScore = winscore
 	jd.LoseScore = losescore
+	jd.GameOverShare = conf.GetNoticeConfig().GameOverShare
 	game.sendMsgToAll("SC_GameOver", jd)
 
 	game.dismissGame()

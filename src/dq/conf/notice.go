@@ -72,7 +72,7 @@ func LoadNoticeConfig() {
 		noticelock.Lock()
 		noticeCfg = noticetmp
 		noticelock.Unlock()
-		log.Info("---version:%d", noticeCfg.Version)
+		log.Info("---version:%d----GameOverShare:%d", noticeCfg.Version, noticeCfg.GameOverShare)
 
 	}
 
@@ -85,6 +85,7 @@ func GetNoticeConfig() NoticeConfig {
 }
 
 type NoticeConfig struct {
-	Version string //版本
-	Notice  string
+	Version       string //版本
+	Notice        string
+	GameOverShare int //游戏结束后分享 1表示可以分享 0表示不能分享
 }

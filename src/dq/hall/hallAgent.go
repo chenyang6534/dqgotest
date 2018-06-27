@@ -12,6 +12,7 @@ import (
 	"dq/conf"
 	"dq/db"
 	"dq/utils"
+	"time"
 )
 
 type ScoreAndTime struct {
@@ -650,6 +651,10 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 
 	//刷新段位
 	GetRank().FreshRankNum(data.Uid)
+
+	day := time.Now().Format("2006-01-02 15:04:05")
+	//设置登录时间
+	db.DbOne.SetPlayerOneInfo(data.Uid, "userbaseinfo", "lastloginday", day)
 
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}

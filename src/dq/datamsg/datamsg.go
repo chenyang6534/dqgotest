@@ -313,6 +313,7 @@ type SC_GameOver struct {
 	WinQiZi            [5][2]int
 	WinScore           int
 	LoseScore          int
+	GameOverShare      int
 }
 
 type MsgTaskInfo struct {
