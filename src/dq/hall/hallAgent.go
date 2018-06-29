@@ -589,6 +589,12 @@ func (a *HallAgent) DoAddScoreData(data *datamsg.MsgBase) {
 	}
 	db.DbOne.AddPlayerScore(data.Uid, h2.Score)
 
+	//重置排行榜
+	winrank := datamsg.RankNodeInfo{}
+	winrank.Uid = data.Uid
+	db.DbOne.GetPlayerManyInfo(data.Uid, "userbaseinfo", "seasonscore,name,avatarurl,RankNum", &winrank.Score, &winrank.Name, &winrank.Avatar, &winrank.AllRankNum)
+	GetRank().SetValue(winrank)
+
 	//回复客户端
 	playerinfo := &datamsg.MsgPlayerInfo{}
 	err = db.DbOne.GetPlayerInfo(data.Uid, playerinfo)

@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 	//"time"
 	"dq/log"
@@ -174,13 +175,18 @@ func (server *WSServer) run() {
 		//server.HttpServer := &http.Server{Addr: addr, Handler: handler}
 		//err := server.HttpServer.ListenAndServeTLS("bin/conf/214571202380020.pem", "bin/conf/214571202380020.key")
 	}
-
-	err := server.HttpServer.ListenAndServe()
-	//err := server.HttpServer.ListenAndServeTLS("bin/conf/214571202380020.pem", "bin/conf/214571202380020.key")
-
-	if err != nil {
-		log.Info(err.Error())
+	if runtime.GOOS == "windows" {
+		err := server.HttpServer.ListenAndServe()
+		if err != nil {
+			log.Info(err.Error())
+		}
+	} else {
+		err := server.HttpServer.ListenAndServeTLS("bin/conf/214571202380020.pem", "bin/conf/214571202380020.key")
+		if err != nil {
+			log.Info(err.Error())
+		}
 	}
+
 	fmt.Println("WSServer Func finish.")
 }
 

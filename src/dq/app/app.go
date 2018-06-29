@@ -17,6 +17,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"runtime"
+	"syscall"
+	"time"
 	//"time"
 	//"encoding/json"
 	"flag"
@@ -100,6 +103,16 @@ func (app *DefaultApp) Run() error {
 	if err != nil {
 		return errors.New("cannot find dir")
 	}
+	if runtime.GOOS == "linux" {
+		errfile := fmt.Sprintf("%s/bin/logs/errfile.json", ApplicationDir)
+		if crashFile, err := os.OpenFile(errfile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0664); err == nil {
+			crashFile.WriteString(fmt.Sprintf("%v Opened crashfile at %v", os.Getpid(), time.Now()))
+			os.Stderr = crashFile
+			t1 := syscall.AF_INET
+			fmt.Println(t1)
+			//syscall.Dup2(int(crashFile.Fd()), 2)
+		}
+	}
 
 	confPath := fmt.Sprintf("%s/bin/conf/server.json", ApplicationDir)
 
@@ -133,6 +146,8 @@ func (app *DefaultApp) Run() error {
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 
 	log.Info("dq starting up")
+
+	log.Info("runtime.GOOS:%s", runtime.GOOS)
 
 	log.Info("---models:%d", len(allModsName))
 	// close

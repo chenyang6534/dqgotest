@@ -42,6 +42,7 @@ func (a *DB) Init() {
 
 	a.Mydb.SetMaxOpenConns(10000)
 	a.Mydb.SetMaxIdleConns(500)
+	//a.Mydb.SetConnMaxLifetime(time.Second * 10)
 	a.Mydb.Ping()
 }
 

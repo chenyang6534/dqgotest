@@ -90,7 +90,7 @@ func (a *LoginAgent) DoWeiXingLoginData(data *datamsg.MsgBase) {
 		a.WriteMsgBytes(datamsg.NewMsgSC_Result(data.Uid, data.ConnectId, "login faild:"+err1.Error()))
 		return
 	}
-	//return
+
 	//查询数据
 	var uid int
 	if uid = db.DbOne.CheckWSOpenidLogin(openid); uid > 0 {
