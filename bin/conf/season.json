@@ -1,11 +1,11 @@
 {
-    "Version":"1.7",
+    "Version":"1.0",
     "Seasons":
     [
         {
             "IdIndex":1,
-            "StartTime":"2018-05-08 08:50:00",
-            "EndTime":"2018-06-07 16:28:00",
+            "StartTime":"2018-07-01 20:00:00",
+            "EndTime":"2018-07-15 20:00:00",
             "RewardList":
             [
                 {
@@ -52,100 +52,49 @@
         },
         {
             "IdIndex":2,
-            "StartTime":"2018-06-07 16:28:00",
-            "EndTime":"2018-06-17 15:48:00",
+            "StartTime":"2018-07-15 20:00:00",
+            "EndTime":"2018-07-29 20:00:00",
             "RewardList":
             [
                 {
                     "RankStart":1,
                     "RankEnd":1,
-                    "Gold":5001
+                    "Gold":5000
                 },
                 {
                     "RankStart":2,
                     "RankEnd":5,
-                    "Gold":3001
+                    "Gold":3000
                 },
                 {
                     "RankStart":6,
                     "RankEnd":20,
-                    "Gold":2001
+                    "Gold":2000
                 },
                 {
                     "RankStart":21,
                     "RankEnd":100,
-                    "Gold":1501
+                    "Gold":1500
                 },
                 {
                     "RankStart":101,
-                    "RankEnd":500,
-                    "Gold":1001
-                }
-            ]
-        },
-        {
-            "IdIndex":3,
-            "StartTime":"2018-06-17 15:48:00",
-            "EndTime":"2018-06-27 15:58:00",
-            "RewardList":
-            [
-                {
-                    "RankStart":1,
-                    "RankEnd":1,
-                    "Gold":5001
+                    "RankEnd":200,
+                    "Gold":1000
                 },
                 {
-                    "RankStart":2,
-                    "RankEnd":5,
-                    "Gold":3001
+                    "RankStart":201,
+                    "RankEnd":400,
+                    "Gold":800
                 },
                 {
-                    "RankStart":6,
-                    "RankEnd":20,
-                    "Gold":2001
+                    "RankStart":401,
+                    "RankEnd":700,
+                    "Gold":600
                 },
                 {
-                    "RankStart":21,
-                    "RankEnd":100,
-                    "Gold":1501
-                },
-                {
-                    "RankStart":101,
-                    "RankEnd":500,
-                    "Gold":1001
-                }
-            ]
-        },
-        {
-            "IdIndex":4,
-            "StartTime":"2018-06-07 15:58:00",
-            "EndTime":"2018-07-27 15:58:00",
-            "RewardList":
-            [
-                {
-                    "RankStart":1,
-                    "RankEnd":1,
-                    "Gold":5001
-                },
-                {
-                    "RankStart":2,
-                    "RankEnd":5,
-                    "Gold":3001
-                },
-                {
-                    "RankStart":6,
-                    "RankEnd":20,
-                    "Gold":2001
-                },
-                {
-                    "RankStart":21,
-                    "RankEnd":100,
-                    "Gold":1501
-                },
-                {
-                    "RankStart":101,
-                    "RankEnd":500,
-                    "Gold":1001
+                    "RankStart":701,
+                    "RankEnd":999,
+                    "Gold":500
                 }
             ]
         }

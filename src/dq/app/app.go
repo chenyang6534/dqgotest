@@ -108,8 +108,7 @@ func (app *DefaultApp) Run() error {
 		if crashFile, err := os.OpenFile(errfile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0664); err == nil {
 			crashFile.WriteString(fmt.Sprintf("%v Opened crashfile at %v", os.Getpid(), time.Now()))
 			os.Stderr = crashFile
-			t1 := syscall.AF_INET
-			fmt.Println(t1)
+			fmt.Println(syscall.AF_INET)
 			//syscall.Dup2(int(crashFile.Fd()), 2)
 		}
 	}
@@ -142,6 +141,8 @@ func (app *DefaultApp) Run() error {
 	conf.LoadItemConfig() //加载道具信息
 
 	conf.LoadNoticeConfig() //加载公共信息
+
+	conf.LoadTurnTableConfig() //加载抽奖转盘信息
 
 	log.InitBeego(true, "dq", Logdir, make(map[string]interface{}))
 

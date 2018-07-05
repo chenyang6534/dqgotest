@@ -9,8 +9,8 @@
             "SaleGoldType":1,
             "SalePrice":300,
             "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
         },
         // {
         //     "Id":1002,
@@ -28,10 +28,10 @@
             "Type":1004,
             "Time":30,
             "SaleGoldType":1,
-            "SalePrice":2000,
+            "SalePrice":3000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
         },
         // {
         //     "Id":1004,
@@ -44,16 +44,16 @@
         //     "EndTime":"2018-06-30 08:50:29"
                
         // },
-        {
-            "Id":1005,
-            "Type":1005,
-            "Time":100,
-            "SaleGoldType":1,
-            "SalePrice":10000,
-            "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
-        },
+        // {
+        //     "Id":1005,
+        //     "Type":1005,
+        //     "Time":100,
+        //     "SaleGoldType":1,
+        //     "SalePrice":10000,
+        //     "SaleDiscount":10,
+        //     "StartTime":"2018-07-01 08:50:29",
+        //     "EndTime":"2018-07-30 08:50:29"
+        // },
         // {
         //     "Id":1006,
         //     "Type":1005,
@@ -65,16 +65,16 @@
         //     "EndTime":"2018-06-30 08:50:29"
                
         // },
-        {
-            "Id":1007,
-            "Type":1006,
-            "Time":300,
-            "SaleGoldType":1,
-            "SalePrice":50000,
-            "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
-        },
+        // {
+        //     "Id":1007,
+        //     "Type":1006,
+        //     "Time":300,
+        //     "SaleGoldType":1,
+        //     "SalePrice":50000,
+        //     "SaleDiscount":10,
+        //     "StartTime":"2018-07-01 08:50:29",
+        //     "EndTime":"2018-07-30 08:50:29"
+        // },
         {
             "Id":1008,
             "Type":1007,
@@ -82,8 +82,8 @@
             "SaleGoldType":1,
             "SalePrice":1000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
         },
         {
             "Id":1009,
@@ -92,19 +92,19 @@
             "SaleGoldType":1,
             "SalePrice":1000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
         },
-        {
-            "Id":1010,
-            "Type":1009,
-            "Time":300,
-            "SaleGoldType":1,
-            "SalePrice":50000,
-            "SaleDiscount":10,
-            "StartTime":"2018-05-08 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
-        },
+        // {
+        //     "Id":1010,
+        //     "Type":1009,
+        //     "Time":300,
+        //     "SaleGoldType":1,
+        //     "SalePrice":50000,
+        //     "SaleDiscount":10,
+        //     "StartTime":"2018-07-01 08:50:29",
+        //     "EndTime":"2018-07-30 08:50:29"
+        // },
         // {
         //     "Id":1008,
         //     "Type":1006,
@@ -123,8 +123,8 @@
             "SaleGoldType":1,
             "SalePrice":1000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-07 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
                
         },
         // {
@@ -145,8 +145,8 @@
             "SaleGoldType":1,
             "SalePrice":3000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-07 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
                
         },
         {
@@ -156,32 +156,32 @@
             "SaleGoldType":1,
             "SalePrice":10000,
             "SaleDiscount":10,
-            "StartTime":"2018-05-07 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "StartTime":"2018-07-01 08:50:29",
+            "EndTime":"2018-12-30 08:50:29"
                
         },
-        // {
-        //     "Id":1604,
-        //     "Type":1604,
-        //     "Time":30,
-        //     "SaleGoldType":1,
-        //     "SalePrice":20000,
-        //     "SaleDiscount":10,
-        //     "StartTime":"2018-05-07 08:50:29",
-        //     "EndTime":"2018-06-30 08:50:29"
-               
-        // },
         {
-            "Id":1605,
-            "Type":1605,
-            "Time":100,
+            "Id":1604,
+            "Type":1604,
+            "Time":30,
             "SaleGoldType":1,
             "SalePrice":20000,
             "SaleDiscount":10,
             "StartTime":"2018-05-07 08:50:29",
-            "EndTime":"2018-06-30 08:50:29"
+            "EndTime":"2018-12-30 08:50:29"
                
         }
+        // {
+        //     "Id":1605,
+        //     "Type":1605,
+        //     "Time":100,
+        //     "SaleGoldType":1,
+        //     "SalePrice":20000,
+        //     "SaleDiscount":10,
+        //     "StartTime":"2018-07-01 08:50:29",
+        //     "EndTime":"2018-07-30 08:50:29"
+               
+        // }
         
         
     ]

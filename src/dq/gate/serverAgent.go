@@ -4,6 +4,7 @@ import (
 	"dq/log"
 	"dq/network"
 	"net"
+	//"time"
 	//"reflect"
 	//"time"
 	//"fmt"
@@ -105,6 +106,21 @@ func (a *ServersAgent) DoGateData(data *datamsg.MsgBase) {
 	}
 
 }
+
+func (a *ServersAgent) SendToAll(data1 []byte) {
+
+	allAgents := a.gate.TcpServer.GetAgents()
+	items := allAgents.Items()
+	for _, v := range items {
+
+		ag := v
+		if ag != nil {
+			ag.(*agent).WriteMsgBytes(data1)
+
+		}
+	}
+}
+
 func (a *ServersAgent) DoClientData(data *datamsg.MsgBase) {
 	h1 := data
 	connectid := (h1.ConnectId)
@@ -114,25 +130,34 @@ func (a *ServersAgent) DoClientData(data *datamsg.MsgBase) {
 	h1.Uid = 0
 	data1, err1 := json.Marshal(h1)
 	if err1 == nil {
-		ag := a.gate.TcpServer.GetAgents().Get(connectid)
-		if ag == nil {
 
-			items := a.gate.TcpServer.GetLoginedConnect().Items()
-			for k, v := range items {
-				log.Info("--uid:%d---connectid:%d---k:%d--v:%d", uid, connectid, k, v.(int))
-			}
-			con := a.gate.TcpServer.GetLoginedConnect().Get(uid)
-			if con != nil {
-				connectid = (con).(int)
-				ag = a.gate.TcpServer.GetAgents().Get(connectid)
+		//给所有玩家发消息
+		if connectid == -2 && uid == -2 {
+			go a.SendToAll(data1)
+		} else {
+			ag := a.gate.TcpServer.GetAgents().Get(connectid)
+			if ag == nil {
+
+				items := a.gate.TcpServer.GetLoginedConnect().Items()
+				for k, v := range items {
+					log.Info("--uid:%d---connectid:%d---k:%d--v:%d", uid, connectid, k, v.(int))
+				}
+				con := a.gate.TcpServer.GetLoginedConnect().Get(uid)
+				if con != nil {
+					connectid = (con).(int)
+					ag = a.gate.TcpServer.GetAgents().Get(connectid)
+				}
+
 			}
 
+			if ag != nil {
+				ag.(*agent).WriteMsgBytes(data1)
+				log.Info("send:%s", data.JsonData)
+			}
 		}
 
-		if ag != nil {
-			ag.(*agent).WriteMsgBytes(data1)
-		}
-
+	} else {
+		log.Info("--err:%s", err1.Error())
 	}
 }
 
@@ -184,6 +209,7 @@ func (a *ServersAgent) Run() {
 			log.Info("--error")
 		} else {
 			if f, ok := a.handles[h1.ModeType]; ok {
+				//go f(h1)
 				f(h1)
 			}
 

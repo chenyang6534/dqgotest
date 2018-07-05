@@ -119,10 +119,11 @@ func (player *PlayerItem) getItemIndex(itemType int) int {
 	return -1
 }
 
-//增加道具时间(购买道具)
+//增加道具时间(包括购买道具和赠送道具) 如果type为1 后面的day则为数量
 func (player *PlayerItem) AddItemsTime(itemType int, days int) {
 	player.lock.Lock()
 	defer player.lock.Unlock()
+
 	//log.Info("AddItemsTime")
 	itemIndex := player.getItemIndex(itemType)
 	if itemIndex >= 0 {
@@ -319,8 +320,14 @@ func (itemManager *ItemManager) GetItemsInfo(uid int) *datamsg.SC_ItemInfo {
 	return nil
 }
 
-//获取玩家道具信息
+//获取玩家道具信息 如果type为1 后面的day则为数量
 func (itemManager *ItemManager) AddItemsTime(uid int, itemtype int, day int) {
+
+	//砖石
+	if itemtype == 1 {
+		db.DbOne.AddPlayerOneInfo(uid, "userbaseinfo", "gold", day)
+		return
+	}
 
 	player := itemManager.GetPlayer(uid)
 	if player != nil {

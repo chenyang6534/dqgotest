@@ -115,6 +115,10 @@ func (a *HallAgent) Init() {
 	a.handles["CS_GetBagInfo"] = a.DoGetBagInfoData
 	a.handles["CS_GetRankInfo"] = a.DoGetRankInfoData
 
+	a.handles["CS_GetTurnTableInfo"] = a.DoGetTurnTableInfoData
+	a.handles["CS_GetOneTurnTable"] = a.DoGetOneTurnTableData
+	a.handles["CS_GetTenTurnTable"] = a.DoGetTenTurnTableData
+
 	a.handles["CS_GetFriendsInfo"] = a.DoGetFriendsInfoData
 
 	a.handles["CS_GetTaskRewards"] = a.DoGetTaskRewardsData
@@ -368,6 +372,58 @@ func (a *HallAgent) DoGetFriendsInfoData(data *datamsg.MsgBase) {
 
 	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, friendsinfo))
 }
+
+func (a *HallAgent) DoGetTurnTableInfoData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_TurnTableInfo"
+
+	//GetTurnTableInfo(uid int) *datamsg.SC_TurnTableInfo
+
+	tsdinfo := GetTurnTableLogic().GetTurnTableInfo(data.Uid)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
+func (a *HallAgent) SendMsgToAllClient(msgtype string, jd interface{}) {
+
+	data := &datamsg.MsgBase{}
+
+	data.ModeType = "Client"
+	data.MsgType = msgtype
+	data.Uid = -2
+	data.ConnectId = -2
+
+	a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+}
+
+func (a *HallAgent) DoGetOneTurnTableData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_DoTurnTable"
+
+	//DoOneTurnTable(uid int) *datamsg.SC_DoTurnTable
+
+	tsdinfo := GetTurnTableLogic().DoOneTurnTable(data.Uid, a)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+func (a *HallAgent) DoGetTenTurnTableData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_DoTurnTable"
+
+	//DoOneTurnTable(uid int) *datamsg.SC_DoTurnTable
+
+	tsdinfo := GetTurnTableLogic().DoTenTurnTable(data.Uid, a)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
+//
 
 //
 func (a *HallAgent) DoGetRankInfoData(data *datamsg.MsgBase) {
@@ -634,14 +690,16 @@ func (a *HallAgent) DoGetHallUIInfoData(data *datamsg.MsgBase) {
 	//大厅界面信息
 	numTed := GetTaskEveryday().getCompleteNumOfTskEd(data.Uid)
 	numMail := GetMail().getNewMailNum(data.Uid)
+	numTurnTable := GetTurnTableLogic().GetFreeTurnTable(data.Uid)
 	//log.Info("ted:%d---mail:%d", numTed, numMail)
-	if numTed > 0 || numMail > 0 {
+	if numTed > 0 || numMail > 0 || numTurnTable > 0 {
 		data.ModeType = "Client"
 		data.MsgType = "SC_HallUIInfo"
 		jd := datamsg.SC_HallUIInfo{}
 		jd.TaskED_ShowNum = numTed
 		jd.Task_ShowNum = 0
 		jd.Mail_ShowNum = numMail
+		jd.TurnTabel_ShowNum = numTurnTable
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
 	}
 }
@@ -697,8 +755,8 @@ func (a *HallAgent) Update() {
 	//500毫秒循环一次
 	oneUpdateTime := 500
 
-	//androidPlayOnce := int64(1000 * 60 * 3)
-	androidPlayOnce := int64(1000 * 3)
+	androidPlayOnce := int64(1000 * 60 * 3)
+	//androidPlayOnce := int64(1000 * 3)
 	//lastAndroidPlayTime := utils.Milliseconde()
 	lastAndroidPlayTime := int64(0)
 

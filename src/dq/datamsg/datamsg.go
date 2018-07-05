@@ -187,9 +187,10 @@ type CS_AddScore struct {
 
 //大厅UI信息
 type SC_HallUIInfo struct {
-	TaskED_ShowNum int
-	Task_ShowNum   int
-	Mail_ShowNum   int
+	TaskED_ShowNum    int
+	Task_ShowNum      int
+	Mail_ShowNum      int
+	TurnTabel_ShowNum int
 }
 
 //操作结果
@@ -397,6 +398,34 @@ type ItemInfo struct {
 //商店信息
 type SC_StoreInfo struct {
 	Commoditys []StoreInfo
+}
+
+//---
+//type TurnTableMsg struct {
+//	conf.TurnTableConfig
+//	FreeTime   int //免费抽的倒计时 0表示可以免费抽了
+//}
+
+//商店信息
+type SC_TurnTableInfo struct {
+	conf.TurnTableConfig
+	FreeTime int //免费抽的倒计时 0表示可以免费抽了
+}
+
+//scrollwords滚动字幕
+type SC_ScrollWords struct {
+	PlayerName string //玩家名字
+	Type       int    //道具类型
+	Time       int    //时长
+	Count      int    //数量
+	Src        string //来源 （抽奖）
+}
+
+//抽奖
+type SC_DoTurnTable struct {
+	SC_TurnTableInfo
+	Ids  []int //中奖的ID
+	Gold int
 }
 
 //	firstqizi := 0

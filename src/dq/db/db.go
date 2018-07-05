@@ -371,6 +371,29 @@ func (a *DB) SetPlayerOneInfo(uid int, tablename string, field string, value int
 
 }
 
+//增加
+func (a *DB) AddPlayerOneInfo(uid int, tablename string, field string, value interface{}) error {
+
+	sqlstr := "UPDATE " + tablename + " SET " + field + "=" + field + "+?" + " where uid=?"
+	if tablename == "mail" || tablename == "publicmail" {
+		sqlstr = "UPDATE " + tablename + " SET " + field + "=" + field + "+?" + " where id=?"
+	}
+	//log.Info("---%s", sqlstr)
+	tx, _ := a.Mydb.Begin()
+
+	res, err1 := tx.Exec(sqlstr, value, uid)
+	//res.LastInsertId()
+	n, e := res.RowsAffected()
+	if err1 != nil || n == 0 || e != nil {
+		log.Info("update err--%d", n)
+		return tx.Rollback()
+	}
+
+	err1 = tx.Commit()
+	return err1
+
+}
+
 //获取玩家一项其他信息
 func (a *DB) GetPlayerOneOtherInfo(uid int, field string, value interface{}) error {
 
