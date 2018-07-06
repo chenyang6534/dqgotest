@@ -168,6 +168,10 @@ type SC_GetGamingInfo struct {
 	GameInfo []MsgGame5GingInfo
 }
 
+type SC_SerchPlayer struct {
+	Heads []string
+}
+
 //CS_GoIn
 
 //大厅信息

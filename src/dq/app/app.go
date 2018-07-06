@@ -179,7 +179,7 @@ func (app *DefaultApp) Run() error {
 		body, _ := ioutil.ReadAll(r.Body)
 		//    r.Body.Close()
 		body_str := string(body)
-		fmt.Println(body_str)
+		log.Info(body_str)
 
 		r.ParseForm()
 		fmt.Println("Form: ", r.Form)

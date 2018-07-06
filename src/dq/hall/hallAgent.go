@@ -37,6 +37,9 @@ type HallAgent struct {
 	PlayerGameState *utils.BeeMap
 
 	ScoreTime []ScoreAndTime
+
+	//搜寻比赛的玩家头像
+	OnlinePlayerHeads *utils.BeeMap
 }
 
 type serchInfo struct {
@@ -62,6 +65,10 @@ func (a *HallAgent) GetModeType() string {
 }
 
 func (a *HallAgent) Init() {
+
+	a.ScoreTime = make([]ScoreAndTime, 10)
+
+	a.OnlinePlayerHeads = utils.NewBeeMap()
 
 	//匹配机制
 	a.ScoreTime = make([]ScoreAndTime, 10)
@@ -513,12 +520,32 @@ func (a *HallAgent) DoQuickGameData(data *datamsg.MsgBase) {
 	playerinfo := &datamsg.MsgPlayerInfo{}
 	err := db.DbOne.GetPlayerInfo(data.Uid, playerinfo)
 	if err == nil {
+
+		//头像
+		jd := datamsg.SC_SerchPlayer{}
+		items := a.OnlinePlayerHeads.Items()
+		headcount := 0
+		for _, v := range items {
+			if v.(string) != playerinfo.AvatarUrl {
+				jd.Heads = append(jd.Heads, v.(string))
+				headcount++
+				if headcount >= 7 {
+					break
+				}
+			}
+
+		}
+
+		//		type SC_SerchPlayer struct {
+		//	Heads []string
+		//}
+
 		sinfo.Score = playerinfo.SeasonScore
 		sinfo.IsAndroid = playerinfo.IsAndroid
 
 		data.ModeType = "Client"
 		data.MsgType = "SC_SerchPlayer"
-		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, nil))
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
 	}
 
 }
@@ -527,6 +554,7 @@ func (a *HallAgent) DoDisConnectData(data *datamsg.MsgBase) {
 
 	log.Info("----DoDisConnectData uid:%d--", data.Uid)
 
+	a.OnlinePlayerHeads.Delete(data.Uid)
 	//玩家游戏状态更新
 	a.PlayerGameState.Delete(data.Uid)
 
@@ -729,6 +757,8 @@ func (a *HallAgent) DoGetInfoData(data *datamsg.MsgBase) {
 		jd := datamsg.SC_MsgHallInfo{}
 		jd.PlayerInfo = *playerinfo
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, jd))
+
+		a.OnlinePlayerHeads.Set(data.Uid, playerinfo.AvatarUrl)
 	} else {
 		log.Info(err.Error())
 	}
@@ -796,9 +826,9 @@ func (a *HallAgent) Update() {
 						continue
 					}
 				}
-				//一个机器人 需要至少5秒
+				//一个机器人 需要至少8秒
 				if player1.IsAndroid == 1 || player2.IsAndroid == 1 {
-					if t1-player1.StartTime < 5000 || t1-player2.StartTime < 5000 {
+					if t1-player1.StartTime < 8000 || t1-player2.StartTime < 8000 {
 						continue
 					}
 				}

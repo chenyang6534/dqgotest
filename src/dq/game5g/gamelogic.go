@@ -589,7 +589,7 @@ func (game *Game5GLogic) ChangeGameTurn() {
 	jd.EveryTime = game.Player[game.GameSeatIndex].StepEveryTime
 	game.sendMsgToAll("SC_ChangeGameTurn", jd)
 
-	log.Info("----SC_ChangeGameTurn")
+	//log.Info("----SC_ChangeGameTurn")
 
 }
 
@@ -689,7 +689,7 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	//检查是否胜利
 	winFlag := game.judgment(data.Y, data.X)
 
-	log.Info("----winFlag:%d", winFlag)
+	//log.Info("----winFlag:%d", winFlag)
 	if winFlag != -1 {
 		game.gameWin(winFlag, 2)
 	} else if game.QiZiCount >= 15*15 {

@@ -152,7 +152,7 @@ func (a *ServersAgent) DoClientData(data *datamsg.MsgBase) {
 
 			if ag != nil {
 				ag.(*agent).WriteMsgBytes(data1)
-				log.Info("send:%s", data.JsonData)
+				//log.Info("send:%s", data.JsonData)
 			}
 		}
 
