@@ -826,9 +826,9 @@ func (a *HallAgent) Update() {
 						continue
 					}
 				}
-				//一个机器人 需要至少8秒
+				//一个机器人 需要至少12秒
 				if player1.IsAndroid == 1 || player2.IsAndroid == 1 {
-					if t1-player1.StartTime < 8000 || t1-player2.StartTime < 8000 {
+					if t1-player1.StartTime < 12000 || t1-player2.StartTime < 12000 {
 						continue
 					}
 				}

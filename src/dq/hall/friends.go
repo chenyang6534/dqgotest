@@ -11,7 +11,7 @@ import (
 var (
 	friends          = &Friends{Lock: new(sync.Mutex)}
 	friendsMaxCount  = 200
-	friendsShowCount = 30
+	friendsShowCount = 15
 )
 
 type Friends struct {
@@ -118,9 +118,9 @@ func (friends *Friends) getFriendsInfo(uid int, count int, a *HallAgent) *datams
 				}
 			}
 		}
-		for _, v := range showids {
-			log.Info("----showids uid:%d--", v)
-		}
+		//		for _, v := range showids {
+		//			log.Info("----showids uid:%d--", v)
+		//		}
 
 		//获取用户基本信息
 		db.DbOne.GetFriendsBaseInfo(showids, &jd.Friends)
@@ -131,7 +131,7 @@ func (friends *Friends) getFriendsInfo(uid int, count int, a *HallAgent) *datams
 		for k, v := range jd.Friends {
 			//用户在线状态信息
 			onlinestate := a.PlayerGameState.Get(v.Uid)
-			log.Info("----friend uid:%d--", v.Uid)
+			//log.Info("----friend uid:%d--", v.Uid)
 			if onlinestate == nil {
 				jd.Friends[k].State = 0
 			} else {

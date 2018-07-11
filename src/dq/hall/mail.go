@@ -15,7 +15,7 @@ import (
 
 var (
 	mail         = &Mail{Lock: new(sync.Mutex)}
-	mailMaxCount = 3
+	mailMaxCount = 10
 )
 
 type Mail struct {

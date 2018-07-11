@@ -139,9 +139,9 @@ func (a *ServersAgent) DoClientData(data *datamsg.MsgBase) {
 			if ag == nil {
 
 				items := a.gate.TcpServer.GetLoginedConnect().Items()
-				for k, v := range items {
-					log.Info("--uid:%d---connectid:%d---k:%d--v:%d", uid, connectid, k, v.(int))
-				}
+				//				for k, v := range items {
+				//					log.Info("--uid:%d---connectid:%d---k:%d--v:%d", uid, connectid, k, v.(int))
+				//				}
 				con := a.gate.TcpServer.GetLoginedConnect().Get(uid)
 				if con != nil {
 					connectid = (con).(int)

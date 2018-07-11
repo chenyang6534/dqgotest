@@ -1237,6 +1237,10 @@ func (a *DB) UpdatePlayerAvatarAndName(avatarurl string, name string, uid int) e
 	//	} else {
 	//		res, err1 := tx.Exec("UPDATE userbaseinfo SET avatarurl=? where uid=?", avatarurl, uid)
 	//	}
+	if err1 != nil {
+		log.Error("update err1:%s", err1.Error())
+		return tx.Rollback()
+	}
 
 	//res.LastInsertId()
 	n, e := res.RowsAffected()
