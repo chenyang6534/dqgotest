@@ -39,7 +39,22 @@ func (turntab *TurnTableLogic) GetTurnTableInfo(uid int) *datamsg.SC_TurnTableIn
 		}
 		tt.TurnTables[k].Value = (turntab.IdValue.Get(v.Id)).(int)
 	}
+	//看视频免费抽
+	lookviewtime := "2006-01-02"
+	lookviewcount := 0
+	db.DbOne.GetPlayerManyInfo(uid, "userbaseinfo", "lookviewtime,lookviewcount",
+		&lookviewtime, &lookviewcount)
+	today := time.Now().Format("2006-01-02")
+	if today != lookviewtime {
+		lookviewcount = 0
+		lookviewtime = today
+		db.DbOne.SetPlayerOneInfo(uid, "userbaseinfo", "lookviewcount", lookviewcount)
+		db.DbOne.SetPlayerOneInfo(uid, "userbaseinfo", "lookviewtime", lookviewtime)
 
+	}
+	LookViewRemainder := conf.GetNoticeConfig().LookViewCount - lookviewcount
+
+	//时间到免费抽
 	lastturntabletime := "2006-01-02 15:04:05"
 	db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "lastturntabletime", &lastturntabletime)
 
@@ -52,12 +67,13 @@ func (turntab *TurnTableLogic) GetTurnTableInfo(uid int) *datamsg.SC_TurnTableIn
 	subtime := nowtime - lasttime
 
 	log.Info("nowtime:%d---lasttime:%d-- subtime:%d", nowtime, lasttime, subtime)
+
 	//时间
 	if subtime >= 60*60*24 {
-		jd := &datamsg.SC_TurnTableInfo{tt, 0}
+		jd := &datamsg.SC_TurnTableInfo{tt, 0, LookViewRemainder}
 		return jd
 	} else {
-		jd := &datamsg.SC_TurnTableInfo{tt, 60*60*24 - int(subtime)}
+		jd := &datamsg.SC_TurnTableInfo{tt, 60*60*24 - int(subtime), LookViewRemainder}
 		return jd
 	}
 
@@ -190,6 +206,52 @@ func (turntab *TurnTableLogic) DoOneTurnTable(uid int, a *HallAgent) *datamsg.SC
 
 		info.FreeTime = 60 * 60 * 24
 	}
+	//随机道具
+	randTurnTable := turntab.getRandTurnTable(info.TurnTables)
+	//更改概率
+	turntab.changeValue(info.TurnTables, randTurnTable)
+	for k, v := range info.TurnTables {
+		info.TurnTables[k].Value = turntab.IdValue.Get(v.Id).(int)
+	}
+
+	//玩家获得道具
+	if randTurnTable.Type < 1000 {
+		GetItemManager().AddItemsTime(uid, randTurnTable.Type, randTurnTable.Num)
+	} else {
+
+		GetItemManager().AddItemsTime(uid, randTurnTable.Type, randTurnTable.Time)
+	}
+	turntab.NoticeAll(uid, randTurnTable, a)
+
+	//金币
+	gold1 := 0
+	db.DbOne.GetPlayerOneInfo(uid, "userbaseinfo", "gold", &gold1)
+	//
+	ids := make([]int, 1)
+	ids[0] = randTurnTable.Id
+	jd := &datamsg.SC_DoTurnTable{*info, ids, gold1}
+
+	return jd
+
+}
+
+//获取商店信息
+func (turntab *TurnTableLogic) DoLookViewTurnTable(uid int, a *HallAgent) *datamsg.SC_DoTurnTable {
+
+	log.Info("DoLookViewTurnTable")
+
+	info := turntab.GetTurnTableInfo(uid)
+	if info.LookViewRemainder <= 0 {
+		return nil
+	}
+
+	turntab.Lock.Lock()
+	defer turntab.Lock.Unlock()
+
+	//增加观看视频抽奖次数
+	db.DbOne.AddPlayerOneInfo(uid, "userbaseinfo", "lookviewcount", 1)
+	info.LookViewRemainder--
+
 	//随机道具
 	randTurnTable := turntab.getRandTurnTable(info.TurnTables)
 	//更改概率

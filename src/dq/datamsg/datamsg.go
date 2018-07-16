@@ -413,7 +413,8 @@ type SC_StoreInfo struct {
 //商店信息
 type SC_TurnTableInfo struct {
 	conf.TurnTableConfig
-	FreeTime int //免费抽的倒计时 0表示可以免费抽了
+	FreeTime          int //免费抽的倒计时 0表示可以免费抽了
+	LookViewRemainder int //观看视频免费抽 剩余次数
 }
 
 //scrollwords滚动字幕

@@ -643,25 +643,25 @@ func (game *Game5GLogic) DoGame5G(playerIndex int, data *datamsg.CS_DoGame5G) er
 	//第一步棋 规则判断
 	if game.QiZiCount <= 0 {
 
-		if data.Y > 2 && data.Y < 12 && data.X > 2 && data.X < 12 {
-			if rand.Intn(2) == 0 {
-				if data.Y > 2 && data.Y < 8 {
-					data.Y = 2
-				}
-				if data.Y >= 8 && data.Y < 12 {
-					data.Y = 12
-				}
-			} else {
-				if data.X > 2 && data.X < 8 {
-					data.X = 2
-				}
-				if data.X >= 8 && data.X < 12 {
-					data.X = 12
-				}
-			}
-		} else {
+		//		if data.Y > 2 && data.Y < 12 && data.X > 2 && data.X < 12 {
+		//			if rand.Intn(2) == 0 {
+		//				if data.Y > 2 && data.Y < 8 {
+		//					data.Y = 2
+		//				}
+		//				if data.Y >= 8 && data.Y < 12 {
+		//					data.Y = 12
+		//				}
+		//			} else {
+		//				if data.X > 2 && data.X < 8 {
+		//					data.X = 2
+		//				}
+		//				if data.X >= 8 && data.X < 12 {
+		//					data.X = 12
+		//				}
+		//			}
+		//		} else {
 
-		}
+		//		}
 
 	}
 

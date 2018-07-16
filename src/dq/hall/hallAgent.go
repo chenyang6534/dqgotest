@@ -124,6 +124,7 @@ func (a *HallAgent) Init() {
 
 	a.handles["CS_GetTurnTableInfo"] = a.DoGetTurnTableInfoData
 	a.handles["CS_GetOneTurnTable"] = a.DoGetOneTurnTableData
+	a.handles["CS_GetLookViewTurnTable"] = a.DoGetLookViewTurnTableData
 	a.handles["CS_GetTenTurnTable"] = a.DoGetTenTurnTableData
 
 	a.handles["CS_GetFriendsInfo"] = a.DoGetFriendsInfoData
@@ -417,6 +418,20 @@ func (a *HallAgent) DoGetOneTurnTableData(data *datamsg.MsgBase) {
 		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
 	}
 }
+func (a *HallAgent) DoGetLookViewTurnTableData(data *datamsg.MsgBase) {
+
+	data.ModeType = "Client"
+	data.MsgType = "SC_DoTurnTable"
+
+	//DoOneTurnTable(uid int) *datamsg.SC_DoTurnTable
+
+	tsdinfo := GetTurnTableLogic().DoLookViewTurnTable(data.Uid, a)
+	if tsdinfo != nil {
+		a.WriteMsgBytes(datamsg.NewMsg1Bytes(data, tsdinfo))
+	}
+}
+
+//
 func (a *HallAgent) DoGetTenTurnTableData(data *datamsg.MsgBase) {
 
 	data.ModeType = "Client"

@@ -94,7 +94,7 @@ func (a *LoginAgent) DoWeiXingLoginData(data *datamsg.MsgBase) {
 	//查询数据
 	var uid int
 	if uid = db.DbOne.CheckWSOpenidLogin(openid); uid > 0 {
-		log.Info("---------user login:%d", uid)
+		log.Info("---------user login:%d--name:%s", uid, h2.Name)
 	} else {
 		log.Info("---------user login name:%s", h2.Name)
 		uid = db.DbOne.CreateQuickWSOpenidPlayer(openid, h2.Name)
@@ -154,7 +154,8 @@ func (a *LoginAgent) DoQuickLoginData(data *datamsg.MsgBase) {
 	//查询数据
 	var uid int
 	if uid = db.DbOne.CheckQuickLogin(h2.MachineId, h2.Platform); uid > 0 {
-		log.Info("---------user login:%d", uid)
+		//log.Info("---------user login:%d", uid)
+		log.Info("---------user login:%d--name:%s", uid, h2.Name)
 	} else {
 		uid = db.DbOne.CreateQuickPlayer(h2.MachineId, h2.Platform, h2.Name)
 		if uid < 0 {

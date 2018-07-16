@@ -88,4 +88,5 @@ type NoticeConfig struct {
 	Version       string //版本
 	Notice        string
 	GameOverShare int //游戏结束后分享 1表示可以分享 0表示不能分享
+	LookViewCount int //观看视频免费抽次数
 }

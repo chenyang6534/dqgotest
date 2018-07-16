@@ -103,6 +103,8 @@ func (server *WSServer) SvrConnHandler(w http.ResponseWriter, r *http.Request) {
 	//server.mutexConns.Lock()
 	server.Agents.Set(agent.GetConnectId(), agent)
 
+	log.Info("agents len:%d", server.Agents.Size())
+
 	//server.mutexConns.Unlock()
 	//time.Sleep(10*time.Second)
 	//go func() {
